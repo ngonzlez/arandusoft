@@ -1,0 +1,470 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ───────────────────────── ENUMS ─────────────────────────
+
+enum Rol {
+  ADMIN
+  CONTABLE
+  JURIDICO
+  SUPERADMIN
+}
+
+enum TipoCliente {
+  CONTABLE
+  JURIDICO
+  AMBOS
+}
+
+enum EstadoCliente {
+  ACTIVO
+  INACTIVO
+  PROSPECTO
+}
+
+enum EstadoFiscal {
+  AL_DIA
+  ATRASADO
+  CCT
+  VECTOR_FISCAL
+}
+
+enum TipoObligacion {
+  IVA
+  IRE_SIMPLE
+  IRE_GENERAL
+  IRP
+  EEFF
+  AUDITORIA_EXTERNA
+  IDU
+  IUID
+  IPS
+  MITES
+  REG_MENSUAL_COMPROBANTES
+  OTRO
+}
+
+enum EstadoObligacion {
+  PENDIENTE
+  PRESENTADO
+  VENCIDO
+  NO_APLICA
+}
+
+enum TipoVencimiento {
+  IVA
+  IRE_SIMPLE
+  IRE_GENERAL
+  IRP
+  EEFF
+  AUDITORIA_EXTERNA
+  IDU
+  IUID
+  IPS
+  MITES
+  REG_MENSUAL_COMPROBANTES
+  ASAMBLEA
+  RENOVACION_CONTRATO
+  PLAZO_PROCESAL
+  OTRO
+}
+
+enum EstadoVencimiento {
+  PENDIENTE
+  GESTIONADO
+  VENCIDO
+}
+
+enum Prioridad {
+  ALTA
+  MEDIA
+  BAJA
+}
+
+enum EstadoTarea {
+  PENDIENTE
+  EN_PROGRESO
+  COMPLETADA
+}
+
+enum TipoNotificacion {
+  VENCIMIENTO_PROXIMO
+  TAREA_ASIGNADA
+  TAREA_VENCIDA
+  EXPEDIENTE_ACTUALIZADO
+  DECLARACION_FALTANTE
+  ARCHIVO_RECIBIDO
+}
+
+enum EstadoLicencia {
+  ACTIVA
+  SUSPENDIDA
+  POR_VENCER
+}
+
+enum TipoExpediente {
+  DEMANDA
+  CONTESTACION
+  APELACION
+  AUDIENCIA
+  OTRO
+}
+
+enum EstadoExpediente {
+  NUEVO
+  EN_PROCESO
+  EN_REVISION
+  COMPLETADO
+  ARCHIVADO
+}
+
+enum MetodoEnvioArchivo {
+  ADJUNTO
+  LINK_FIRMADO
+}
+
+// ───────────────────────── USUARIOS / LICENCIA ─────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  nombre    String
+  email     String   @unique
+  password  String
+  rol       Rol
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  clientesResponsable  Cliente[]             @relation("ClienteResponsable")
+  estadosMensuales     EstadoMensual[]       @relation("EstadoMensualResponsable")
+  declaraciones        Declaracion[]         @relation("DeclaracionCargadoPor")
+  vencimientos         Vencimiento[]         @relation("VencimientoResponsable")
+  tareas               Tarea[]               @relation("TareaResponsable")
+  notas                Nota[]                @relation("NotaAutor")
+  notificaciones       Notificacion[]
+  asambleaCambios      AsambleaPrioridad[]   @relation("AsambleaTildadoPor")
+  expedientes          Expediente[]          @relation("ExpedienteResponsable")
+  historialExpedientes HistorialExpediente[]
+  documentosSubidos    Documento[]           @relation("DocumentoSubidoPor")
+  pagosRegistrados     PagoLicencia[]        @relation("PagoRegistradoPor")
+  archivosEnviados     EnvioArchivo[]        @relation("ArchivosEnviados")
+  archivosRecibidos    EnvioArchivo[]        @relation("ArchivosRecibidos")
+  resetTokens          PasswordResetToken[]
+
+  @@index([rol])
+}
+
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id])
+  token     String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+model Licencia {
+  id                String         @id @default(cuid())
+  estado            EstadoLicencia
+  venceEl           DateTime
+  mensajeSuspension String?
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+  pagos             PagoLicencia[]
+}
+
+model PagoLicencia {
+  id            String   @id @default(cuid())
+  licenciaId    String
+  licencia      Licencia @relation(fields: [licenciaId], references: [id])
+  monto         Int
+  fechaPago     DateTime
+  nota          String?
+  registradoPor String?
+  registrador   User?    @relation("PagoRegistradoPor", fields: [registradoPor], references: [id])
+  createdAt     DateTime @default(now())
+
+  @@index([licenciaId])
+}
+
+// ───────────────────────── CLIENTES ─────────────────────────
+
+model Cliente {
+  id            String        @id @default(cuid())
+  nombre        String
+  ruc           String        @unique
+  cedula        String?
+  telefono      String?
+  email         String?
+  direccion     String?
+  tipo          TipoCliente
+  estado        EstadoCliente @default(ACTIVO)
+  estadoFiscal  EstadoFiscal  @default(AL_DIA)
+  responsableId String
+  responsable   User          @relation("ClienteResponsable", fields: [responsableId], references: [id])
+  accesos       String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  obligaciones     ClienteObligacion[]
+  estadosMensuales EstadoMensual[]
+  declaraciones    Declaracion[]
+  vencimientos     Vencimiento[]
+  tareas           Tarea[]
+  asambleas        AsambleaPrioridad[]
+  expedientes      Expediente[]
+
+  @@index([tipo])
+  @@index([estado])
+  @@index([responsableId])
+}
+
+model ClienteObligacion {
+  id        String         @id @default(cuid())
+  clienteId String
+  cliente   Cliente        @relation(fields: [clienteId], references: [id])
+  tipo      TipoObligacion
+  activa    Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+
+  @@unique([clienteId, tipo])
+}
+
+model EstadoMensual {
+  id                String           @id @default(cuid())
+  clienteId         String
+  cliente           Cliente          @relation(fields: [clienteId], references: [id])
+  mes               String // "2026-06"
+  obligacion        TipoObligacion
+  estado            EstadoObligacion @default(PENDIENTE)
+  fechaPresentacion DateTime?
+  responsableId     String?
+  responsable       User?            @relation("EstadoMensualResponsable", fields: [responsableId], references: [id])
+  declaracionId     String?
+  declaracion       Declaracion?     @relation(fields: [declaracionId], references: [id])
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@unique([clienteId, mes, obligacion])
+  @@index([mes])
+}
+
+model Declaracion {
+  id                    String         @id @default(cuid())
+  clienteId             String
+  cliente               Cliente        @relation(fields: [clienteId], references: [id])
+  tipo                  TipoObligacion
+  periodo               String
+  fechaPresentacion     DateTime
+  archivoUrl            String
+  archivoPublicId       String?
+  archivoNombreOriginal String?
+  tamanioBytes          Int?
+  archivado             Boolean        @default(false)
+  cargadoPor            String
+  cargador              User           @relation("DeclaracionCargadoPor", fields: [cargadoPor], references: [id])
+  createdAt             DateTime       @default(now())
+  updatedAt             DateTime       @updatedAt
+
+  estadosMensuales EstadoMensual[]
+  envios           EnvioArchivo[]
+
+  @@index([clienteId, tipo, periodo])
+  @@index([archivado])
+}
+
+model Vencimiento {
+  id               String            @id @default(cuid())
+  clienteId        String?
+  cliente          Cliente?          @relation(fields: [clienteId], references: [id])
+  expedienteId     String?
+  expediente       Expediente?       @relation(fields: [expedienteId], references: [id])
+  tipo             TipoVencimiento
+  fechaVencimiento DateTime
+  estado           EstadoVencimiento @default(PENDIENTE)
+  responsableId    String?
+  responsable      User?             @relation("VencimientoResponsable", fields: [responsableId], references: [id])
+  notificado7d     Boolean           @default(false)
+  notificado3d     Boolean           @default(false)
+  notificadoDia    Boolean           @default(false)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
+  @@index([fechaVencimiento, estado])
+  @@index([clienteId])
+}
+
+model AsambleaPrioridad {
+  id                 String    @id @default(cuid())
+  clienteId          String
+  cliente            Cliente   @relation(fields: [clienteId], references: [id])
+  periodo            String // "2026-06"
+  fechaEEFF          DateTime?
+  asambleaSolicitada Boolean   @default(false)
+  asambleaConfirmada Boolean   @default(false)
+  idu                Boolean   @default(false)
+  mttes              Boolean   @default(false)
+  regAdm             Boolean   @default(false)
+  ips                Boolean   @default(false)
+  libros             Boolean   @default(false)
+  contAdm            Boolean   @default(false)
+  auditoria          Json      @default("{}") // { idu: {userId, at}, ... } por celda
+  ultimoEditorId     String?
+  ultimoEditor       User?     @relation("AsambleaTildadoPor", fields: [ultimoEditorId], references: [id])
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  @@unique([clienteId, periodo])
+}
+
+// ───────────────────────── TAREAS / NOTAS ─────────────────────────
+
+model Tarea {
+  id            String      @id @default(cuid())
+  titulo        String
+  descripcion   String?
+  clienteId     String?
+  cliente       Cliente?    @relation(fields: [clienteId], references: [id])
+  expedienteId  String?
+  expediente    Expediente? @relation(fields: [expedienteId], references: [id])
+  responsableId String
+  responsable   User        @relation("TareaResponsable", fields: [responsableId], references: [id])
+  prioridad     Prioridad   @default(MEDIA)
+  fechaLimite   DateTime?
+  estado        EstadoTarea @default(PENDIENTE)
+  checklist     Json        @default("[]") // [{ id, texto, hecho }]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  notas Nota[]
+
+  @@index([responsableId, estado])
+  @@index([clienteId])
+  @@index([expedienteId])
+}
+
+model Nota {
+  id           String      @id @default(cuid())
+  contenido    String
+  autorId      String
+  autor        User        @relation("NotaAutor", fields: [autorId], references: [id])
+  tareaId      String?
+  tarea        Tarea?      @relation(fields: [tareaId], references: [id])
+  expedienteId String?
+  expediente   Expediente? @relation(fields: [expedienteId], references: [id])
+  createdAt    DateTime    @default(now())
+
+  @@index([tareaId])
+  @@index([expedienteId])
+}
+
+// ───────────────────────── NOTIFICACIONES ─────────────────────────
+
+model Notificacion {
+  id           String           @id @default(cuid())
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+  tipo         TipoNotificacion
+  mensaje      String
+  entidadTipo  String? // "Cliente" | "Vencimiento" | "Declaracion" — deep-link
+  entidadId    String?
+  leida        Boolean          @default(false)
+  emailEnviado Boolean          @default(false)
+  createdAt    DateTime         @default(now())
+
+  @@index([userId, leida])
+  @@index([createdAt])
+}
+
+// ───────────────────────── ENVÍO DE ARCHIVOS POR CORREO INTERNO ─────────────────────────
+
+model EnvioArchivo {
+  id                String             @id @default(cuid())
+  declaracionId     String?
+  declaracion       Declaracion?       @relation(fields: [declaracionId], references: [id])
+  documentoId       String?
+  documento         Documento?         @relation(fields: [documentoId], references: [id])
+  remitenteId       String
+  remitente         User               @relation("ArchivosEnviados", fields: [remitenteId], references: [id])
+  destinatarioId    String
+  destinatario      User               @relation("ArchivosRecibidos", fields: [destinatarioId], references: [id])
+  destinatarioEmail String // snapshot
+  mensaje           String?
+  metodoEnvio       MetodoEnvioArchivo
+  enviado           Boolean            @default(true)
+  errorMensaje      String?
+  resendMessageId   String?
+  createdAt         DateTime           @default(now())
+
+  @@index([remitenteId])
+  @@index([destinatarioId])
+  @@index([declaracionId])
+}
+
+// ───────────────────────── FASE 2 — JURÍDICO ─────────────────────────
+// Modelo listo desde el día 1; UI/rutas congeladas hasta Fase 2.
+
+model Expediente {
+  id            String           @id @default(cuid())
+  titulo        String
+  clienteId     String
+  cliente       Cliente          @relation(fields: [clienteId], references: [id])
+  tipo          TipoExpediente
+  estado        EstadoExpediente @default(NUEVO)
+  responsableId String
+  responsable   User             @relation("ExpedienteResponsable", fields: [responsableId], references: [id])
+  fechaInicio   DateTime
+  fechaLimite   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  documentos   Documento[]
+  notas        Nota[]
+  historial    HistorialExpediente[]
+  tareas       Tarea[]
+  vencimientos Vencimiento[]
+
+  @@index([clienteId])
+  @@index([responsableId])
+  @@index([estado])
+}
+
+model Documento {
+  id           String     @id @default(cuid())
+  expedienteId String
+  expediente   Expediente @relation(fields: [expedienteId], references: [id])
+  nombre       String
+  url          String
+  publicId     String?
+  subidoPor    String
+  subidor      User       @relation("DocumentoSubidoPor", fields: [subidoPor], references: [id])
+  createdAt    DateTime   @default(now())
+
+  envios EnvioArchivo[]
+
+  @@index([expedienteId])
+}
+
+model HistorialExpediente {
+  id             String            @id @default(cuid())
+  expedienteId   String
+  expediente     Expediente        @relation(fields: [expedienteId], references: [id])
+  estadoAnterior EstadoExpediente?
+  estadoNuevo    EstadoExpediente
+  userId         String
+  user           User              @relation(fields: [userId], references: [id])
+  comentario     String?
+  createdAt      DateTime          @default(now())
+
+  @@index([expedienteId])
+}

@@ -1,0 +1,17 @@
+# Uso local únicamente. En Coolify, Postgres es un recurso managed separado
+# (ver docs/DEPLOY.md) — este compose NO se usa en producción.
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: arandusoft
+      POSTGRES_PASSWORD: arandusoft
+      POSTGRES_DB: arandusoft
+    ports:
+      - "5432:5432"
+    volumes:
+      - arandusoft_db_data:/var/lib/postgresql/data
+
+volumes:
+  arandusoft_db_data:
