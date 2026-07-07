@@ -35,3 +35,30 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** `docker compose up -d db` levanta Postgres local → `npx prisma migrate dev --name init` aplica el esquema completo sin errores → `npm run db:seed` crea usuarios/licencia/clientes → `npm run build` compila sin errores con TypeScript strict.
 
 **Pendiente / notas:** confirmar con el cliente si las credenciales de Resend/Cloudinary ya están disponibles antes de Fase 4 (Declaraciones + envío de correo). El plan completo de fases está en el plan de implementación aprobado; próxima fase: Auth + Roles + Middleware + Layout base.
+
+---
+
+## Fase 1 — Auth + Roles + Licencia + Layout base (2026-07-07)
+
+**Qué se construyó:**
+- **NextAuth v5** con provider Credentials (email+password, bcrypt) y sesión JWT que incluye `id` y `rol` (`src/lib/auth.ts`, `src/lib/auth.config.ts`, `src/types/next-auth.d.ts`).
+- **Middleware** (`src/middleware.ts`) edge-safe: exige sesión en toda ruta no pública, aplica control de acceso por rol (`/usuarios` solo ADMIN, `/admin` solo SUPERADMIN, `/expedientes` ADMIN+JURIDICO) y confina al SUPERADMIN a su panel.
+- **Chequeo de licencia** (`src/lib/licencia.ts`): cache en memoria TTL 30s; se ejecuta en el layout del dashboard (server component) y en el guard de API (`requireApiSession`). *Decisión técnica:* el middleware de Next corre en Edge runtime donde Prisma no funciona — el chequeo vive en layout + API guard, con el mismo efecto funcional (suspensión efectiva en ≤30s, inmediata al invalidar el cache desde el panel superadmin).
+- **Guard de API** (`src/lib/api-auth.ts`): `requireApiSession(roles?)` (401/403 estándar + bloqueo por licencia) y `filtroClientesPorRol()` (regla dura del PRD: CONTABLE ve CONTABLE+AMBOS, JURIDICO ve JURIDICO+AMBOS, ADMIN todo).
+- **Kit UI** (`src/components/ui/`): Button, Badge (lookup de `lib/badges.ts` con los pares hex del prototipo), Card/StatTile, Input/Select/Textarea, Avatar (iniciales + color estable), Modal, SlideOver (animado, ancho 440/480), Table, Tabs, Spinner, EmptyState, Toast (provider global).
+- **Layout** (`src/components/layout/`): Sidebar con gradiente del prototipo + nav filtrada por rol + badge de notificaciones + usuario/logout; AppShell con drawer mobile (<920px); PageHeader; íconos SVG inline.
+- **Login** split-screen (panel marca azul marino + form) con manejo de error y loading.
+- **Página `/suspendido`** con mensaje personalizado del proveedor.
+- **Dashboard** inicial con StatTiles reales (clientes activos filtrados por rol, tareas pendientes del usuario, vencimientos próximos 7 días) — widgets completos llegan con sus módulos.
+- `src/lib/crypto.ts`: AES-256-GCM para `Cliente.accesos` (se usa desde Fase 2).
+- `src/lib/format.ts`: guaraníes (`Gs. 9.500.000`), fechas en hora Paraguay (`date-fns-tz`), períodos, iniciales.
+
+**Migraciones:** ninguna nueva (esquema ya creado en Fase 0).
+
+**Usuarios/seed:** sin cambios.
+
+**Env vars nuevas:** ninguna (todas definidas en Fase 0).
+
+**Verificado (curl contra dev server):** login page 200 · `/dashboard` sin sesión → 307 a `/login` · POST credentials → sesión con `rol: ADMIN` · `/dashboard` con sesión → 200 · licencia SUSPENDIDA en DB → `/dashboard` → 307 a `/suspendido` mostrando el mensaje personalizado · licencia reactivada → `/dashboard` 200 de nuevo · `npm run build` limpio.
+
+**Pendiente / notas:** probar visual completo en browser cuando haya más páginas. Próxima fase: Módulo Clientes.
