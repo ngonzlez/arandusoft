@@ -14,7 +14,7 @@ Coolify (Hetzner)
         ▲
 Cloudflare DNS: panel.criterioasesores.com.py → IP Hetzner
 Resend: SPF/DKIM/DMARC en la zona criterioasesores.com.py
-Cloudinary: PDFs de declaraciones (recurso raw privado)
+MinIO (ya corriendo en tu Coolify): bucket "arandufiles" — PDFs/Excel privados, descarga vía URL firmada
 cron-job.org (o Coolify Scheduled Task): GET /api/cron/daily diario 12:00 UTC
 ```
 
@@ -42,7 +42,9 @@ cron-job.org (o Coolify Scheduled Task): GET /api/cron/daily diario 12:00 UTC
 | `AUTH_TRUST_HOST` | `true` (necesario detrás del proxy de Coolify) |
 | `RESEND_API_KEY` | API key de Resend |
 | `EMAIL_FROM` | `no-reply@criterioasesores.com.py` |
-| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | del dashboard de Cloudinary |
+| `MINIO_ENDPOINT` | URL completa de tu MinIO (ej. `https://storage.tudominio.com`) |
+| `MINIO_ACCESS_KEY` / `MINIO_SECRET_KEY` | credenciales de tu MinIO |
+| `MINIO_BUCKET` | `arandufiles` — crear el bucket antes desde la consola de MinIO |
 | `SUPERADMIN_EMAIL` | correo del proveedor (recibe alertas de licencia) |
 | `SUPERADMIN_PASSWORD_HASH` | hash bcrypt — generar: `node -e "require('bcryptjs').hash('CLAVE', 10).then(console.log)"` |
 | `ENCRYPTION_KEY` | `openssl rand -base64 32` (32 bytes — cifra los accesos de clientes). **Guardar copia segura: si se pierde, los accesos cifrados son irrecuperables** |
@@ -95,7 +97,7 @@ Verificar: la respuesta es JSON `{"data":{"alertas7d":...}}`; sin el header devu
 - [ ] Login ADMIN funciona; cambiar contraseña del admin de prueba
 - [ ] Login SUPERADMIN → cae en `/admin/licencia`
 - [ ] Suspender desde el panel → usuarios ven `/suspendido` → reactivar
-- [ ] Subir un PDF de prueba a un cliente (verifica Cloudinary)
+- [ ] Subir un PDF de prueba a un cliente (verifica MinIO)
 - [ ] Enviar ese PDF por correo a otro usuario (verifica Resend + notificación)
 - [ ] Cron responde 401 sin header y JSON con header
 - [ ] Importar clientes reales por Excel (`/clientes/importar`, plantilla descargable)

@@ -28,7 +28,8 @@ export async function GET(
 
   try {
     const formato = declaracion.archivoFormato as FormatoArchivo;
-    return NextResponse.redirect(urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, 600));
+    const url = await urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, 600);
+    return NextResponse.redirect(url);
   } catch (e) {
     console.error("Error generando URL firmada:", e);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

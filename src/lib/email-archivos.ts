@@ -84,7 +84,7 @@ export async function enviarDeclaracionPorCorreo({
       if (!declaracion.archivoPublicId) {
         throw new Error("La declaración no tiene archivo asociado en el almacenamiento");
       }
-      const link = urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, LINK_EXPIRA_SEGUNDOS);
+      const link = await urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, LINK_EXPIRA_SEGUNDOS);
       const res = await resend.emails.send({
         from: EMAIL_FROM,
         to: destinatario.email,

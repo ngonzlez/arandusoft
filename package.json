@@ -15,9 +15,10 @@
     "seed": "tsx prisma/seed.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1082.0",
+    "@aws-sdk/s3-request-presigner": "^3.1082.0",
     "@prisma/client": "^6.19.3",
     "bcryptjs": "^3.0.3",
-    "cloudinary": "^2.10.0",
     "date-fns": "^4.4.0",
     "date-fns-tz": "^3.2.0",
     "exceljs": "^4.4.0",

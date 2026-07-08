@@ -1,26 +1,41 @@
-import { v2 as cloudinary } from "cloudinary";
+import {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+} from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-// Archivos de declaraciones (PDF o el Excel de Marangatu/DNIT): se suben como
-// recurso raw PRIVADO en Cloudinary. La descarga siempre pasa por URL firmada
-// con expiración corta.
+// Archivos de declaraciones (PDF o el Excel de Marangatu/DNIT): se suben
+// PRIVADOS a MinIO (self-hosted, compatible S3). La descarga siempre pasa
+// por URL firmada con expiración corta — nunca hay acceso público directo,
+// son datos fiscales confidenciales de clientes.
 
 export type FormatoArchivo = "pdf" | "xlsx";
 
-let configurado = false;
+const CONTENT_TYPE: Record<FormatoArchivo, string> = {
+  pdf: "application/pdf",
+  xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+};
 
-function ensureConfig() {
-  if (configurado) return;
-  const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
-  if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
-    throw new Error("Cloudinary no está configurado (CLOUDINARY_* en .env)");
+let cliente: S3Client | null = null;
+
+function getCliente(): S3Client {
+  if (cliente) return cliente;
+  const { MINIO_ENDPOINT, MINIO_ACCESS_KEY, MINIO_SECRET_KEY } = process.env;
+  if (!MINIO_ENDPOINT || !MINIO_ACCESS_KEY || !MINIO_SECRET_KEY) {
+    throw new Error("MinIO no está configurado (MINIO_* en .env)");
   }
-  cloudinary.config({
-    cloud_name: CLOUDINARY_CLOUD_NAME,
-    api_key: CLOUDINARY_API_KEY,
-    api_secret: CLOUDINARY_API_SECRET,
-    secure: true,
+  cliente = new S3Client({
+    endpoint: MINIO_ENDPOINT,
+    region: "us-east-1", // MinIO ignora la región real, pero el SDK la exige
+    credentials: { accessKeyId: MINIO_ACCESS_KEY, secretAccessKey: MINIO_SECRET_KEY },
+    forcePathStyle: true, // requerido por MinIO (no usa buckets como subdominio)
   });
-  configurado = true;
+  return cliente;
+}
+
+function getBucket(): string {
+  return process.env.MINIO_BUCKET || "arandufiles";
 }
 
 export async function subirArchivoDeclaracion(
@@ -29,53 +44,35 @@ export async function subirArchivoDeclaracion(
   nombreBase: string,
   formato: FormatoArchivo
 ): Promise<{ url: string; publicId: string; bytes: number }> {
-  ensureConfig();
+  const key = `${carpeta}/${nombreBase}-${Date.now()}.${formato}`;
 
-  const publicId = `${carpeta}/${nombreBase}-${Date.now()}`;
-
-  const resultado = await new Promise<{ secure_url: string; public_id: string; bytes: number }>(
-    (resolve, reject) => {
-      const stream = cloudinary.uploader.upload_stream(
-        {
-          public_id: publicId,
-          resource_type: "raw",
-          type: "private",
-          format: formato,
-        },
-        (err, res) => {
-          if (err || !res) reject(err ?? new Error("Upload sin respuesta"));
-          else resolve(res as never);
-        }
-      );
-      stream.end(buffer);
-    }
+  await getCliente().send(
+    new PutObjectCommand({
+      Bucket: getBucket(),
+      Key: key,
+      Body: buffer,
+      ContentType: CONTENT_TYPE[formato],
+    })
   );
 
-  return {
-    url: resultado.secure_url,
-    publicId: resultado.public_id,
-    bytes: resultado.bytes,
-  };
+  return { url: key, publicId: key, bytes: buffer.length };
 }
 
 // URL firmada de descarga (default 1 hora; para links por email usar 48-72h).
-export function urlFirmadaDeclaracion(
+export async function urlFirmadaDeclaracion(
   publicId: string,
-  formato: FormatoArchivo,
+  _formato: FormatoArchivo,
   expiraEnSegundos = 3600
-): string {
-  ensureConfig();
-  return cloudinary.utils.private_download_url(publicId, formato, {
-    resource_type: "raw",
-    expires_at: Math.floor(Date.now() / 1000) + expiraEnSegundos,
-  });
+): Promise<string> {
+  const command = new GetObjectCommand({ Bucket: getBucket(), Key: publicId });
+  return getSignedUrl(getCliente(), command, { expiresIn: expiraEnSegundos });
 }
 
 export async function descargarArchivoDeclaracion(
   publicId: string,
   formato: FormatoArchivo
 ): Promise<Buffer> {
-  const url = urlFirmadaDeclaracion(publicId, formato, 300);
+  const url = await urlFirmadaDeclaracion(publicId, formato, 300);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`No se pudo descargar el archivo (${res.status})`);
   return Buffer.from(await res.arrayBuffer());
