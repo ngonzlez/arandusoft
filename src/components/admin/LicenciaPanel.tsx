@@ -1,0 +1,227 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { EstadoLicencia } from "@prisma/client";
+import { formatFecha, formatGuaranies } from "@/lib/format";
+import { Badge } from "@/components/ui/Badge";
+import { Button } from "@/components/ui/Button";
+import { Card } from "@/components/ui/Card";
+import { Input, Textarea } from "@/components/ui/Input";
+import { Modal } from "@/components/ui/Modal";
+import { Spinner } from "@/components/ui/Spinner";
+import { useToast } from "@/components/ui/Toast";
+
+interface Pago {
+  id: string;
+  monto: number;
+  fechaPago: string;
+  nota: string | null;
+  registrador: { nombre: string } | null;
+}
+
+interface Licencia {
+  id: string;
+  estado: EstadoLicencia;
+  venceEl: string;
+  mensajeSuspension: string | null;
+  pagos: Pago[];
+}
+
+const ESTADO_BADGE: Record<EstadoLicencia, { bg: string; text: string }> = {
+  ACTIVA: { bg: "#E7F2EC", text: "#2C6E4C" },
+  POR_VENCER: { bg: "#FAF1D8", text: "#9A7416" },
+  SUSPENDIDA: { bg: "#FBE9EC", text: "#C0344B" },
+};
+
+export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
+  const router = useRouter();
+  const toast = useToast();
+  const [modalSuspender, setModalSuspender] = useState(false);
+  const [modalPago, setModalPago] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!licencia) {
+    return (
+      <Card>
+        <p className="text-sm text-urgent">
+          No hay licencia creada. Corré el seed (`npm run db:seed`) para inicializarla.
+        </p>
+      </Card>
+    );
+  }
+
+  async function llamar(url: string, body?: unknown): Promise<boolean> {
+    setCargando(true);
+    const res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      ...(body ? { body: JSON.stringify(body) } : {}),
+    });
+    const json = await res.json().catch(() => null);
+    setCargando(false);
+
+    if (!res.ok) {
+      setError(json?.error ?? "Error");
+      toast("error", json?.error ?? "Error");
+      return false;
+    }
+    return true;
+  }
+
+  async function suspender(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    if (await llamar("/api/admin/licencia/suspender", { mensaje: form.get("mensaje") })) {
+      toast("exito", "Acceso suspendido");
+      setModalSuspender(false);
+      router.refresh();
+    }
+  }
+
+  async function reactivar() {
+    if (await llamar("/api/admin/licencia/activar")) {
+      toast("exito", "Acceso reactivado");
+      router.refresh();
+    }
+  }
+
+  async function registrarPago(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setError(null);
+    const form = new FormData(e.currentTarget);
+    const ok = await llamar("/api/admin/licencia", {
+      monto: Number(form.get("monto")),
+      fechaPago: `${form.get("fechaPago")}T12:00:00Z`,
+      nuevoVencimiento: `${form.get("nuevoVencimiento")}T12:00:00Z`,
+      nota: form.get("nota"),
+    });
+    if (ok) {
+      toast("exito", "Pago registrado y licencia extendida");
+      setModalPago(false);
+      router.refresh();
+    }
+  }
+
+  const suspendida = licencia.estado === "SUSPENDIDA";
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <div className="flex items-center gap-3">
+              <h2 className="font-heading text-lg font-bold text-primary">Estado de la licencia</h2>
+              <Badge style={ESTADO_BADGE[licencia.estado]}>{licencia.estado}</Badge>
+            </div>
+            <p className="text-sm text-ink-muted mt-1">
+              Vence el <strong className="text-ink-base">{formatFecha(licencia.venceEl)}</strong>
+            </p>
+            {suspendida && licencia.mensajeSuspension && (
+              <p className="text-xs text-urgent mt-1">
+                Mensaje mostrado: “{licencia.mensajeSuspension}”
+              </p>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button variant="secondary" onClick={() => setModalPago(true)} disabled={cargando}>
+              Registrar pago
+            </Button>
+            {suspendida ? (
+              <Button onClick={reactivar} disabled={cargando}>
+                {cargando ? <Spinner className="text-white" /> : "Reactivar acceso"}
+              </Button>
+            ) : (
+              <Button variant="danger" onClick={() => setModalSuspender(true)} disabled={cargando}>
+                Suspender acceso
+              </Button>
+            )}
+          </div>
+        </div>
+      </Card>
+
+      <Card>
+        <h3 className="font-heading font-semibold text-primary mb-4">
+          Historial de pagos ({licencia.pagos.length})
+        </h3>
+        {licencia.pagos.length === 0 ? (
+          <p className="text-sm text-ink-faint">Sin pagos registrados.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-line">
+                  {["Fecha", "Monto", "Nota", "Registrado por"].map((h) => (
+                    <th key={h} className="py-2 px-3 text-left font-medium text-ink-muted text-xs uppercase">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {licencia.pagos.map((p) => (
+                  <tr key={p.id} className="border-b border-line/60 last:border-0">
+                    <td className="py-2 px-3">{formatFecha(p.fechaPago)}</td>
+                    <td className="py-2 px-3 font-medium text-primary">{formatGuaranies(p.monto)}</td>
+                    <td className="py-2 px-3 text-ink-muted">{p.nota ?? "—"}</td>
+                    <td className="py-2 px-3 text-ink-muted">{p.registrador?.nombre ?? "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </Card>
+
+      {/* Suspender */}
+      <Modal open={modalSuspender} onClose={() => setModalSuspender(false)} title="Suspender acceso">
+        <form onSubmit={suspender} className="space-y-4">
+          <p className="text-sm text-ink-muted">
+            Todos los usuarios del cliente serán redirigidos a la pantalla de
+            suspensión. Los datos quedan intactos y el acceso se restablece al
+            reactivar.
+          </p>
+          <Textarea
+            label="Mensaje personalizado (opcional)"
+            name="mensaje"
+            placeholder="Ej: El acceso fue suspendido por falta de pago del mes de julio..."
+          />
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => setModalSuspender(false)} disabled={cargando}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="danger" disabled={cargando}>
+              {cargando ? <Spinner className="text-white" /> : "Suspender"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* Registrar pago */}
+      <Modal open={modalPago} onClose={() => setModalPago(false)} title="Registrar pago">
+        <form onSubmit={registrarPago} className="space-y-4">
+          <Input label="Monto (Gs.)" name="monto" type="number" min={1} required />
+          <div className="grid grid-cols-2 gap-3">
+            <Input label="Fecha de pago" name="fechaPago" type="date" required />
+            <Input label="Nuevo vencimiento" name="nuevoVencimiento" type="date" required />
+          </div>
+          <Input label="Nota (opcional)" name="nota" placeholder="Ej: Mantenimiento julio 2026" />
+
+          {error && (
+            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">{error}</p>
+          )}
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={() => setModalPago(false)} disabled={cargando}>
+              Cancelar
+            </Button>
+            <Button type="submit" disabled={cargando}>
+              {cargando ? <Spinner className="text-white" /> : "Registrar"}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+    </div>
+  );
+}

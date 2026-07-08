@@ -253,3 +253,20 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** alta OK · password corto → 400 · CONTABLE → 403 · baja → el usuario no puede loguear (session null) · admin intenta auto-baja → 400 con mensaje claro · reactivar OK · `/reportes` 200 · build limpio.
 
 **Pendiente / notas:** próxima fase: Cron diario + Panel Superadmin.
+
+---
+
+## Fase 11 — Cron diario + Panel Superadmin (2026-07-08)
+
+**Qué se construyó:**
+- **Cron** `GET /api/cron/daily` (header `x-cron-secret` obligatorio; 401 sin él o si `CRON_SECRET` no está seteada). Ejecuta en orden: (1) vencimientos PENDIENTE pasados → VENCIDO; (2) alertas por ventana — 7 días (notif in-app), 3 días (notif + email), día del vencimiento (notif + email urgente) — usando los flags `notificado7d/3d/Dia` para no duplicar jamás; (3) tareas vencidas → notif `TAREA_VENCIDA` (dedup por día); (4) licencia a ≤5 días de vencer → email al proveedor (`SUPERADMIN_EMAIL`). Si `RESEND_API_KEY` no está configurada, los emails se omiten con warning sin romper el cron. Devuelve resumen JSON de lo procesado.
+- **API superadmin**: `GET/POST /api/admin/licencia` (estado + historial de pagos; registrar pago extiende `venceEl` y reactiva), `POST /api/admin/licencia/suspender` (con mensaje personalizado) y `/activar`. Ambas invalidan el cache de licencia → **suspensión/reactivación inmediata** (verificado: el dashboard del cliente redirige a `/suspendido` en el request siguiente).
+- **UI `/admin/licencia`**: panel independiente del sistema del cliente (header propio azul marino "Panel del proveedor", sin sidebar del dashboard). Estado con badge, fecha de vencimiento, botones Suspender (modal con mensaje personalizado) / Reactivar / Registrar pago (monto Gs., fecha, nuevo vencimiento, nota), historial de pagos con quién lo registró.
+
+**Migraciones:** ninguna. **Usuarios/seed:** sin cambios. **Env vars nuevas:** ninguna (usa `CRON_SECRET` y `SUPERADMIN_EMAIL` de Fase 0).
+
+**Verificado:** cron sin secret → 401 · vencimiento de ayer queda VENCIDO · notif `TAREA_VENCIDA` creada y NO duplicada al correr el cron dos veces · alerta 3 días genera la notificación correcta ("Vencimiento en 3 días: EEFF — Plastisur EAS (11/07/2026)") · superadmin confinado a su panel (dashboard → redirect) · ADMIN no accede a `/admin` · pago registrado extiende y activa · suspensión bloquea al cliente en el request inmediato siguiente · reactivación instantánea · build limpio.
+
+**⚠️ Producción (recordatorio):** programar el trigger externo del cron — Coolify Scheduled Task o cron-job.org → `GET https://panel.criterioasesores.com.py/api/cron/daily` con header `x-cron-secret`, todos los días a las **12:00 UTC** (08:00 Paraguay).
+
+**Pendiente / notas:** próxima fase: Dockerfile + deploy Coolify (docs/DEPLOY.md).
