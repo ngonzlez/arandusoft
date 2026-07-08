@@ -25,7 +25,7 @@ import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTab
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
 import { categoriaVencimiento, CATEGORIA_COLORES } from "@/lib/vencimientos";
-import { ESTADO_VENCIMIENTO } from "@/lib/badges";
+import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
 
@@ -59,6 +59,18 @@ export default async function ClienteDetallePage({
         orderBy: { fechaVencimiento: "asc" },
         take: 15,
         select: { id: true, tipo: true, estado: true, fechaVencimiento: true },
+      },
+      tareas: {
+        orderBy: [{ estado: "asc" }, { fechaLimite: "asc" }],
+        take: 20,
+        select: {
+          id: true,
+          titulo: true,
+          estado: true,
+          prioridad: true,
+          fechaLimite: true,
+          responsable: { select: { nombre: true } },
+        },
       },
     },
   });
@@ -123,14 +135,6 @@ export default async function ClienteDetallePage({
         {esAdmin && <AccesosPanel accesos={accesos} />}
       </div>
     </div>
-  );
-
-  const placeholder = (modulo: string, fase: string) => (
-    <Card>
-      <p className="text-sm text-ink-faint">
-        {modulo} se habilita en la {fase}.
-      </p>
-    </Card>
   );
 
   return (
@@ -229,7 +233,36 @@ export default async function ClienteDetallePage({
                 </Card>
               ),
           },
-          { key: "tareas", label: "Tareas", content: placeholder("Las tareas", "Fase 8") },
+          {
+            key: "tareas",
+            label: "Tareas",
+            content:
+              cliente.tareas.length === 0 ? (
+                <Card>
+                  <p className="text-sm text-ink-faint">
+                    Sin tareas vinculadas. Crealas desde el módulo Tareas eligiendo
+                    este cliente.
+                  </p>
+                </Card>
+              ) : (
+                <Card>
+                  <ul className="divide-y divide-line/60">
+                    {cliente.tareas.map((t) => (
+                      <li key={t.id} className="flex items-center gap-3 py-2.5 text-sm">
+                        <span className="flex-1 font-medium text-primary">{t.titulo}</span>
+                        <Badge style={ESTADO_TAREA[t.estado]}>{t.estado.replace("_", " ")}</Badge>
+                        {t.fechaLimite && (
+                          <span className="text-xs text-ink-muted w-20">
+                            {formatFecha(t.fechaLimite)}
+                          </span>
+                        )}
+                        <Avatar nombre={t.responsable.nombre} size="sm" />
+                      </li>
+                    ))}
+                  </ul>
+                </Card>
+              ),
+          },
         ]}
       />
     </div>

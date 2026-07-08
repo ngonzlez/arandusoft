@@ -202,3 +202,19 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** GET lista la notificación del usuario · PATCH marca leída · otro usuario intenta marcarla → 404 (ownership) · badge rojo aparece en el layout con no leídas · build limpio.
 
 **Pendiente / notas:** próxima fase: Tareas (Kanban + lista).
+
+---
+
+## Fase 8 — Tareas internas (2026-07-08)
+
+**Qué se construyó:**
+- **API** `GET/POST /api/tareas` y `PATCH /api/tareas/[id]`: CRUD con checklist embebido (Json `[{id, texto, hecho}]`), visibilidad por rol (tareas de clientes no visibles quedan fuera; sin cliente = visibles para todos), notificación `TAREA_ASIGNADA` al crear o reasignar a otro usuario.
+- **UI `/tareas`**: toggle **Kanban** (3 columnas Pendiente/En progreso/Completada con contador) / **Lista** (tabla ordenada por prioridad y fecha), filtro "Solo mías", tarjetas con prioridad, cliente, fecha, progreso de checklist (☑ 2/5) y avatar. Modal de detalle: checklist tildable en vivo, botones para mover de estado. Modal de creación con checklist dinámico (+ / ✕).
+- **Ficha del cliente:** tab Tareas con las tareas vinculadas.
+- Sin delete: las tareas se completan, no se borran (consistente con soft-delete global).
+
+**Migraciones:** ninguna. **Usuarios/seed:** sin cambios. **Env vars nuevas:** ninguna.
+
+**Verificado:** ADMIN crea tarea con checklist asignada al CONTABLE → notificación `TAREA_ASIGNADA` generada · CONTABLE la mueve a EN_PROGRESO vía PATCH · build limpio.
+
+**Pendiente / notas:** mover tarjetas es por botones (drag & drop real requeriría librería extra — se puede agregar post-beta si el cliente lo pide). Próxima fase: Importación Excel.
