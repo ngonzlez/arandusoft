@@ -340,3 +340,25 @@ Sesión de ajustes tras revisión del cliente en local. Contexto importante para
 **Fix:** nuevo helper `filtroTareasPorRol()` en `lib/api-auth.ts` con early-return explícito — si el filtro de cliente es vacío, devuelve `{}` en vez de anidarlo en el OR (mismo patrón que `filtroVencimientosPorRol`, que sí lo hacía bien desde la Fase 5). Corregidos 3 call-sites: `GET /api/tareas`, `PATCH /api/tareas/[id]`, y la query inicial de `/tareas/page.tsx`. Auditado el resto de usos de `filtroClientesPorRol` en el proyecto — ningún otro lugar tenía este patrón roto (los demás lo spreadean directo en el `where`, no anidado en un OR, donde omitirlo si está vacío es matemáticamente correcto).
 
 **Verificado:** ADMIN ve ambas tareas (una con cliente CONTABLE, otra con cliente distinto) · CONTABLE ve las suyas · JURIDICO no ve la de un cliente CONTABLE · build limpio.
+
+---
+
+## Feature — Config de estudio editable desde superadmin (2026-07-08)
+
+**Contexto:** decisión de arquitectura tomada con el cliente para la multi-tenencia: **Opción A** (1 deploy de Coolify = 1 estudio, no multi-tenant real en una sola DB) en vez de Opción B (un solo DB/deploy con `estudioId` en cada tabla). Motivo: Opción B implica refactor grande y riesgo de fuga de datos entre estudios; Opción A ya es el modelo actual y es más simple de operar. Se mejoró Opción A moviendo lo que antes era hardcodeado/env var a la fila `Licencia` de la DB, editable sin redeploy.
+
+**Qué se construyó:**
+- `Licencia` extendido: `nombreEstudio` (default `"Mi Estudio"`), `dominio` (opcional, informativo), `moduloJuridicoHabilitado` (default `false`).
+- `lib/licencia.ts`: nuevo `getConfigEstudio()` comparte el mismo cache TTL 30s que `getEstadoLicencia()`; `invalidarCacheLicencia()` se llama al guardar.
+- `PATCH /api/admin/licencia` (SUPERADMIN-only) para actualizar los 3 campos.
+- Card "Configuración del estudio" en `/admin/licencia` (`LicenciaPanel.tsx`): inputs nombre/dominio + switch del módulo jurídico.
+- `navParaRol(rol, juridicoActivo)` ahora recibe el flag por parámetro en vez de leer `NEXT_PUBLIC_ENABLE_JURIDICO` — permite prender/apagar "Expedientes" del nav sin rebuild.
+- Sidebar (desktop+mobile) y footer de `/login` muestran `nombreEstudio` de la DB en vez de "Criterio Asesores" hardcodeado.
+
+**Migraciones:** `20260708181930_config_estudio`.
+
+**Env vars:** ninguna nueva — `NEXT_PUBLIC_ENABLE_JURIDICO` queda obsoleta (no se lee más, se puede quitar de Coolify cuando se despliegue esto).
+
+**Verificado:** login SUPERADMIN → PATCH toggle a `true` → login como `juridico@criterioasesores.com.py` → "Expedientes" aparece en el nav sin reiniciar el server (cache de 30s se invalida al guardar) → toggle a `false` → desaparece · nombreEstudio actualizado se refleja en Sidebar y en el footer de `/login` · build limpio.
+
+**Pendiente (según lo acordado con el cliente, orden explícito):** con este toggle ya funcionando, sigue la Fase 2 liviana (Expediente + Documentos + Notas + vínculo con Tarea), gateada por `moduloJuridicoHabilitado`.
