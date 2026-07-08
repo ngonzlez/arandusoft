@@ -21,8 +21,9 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/usuarios", label: "Equipo", icon: "briefcase", roles: ["ADMIN"] },
 ];
 
-export function navParaRol(rol: Rol): NavItem[] {
-  const juridicoActivo = process.env.NEXT_PUBLIC_ENABLE_JURIDICO === "true";
+// juridicoActivo viene de Licencia.moduloJuridicoHabilitado (DB, editable
+// desde el panel superadmin) — ya no es una env var estática.
+export function navParaRol(rol: Rol, juridicoActivo: boolean): NavItem[] {
   return NAV_ITEMS.filter((item) => {
     if (item.feature === "juridico" && !juridicoActivo) return false;
     return item.roles.includes(rol);

@@ -177,6 +177,12 @@ model Licencia {
   estado            EstadoLicencia
   venceEl           DateTime
   mensajeSuspension String?
+  // Config del estudio (Opción A: 1 deploy = 1 cliente). El superadmin la
+  // edita desde su panel — reemplaza nombre/dominio hardcodeados y el flag
+  // de módulo jurídico por variable de entorno estática.
+  nombreEstudio            String  @default("Mi Estudio")
+  dominio                  String?
+  moduloJuridicoHabilitado Boolean @default(false)
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   pagos             PagoLicencia[]

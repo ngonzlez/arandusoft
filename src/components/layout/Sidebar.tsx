@@ -11,6 +11,7 @@ import type { NavItem } from "@/components/layout/nav";
 interface SidebarProps {
   items: NavItem[];
   usuario: { nombre: string; rol: string };
+  nombreEstudio: string;
   notificacionesNoLeidas?: number;
   onNavigate?: () => void; // cierra drawer en mobile
 }
@@ -22,7 +23,7 @@ const ROL_LABEL: Record<string, string> = {
   SUPERADMIN: "Superadmin",
 };
 
-export function Sidebar({ items, usuario, notificacionesNoLeidas = 0, onNavigate }: SidebarProps) {
+export function Sidebar({ items, usuario, nombreEstudio, notificacionesNoLeidas = 0, onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -40,7 +41,7 @@ export function Sidebar({ items, usuario, notificacionesNoLeidas = 0, onNavigate
             Arandú<span className="text-gold">Soft</span>
           </p>
           <p className="text-[10px] text-gold/90 tracking-wide mt-0.5 truncate">
-            GESTIÓN INTERNA · CRITERIO ASESORES
+            GESTIÓN INTERNA · {nombreEstudio.toUpperCase()}
           </p>
         </div>
       </div>

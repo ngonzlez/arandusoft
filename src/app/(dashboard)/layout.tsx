@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getEstadoLicencia } from "@/lib/licencia";
+import { getEstadoLicencia, getConfigEstudio } from "@/lib/licencia";
 import { prisma } from "@/lib/prisma";
 import { navParaRol } from "@/components/layout/nav";
 import { AppShell } from "@/components/layout/AppShell";
@@ -22,15 +22,17 @@ export default async function DashboardLayout({
   const { activa } = await getEstadoLicencia();
   if (!activa) redirect("/suspendido");
 
-  const noLeidas = await prisma.notificacion.count({
-    where: { userId: id, leida: false },
-  });
+  const [noLeidas, config] = await Promise.all([
+    prisma.notificacion.count({ where: { userId: id, leida: false } }),
+    getConfigEstudio(),
+  ]);
 
   return (
     <ToastProvider>
       <AppShell
-        items={navParaRol(rol)}
+        items={navParaRol(rol, config.moduloJuridicoHabilitado)}
         usuario={{ nombre: name ?? "Usuario", rol }}
+        nombreEstudio={config.nombreEstudio}
         notificacionesNoLeidas={noLeidas}
       >
         {children}

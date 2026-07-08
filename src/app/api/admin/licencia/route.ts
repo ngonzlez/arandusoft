@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
+import { invalidarCacheLicencia } from "@/lib/licencia";
 
 export async function GET() {
   const { error } = await requireApiSession(["SUPERADMIN"]);
@@ -53,6 +54,49 @@ export async function POST(req: NextRequest) {
     where: { id: licencia.id },
     data: { venceEl: new Date(nuevoVencimiento), estado: "ACTIVA" },
   });
+
+  return NextResponse.json({ data: actualizada });
+}
+
+// Config del estudio: nombre, dominio y qué módulos tiene habilitados este
+// cliente (Opción A — 1 deploy = 1 cliente, así vendés "solo contable" o
+// "contable + jurídico" sin tocar código, solo este toggle).
+export async function PATCH(req: NextRequest) {
+  const { error } = await requireApiSession(["SUPERADMIN"]);
+  if (error) return error;
+
+  const body = await req.json().catch(() => null);
+  if (!body) {
+    return NextResponse.json(
+      { error: "Cuerpo inválido", code: "VALIDATION_ERROR" },
+      { status: 400 }
+    );
+  }
+
+  const licencia = await prisma.licencia.findFirst({ orderBy: { createdAt: "desc" } });
+  if (!licencia) {
+    return NextResponse.json({ error: "No hay licencia creada" }, { status: 404 });
+  }
+
+  if (body.nombreEstudio !== undefined && !body.nombreEstudio?.trim()) {
+    return NextResponse.json(
+      { error: "El nombre del estudio no puede estar vacío", code: "VALIDATION_ERROR" },
+      { status: 400 }
+    );
+  }
+
+  const actualizada = await prisma.licencia.update({
+    where: { id: licencia.id },
+    data: {
+      ...(body.nombreEstudio !== undefined ? { nombreEstudio: body.nombreEstudio.trim() } : {}),
+      ...(body.dominio !== undefined ? { dominio: body.dominio?.trim() || null } : {}),
+      ...(body.moduloJuridicoHabilitado !== undefined
+        ? { moduloJuridicoHabilitado: !!body.moduloJuridicoHabilitado }
+        : {}),
+    },
+  });
+
+  invalidarCacheLicencia();
 
   return NextResponse.json({ data: actualizada });
 }

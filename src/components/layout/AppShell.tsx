@@ -9,11 +9,12 @@ import type { NavItem } from "@/components/layout/nav";
 interface AppShellProps {
   items: NavItem[];
   usuario: { nombre: string; rol: string };
+  nombreEstudio: string;
   notificacionesNoLeidas?: number;
   children: React.ReactNode;
 }
 
-export function AppShell({ items, usuario, notificacionesNoLeidas, children }: AppShellProps) {
+export function AppShell({ items, usuario, nombreEstudio, notificacionesNoLeidas, children }: AppShellProps) {
   const [drawerAbierto, setDrawerAbierto] = useState(false);
 
   return (
@@ -23,6 +24,7 @@ export function AppShell({ items, usuario, notificacionesNoLeidas, children }: A
         <Sidebar
           items={items}
           usuario={usuario}
+          nombreEstudio={nombreEstudio}
           notificacionesNoLeidas={notificacionesNoLeidas}
         />
       </div>
@@ -38,6 +40,7 @@ export function AppShell({ items, usuario, notificacionesNoLeidas, children }: A
             <Sidebar
               items={items}
               usuario={usuario}
+              nombreEstudio={nombreEstudio}
               notificacionesNoLeidas={notificacionesNoLeidas}
               onNavigate={() => setDrawerAbierto(false)}
             />

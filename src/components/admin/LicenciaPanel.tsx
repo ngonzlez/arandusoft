@@ -25,6 +25,9 @@ interface Licencia {
   estado: EstadoLicencia;
   venceEl: string;
   mensajeSuspension: string | null;
+  nombreEstudio: string;
+  dominio: string | null;
+  moduloJuridicoHabilitado: boolean;
   pagos: Pago[];
 }
 
@@ -41,6 +44,8 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
   const [modalPago, setModalPago] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [guardandoConfig, setGuardandoConfig] = useState(false);
+  const [moduloJuridico, setModuloJuridico] = useState(licencia?.moduloJuridicoHabilitado ?? false);
 
   if (!licencia) {
     return (
@@ -104,6 +109,29 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
     }
   }
 
+  async function guardarConfig(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setGuardandoConfig(true);
+    const form = new FormData(e.currentTarget);
+    const res = await fetch("/api/admin/licencia", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        nombreEstudio: form.get("nombreEstudio"),
+        dominio: form.get("dominio"),
+        moduloJuridicoHabilitado: moduloJuridico,
+      }),
+    });
+    setGuardandoConfig(false);
+    if (!res.ok) {
+      const json = await res.json().catch(() => null);
+      toast("error", json?.error ?? "No se pudo guardar");
+      return;
+    }
+    toast("exito", "Configuración actualizada");
+    router.refresh();
+  }
+
   const suspendida = licencia.estado === "SUSPENDIDA";
 
   return (
@@ -139,6 +167,54 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
             )}
           </div>
         </div>
+      </Card>
+
+      <Card>
+        <h3 className="font-heading font-semibold text-primary mb-1">Configuración del estudio</h3>
+        <p className="text-xs text-ink-muted mb-4">
+          Nombre y dominio son solo informativos (branding). El módulo
+          jurídico prende/apaga el menú de Expedientes para este cliente —
+          así vendés &quot;solo contable&quot; o &quot;contable + jurídico&quot; sin redeploy.
+        </p>
+        <form onSubmit={guardarConfig} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input label="Nombre del estudio" name="nombreEstudio" defaultValue={licencia.nombreEstudio} required />
+            <Input
+              label="Dominio (opcional)"
+              name="dominio"
+              defaultValue={licencia.dominio ?? ""}
+              placeholder="panel.criterioasesores.com.py"
+            />
+          </div>
+
+          <label className="flex items-center justify-between rounded-control border border-line px-4 py-3 cursor-pointer">
+            <div>
+              <p className="text-sm font-medium text-ink-base">Módulo Jurídico</p>
+              <p className="text-xs text-ink-muted">Expedientes, documentos y notas de casos legales</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setModuloJuridico((v) => !v)}
+              className={`relative h-6 w-11 rounded-full transition-colors shrink-0 ${
+                moduloJuridico ? "bg-success" : "bg-line"
+              }`}
+              role="switch"
+              aria-checked={moduloJuridico}
+            >
+              <span
+                className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  moduloJuridico ? "translate-x-[22px]" : "translate-x-0.5"
+                }`}
+              />
+            </button>
+          </label>
+
+          <div className="flex justify-end">
+            <Button type="submit" disabled={guardandoConfig}>
+              {guardandoConfig ? <Spinner className="text-white" /> : "Guardar configuración"}
+            </Button>
+          </div>
+        </form>
       </Card>
 
       <Card>
