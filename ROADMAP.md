@@ -270,3 +270,27 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **⚠️ Producción (recordatorio):** programar el trigger externo del cron — Coolify Scheduled Task o cron-job.org → `GET https://panel.criterioasesores.com.py/api/cron/daily` con header `x-cron-secret`, todos los días a las **12:00 UTC** (08:00 Paraguay).
 
 **Pendiente / notas:** próxima fase: Dockerfile + deploy Coolify (docs/DEPLOY.md).
+
+---
+
+## Fase 12 — Docker + Deploy Coolify (2026-07-08)
+
+**Qué se construyó:**
+- **`Dockerfile`** multi-stage (node:22-alpine): deps → builder (prisma generate + next build standalone) → etapa `prismacli` aislada (CLI de Prisma con todas sus dependencias, para `migrate deploy`) → runner con usuario sin privilegios `nextjs`. Imagen final: **382MB**. Las migraciones corren automáticamente en cada arranque del contenedor (idempotente).
+- **`.dockerignore`** (excluye docs, ejemplos, prototipo, .env).
+- **`docs/DEPLOY.md`**: guía completa Coolify — Postgres managed separado con backups, todas las env vars de producción (incl. `AUTH_TRUST_HOST=true` necesario detrás del proxy), DNS Cloudflare, SPF/DKIM/DMARC para Resend, seed inicial, configuración del cron externo (12:00 UTC) y checklist post-deploy.
+- **`scripts/fix-lockfile.js`**: workaround de un bug de npm 11 que escribe una entrada corrupta de `@img/sharp-win32-x64` (`{"optional":true}` sin versión) en `package-lock.json`, rompiendo `npm ci` en Linux/Docker con "Invalid Version:". Correr tras cualquier `npm install` que regenere el lockfile si el build de Docker falla con ese error.
+
+**Decisiones técnicas:**
+- **node:22-alpine** (no 20): npm 10.8 de node:20 no digiere lockfiles v3 generados por npm 11.
+- El CLI de Prisma se empaqueta **aislado en `/app/prisma-cli/node_modules`** porque copiar solo `node_modules/prisma` + `@prisma` no alcanza (el CLI 6.19 depende de `effect`, `@prisma/engines`, etc.) y el bin es un symlink que se rompe al copiar.
+
+**Verificado:** imagen buildea limpia · contenedor arranca contra el Postgres local: "3 migrations found / No pending migrations" + Next Ready · login page 200 · dashboard sin sesión 307 → login · **login completo dentro de la imagen de producción → dashboard 200** · usuario sin privilegios.
+
+**Pendiente para el deploy real (requiere acción manual):**
+1. Crear el recurso PostgreSQL en Coolify + backups.
+2. Crear la app en Coolify apuntando a `ngonzlez/arandusoft` con las env vars de `docs/DEPLOY.md`.
+3. DNS `panel.criterioasesores.com.py` → IP Hetzner (Cloudflare, DNS-only hasta emitir SSL).
+4. Verificar dominio en Resend (SPF/DKIM en Cloudflare) y cargar `RESEND_API_KEY` + `CLOUDINARY_*` — **con esto se prueba por primera vez la subida real de PDFs y el envío real de correos**.
+5. Programar el cron externo (cron-job.org o Coolify Scheduled Task).
+6. Seed + cambio de contraseñas + importación de clientes reales por Excel.
