@@ -163,3 +163,20 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** visita a `/calendario?mes=2026-08` genera IVA correcto por terminación de RUC (5→17/08, 7→21/08, 8→23/08; el cliente jurídico sin IVA no genera) · 3 visitas seguidas → siguen siendo 3 registros (idempotente) · PATCH gestiona · POST manual IPS OK · build limpio.
 
 **Pendiente / notas:** las alertas 7d/3d/día-de se implementan con el cron en Fase 11 (flags `notificado7d/3d/Dia` ya existen). Próxima fase: Asambleas.
+
+---
+
+## Fase 6 — Calendario de Asambleas y Prioridades (2026-07-08)
+
+**Qué se construyó:**
+- **API** `GET /api/asambleas?periodo=AAAA-MM` (clientes activos visibles + registro del período) y `PATCH /api/asambleas` (upsert de celda). Campos tildables: Asamblea Solicitada, Confirmada, IDU, MTTES, Reg. Adm, IPS, Libros, Cont. Adm — whitelist estricta (cualquier otro campo → 400, protege el Json de auditoría). También setea Fecha EEFF.
+- **Auditoría por celda:** el Json `auditoria` guarda `{campo: {userId, at}}` por cada tilde — quién marcó cada cosa y cuándo, tal como exige el PRD. `ultimoEditorId` a nivel de fila.
+- **UI `/asambleas`**: réplica digital de la hoja física — tabla Cliente | Fecha EEFF (date input inline) | 8 columnas de checkboxes con tildado optimista (revierte si falla el guardado), selector de mes, columna cliente sticky. Solo ADMIN/CONTABLE.
+
+**Migraciones:** ninguna nueva.
+**Usuarios/seed:** sin cambios.
+**Env vars nuevas:** ninguna.
+
+**Verificado:** tilde de IDU como CONTABLE y de IPS como ADMIN sobre la misma fila → `auditoria` registra ambos con userId y timestamp distintos · campo fuera de whitelist → 400 · build limpio.
+
+**Pendiente / notas:** próxima fase: Notificaciones in-app.
