@@ -236,3 +236,20 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Alcance:** se importan **clientes** (la carga inicial crítica del lanzamiento). Declaraciones históricas no se importan por Excel porque requieren el PDF físico de cada una (se suben desde el módulo Declaraciones); los vencimientos de IVA se generan solos por RUC. Si el estudio necesita importar vencimientos manuales masivos, se agrega post-beta.
 
 **Pendiente / notas:** próxima fase: Usuarios + Reportes básico.
+
+---
+
+## Fase 10 — Gestión de Usuarios + Reportes básico (2026-07-08)
+
+**Qué se construyó:**
+- **API** `POST /api/usuarios` (alta con bcrypt, password mín. 8, email único, roles asignables solo ADMIN/CONTABLE/JURIDICO — SUPERADMIN jamás desde acá) y `PATCH /api/usuarios/[id]` (rol, activo = soft delete reversible, nombre, reset de contraseña). Protecciones: el admin no puede darse de baja ni degradarse a sí mismo; el SUPERADMIN es intocable desde estos endpoints. Solo ADMIN.
+- **UI `/usuarios`** ("Equipo", como el prototipo): cards con avatar, badge Admin/Inactivo, rol, correo y **barra de carga de trabajo** (tareas activas). Modal de alta (correo corporativo + contraseña inicial) y modal de edición (cambiar rol, resetear contraseña, dar de baja/reactivar).
+- **UI `/reportes`** (alcance básico acordado): 4 KPI tiles del mes (clientes activos, declaraciones subidas, vencimientos gestionados con contador de vencidos, tareas completadas) + barras CSS "tareas completadas por usuario". Sin librerías de gráficos.
+
+**Migraciones:** ninguna. **Env vars nuevas:** ninguna.
+
+**Usuarios/seed (dev):** creado por API de prueba `juridico@criterioasesores.com.py` (JURIDICO, password `password123`) — queda activo en la DB local para probar el rol jurídico.
+
+**Verificado:** alta OK · password corto → 400 · CONTABLE → 403 · baja → el usuario no puede loguear (session null) · admin intenta auto-baja → 400 con mensaje claro · reactivar OK · `/reportes` 200 · build limpio.
+
+**Pendiente / notas:** próxima fase: Cron diario + Panel Superadmin.
