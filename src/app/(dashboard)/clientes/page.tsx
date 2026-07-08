@@ -65,9 +65,16 @@ export default async function ClientesPage({ searchParams }: Props) {
         titulo="Clientes"
         subtitulo={`${clientes.length} cliente${clientes.length === 1 ? "" : "s"}`}
         acciones={
-          <Link href="/clientes/nuevo">
-            <Button>+ Nuevo cliente</Button>
-          </Link>
+          <>
+            {user.rol === "ADMIN" && (
+              <Link href="/clientes/importar">
+                <Button variant="outline">Importar</Button>
+              </Link>
+            )}
+            <Link href="/clientes/nuevo">
+              <Button>+ Nuevo cliente</Button>
+            </Link>
+          </>
         }
       />
 

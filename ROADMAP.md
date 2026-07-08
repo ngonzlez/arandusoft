@@ -218,3 +218,21 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** ADMIN crea tarea con checklist asignada al CONTABLE → notificación `TAREA_ASIGNADA` generada · CONTABLE la mueve a EN_PROGRESO vía PATCH · build limpio.
 
 **Pendiente / notas:** mover tarjetas es por botones (drag & drop real requeriría librería extra — se puede agregar post-beta si el cliente lo pide). Próxima fase: Importación Excel.
+
+---
+
+## Fase 9 — Importación desde Excel (2026-07-08)
+
+**Qué se construyó:**
+- **`lib/importar.ts`** (exceljs): parseo de .xlsx de clientes con validación fila a fila — nombre/RUC obligatorios, formato de RUC, duplicados dentro del archivo, duplicados contra la DB, tipo (acepta "MIXTO" como alias de AMBOS), obligaciones separadas por coma con nombres del enum. Filas vacías se ignoran.
+- **API** `POST /api/importar?modo=preview` (valida sin tocar la DB) y `?modo=confirmar` (re-valida el mismo archivo e importa solo las válidas; responsable = quien importa). Solo ADMIN. Máx 5MB.
+- **API** `GET /api/importar/plantilla`: descarga `plantilla-clientes-arandusoft.xlsx` con headers y fila de ejemplo.
+- **UI** `/clientes/importar` (botón "Importar" en la lista de clientes, solo ADMIN): flujo subir → preview con dos tablas (válidas en verde / errores en rojo con el motivo exacto por fila) → confirmar → reporte final.
+
+**Migraciones:** ninguna. **Usuarios/seed:** en dev quedaron importados 2 clientes de prueba reales de las hojas físicas (Toreto Transportes EAS 80124893-0, Mirta Caceres 4689200). **Env vars nuevas:** ninguna.
+
+**Verificado (end-to-end con xlsx real generado):** preview detecta RUC inválido ("ABC-99"), tipo inválido ("FISCAL") y RUC ya existente, aceptando 2 filas válidas · confirmar importa exactamente esas 2 (verificado en DB) · CONTABLE → 403 · plantilla descarga (6.7KB) · build limpio.
+
+**Alcance:** se importan **clientes** (la carga inicial crítica del lanzamiento). Declaraciones históricas no se importan por Excel porque requieren el PDF físico de cada una (se suben desde el módulo Declaraciones); los vencimientos de IVA se generan solos por RUC. Si el estudio necesita importar vencimientos manuales masivos, se agrega post-beta.
+
+**Pendiente / notas:** próxima fase: Usuarios + Reportes básico.
