@@ -180,3 +180,25 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado:** tilde de IDU como CONTABLE y de IPS como ADMIN sobre la misma fila → `auditoria` registra ambos con userId y timestamp distintos · campo fuera de whitelist → 400 · build limpio.
 
 **Pendiente / notas:** próxima fase: Notificaciones in-app.
+
+**Hallazgo — hojas físicas reales (carpeta `ejemplos/`, fotos WhatsApp del estudio):**
+- El "Calendario Prioridades" físico coincide columna por columna con lo implementado (EEFF, Asamblea Solicitado/Confirmado, IDU, MTTES, Reg. Adm., IPS, Cont. Adm., Libros). ✓
+- La planilla física de clientes usa estados AL DIA / CCT / ATRASADO y RUCs sin guión — ambos ya soportados. ✓
+- ⚠️ La planilla física tiene columnas que el PRD **no** contempla: **Pagos Pendientes (monto Gs.), Última Declaración (mes), Situación Actual y Observaciones** ("Cliente puntual", "FALTA DE PAGO", "SEMI-PUNTUAL"). Confirmar con el cliente si quiere estos campos en la ficha (candidato: campo `observaciones` + módulo simple de pagos pendientes — sería adicional al presupuesto).
+- Hay una hoja de expedientes judiciales (carátula/estado/fecha) que valida el modelo `Expediente`+`HistorialExpediente` ya preparado para Fase 2.
+
+---
+
+## Fase 7 — Notificaciones in-app (2026-07-08)
+
+**Qué se construyó:**
+- **API** `GET /api/notificaciones` (historial 30 días, filtro `?noLeidas=true`, máx 100) y `PATCH` (marcar una por `{id}` con validación de dueño, o todas con `{todas:true}`).
+- **UI `/notificaciones`**: filtros Todas / No leídas (contador), botón "Marcar todas como leídas", ícono por tipo (📅 vencimiento, 📋 tarea asignada, ⚠️ tarea vencida, ✉️ archivo recibido, etc.), punto rojo en no leídas, clic marca leída, deep-link según entidad (Cliente → ficha, Declaración → descarga, Vencimiento → calendario).
+- El badge de contador en sidebar + topbar ya venía de Fase 1 (count en el layout) — ahora con contenido real.
+- `crearNotificacion()` (Fase 4) es el helper que ya usan/usarán todos los módulos; el cron de Fase 11 generará las de vencimientos.
+
+**Migraciones:** ninguna. **Usuarios/seed:** sin cambios. **Env vars nuevas:** ninguna.
+
+**Verificado:** GET lista la notificación del usuario · PATCH marca leída · otro usuario intenta marcarla → 404 (ownership) · badge rojo aparece en el layout con no leídas · build limpio.
+
+**Pendiente / notas:** próxima fase: Tareas (Kanban + lista).
