@@ -62,3 +62,36 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado (curl contra dev server):** login page 200 · `/dashboard` sin sesión → 307 a `/login` · POST credentials → sesión con `rol: ADMIN` · `/dashboard` con sesión → 200 · licencia SUSPENDIDA en DB → `/dashboard` → 307 a `/suspendido` mostrando el mensaje personalizado · licencia reactivada → `/dashboard` 200 de nuevo · `npm run build` limpio.
 
 **Pendiente / notas:** probar visual completo en browser cuando haya más páginas. Próxima fase: Módulo Clientes.
+
+---
+
+## Fase 2 — Módulo Clientes (2026-07-07)
+
+**Qué se construyó:**
+- **API** `GET/POST /api/clientes` y `GET/PATCH/DELETE /api/clientes/[id]`: CRUD completo con filtro por rol en cada query, validación de RUC (formato paraguayo laxo) y RUC único, soft delete (DELETE = estado INACTIVO, solo ADMIN), sincronización de obligaciones (activa/desactiva `ClienteObligacion`, nunca borra).
+- **Accesos internos** (Marangatu/SET/IPS/MITES/otros): se guardan cifrados AES-256-GCM en `Cliente.accesos`; solo ADMIN los envía/recibe — el campo jamás aparece en respuestas para CONTABLE/JURIDICO (se excluye vía `select` explícito en lista y se separa del objeto en detalle).
+- **API** `GET /api/usuarios`: lista liviana (activos, sin SUPERADMIN) para selects de responsable — el CRUD completo llega en Fase 10.
+- **UI** `/clientes`: lista server-rendered con búsqueda debounced por nombre/RUC (searchParams), chips de filtro por tipo (solo ADMIN los ve) y estado, badges con los colores del prototipo, avatar del responsable.
+- **UI** `/clientes/nuevo` y `/clientes/[id]/editar`: formulario completo (datos generales, obligaciones como checkboxes estilo chip, panel de accesos solo-ADMIN con usuario/clave por sistema).
+- **UI** `/clientes/[id]`: detalle con tabs (Resumen activo; Estado Mensual/Declaraciones/Vencimientos/Tareas como placeholder hasta sus fases), panel de accesos con claves ocultas por defecto ("Ver clave" por clic), badges de tipo/estado/estado fiscal.
+- **Auditoría:** campo `Cliente.actualizadoPor` (userId) se setea en cada create/update/delete.
+
+**Migraciones:**
+- `20260707235252_cliente_auditoria` — agrega `Cliente.actualizadoPor String?`.
+
+**Usuarios/seed:** se agregó a mano en DB local un usuario de prueba `contable@criterioasesores.com.py` (rol CONTABLE, password local `cambiar123`) para verificar la separación de roles. No forma parte del seed — recrear si se resetea la DB.
+
+**Env vars nuevas:** ninguna.
+
+**Verificado (curl, dos sesiones simultáneas ADMIN y CONTABLE):**
+1. Cliente tipo JURIDICO creado por ADMIN no aparece en la lista del CONTABLE.
+2. GET directo del detalle jurídico como CONTABLE → 404.
+3. ADMIN ve `accesos` desencriptados en el detalle.
+4. En la DB el campo `accesos` está cifrado (el texto plano no aparece).
+5. Ninguna respuesta para CONTABLE contiene el campo `accesos`.
+6. `actualizadoPor` queda registrado con el userId del ADMIN.
+7. `npm run build` limpio.
+
+**Nota técnica:** tras una migración con el dev server corriendo, hay que reiniciarlo y si persiste el error de "Unknown argument" borrar `.next` (bundle cachea el cliente Prisma viejo).
+
+**Pendiente / notas:** próxima fase: Estado Mensual (checklist).

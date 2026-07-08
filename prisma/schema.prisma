@@ -211,9 +211,10 @@ model Cliente {
   estadoFiscal  EstadoFiscal  @default(AL_DIA)
   responsableId String
   responsable   User          @relation("ClienteResponsable", fields: [responsableId], references: [id])
-  accesos       String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
+  accesos        String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
+  actualizadoPor String? // userId de la última modificación (auditoría PRD)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
   obligaciones     ClienteObligacion[]
   estadosMensuales EstadoMensual[]
