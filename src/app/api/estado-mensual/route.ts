@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { EstadoObligacion, TipoObligacion } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
+import { recalcularEstadoFiscal } from "@/lib/clientes";
 
 const MES_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -63,7 +64,7 @@ export async function PATCH(req: NextRequest) {
 
   const cliente = await prisma.cliente.findFirst({
     where: { id: clienteId, ...filtroClientesPorRol(user.rol) },
-    select: { id: true, estadoFiscal: true },
+    select: { id: true },
   });
   if (!cliente) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
@@ -88,20 +89,7 @@ export async function PATCH(req: NextRequest) {
     },
   });
 
-  // Estado fiscal automático: solo alterna AL_DIA/ATRASADO.
-  // CCT y VECTOR_FISCAL son estados manuales — no se tocan.
-  if (cliente.estadoFiscal === "AL_DIA" || cliente.estadoFiscal === "ATRASADO") {
-    const vencidas = await prisma.estadoMensual.count({
-      where: { clienteId, estado: "VENCIDO" },
-    });
-    const nuevoEstadoFiscal = vencidas > 0 ? "ATRASADO" : "AL_DIA";
-    if (nuevoEstadoFiscal !== cliente.estadoFiscal) {
-      await prisma.cliente.update({
-        where: { id: clienteId },
-        data: { estadoFiscal: nuevoEstadoFiscal, actualizadoPor: user.id },
-      });
-    }
-  }
+  await recalcularEstadoFiscal(clienteId, user.id);
 
   return NextResponse.json({ data: registro });
 }

@@ -4,10 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { crearNotificacion } from "@/lib/notificaciones";
 import { getResend, EMAIL_FROM, plantillaEmail } from "@/lib/email";
 import { formatFecha } from "@/lib/format";
+import { recalcularEstadoFiscal } from "@/lib/clientes";
 
 // Cron diario (invocar 12:00 UTC = 08:00 Paraguay) con header x-cron-secret.
 // 1) Alertas de vencimientos 7d / 3d / día-de  2) marcar vencidos
-// 3) tareas vencidas  4) licencia por vencer → email al proveedor.
+// 3) tareas vencidas  4) licencia por vencer → email al proveedor
+// 5) recalcular estado fiscal de todos los clientes (aunque nadie tilde nada,
+//    un mes que cierra sin presentar pasa a ATRASADO solo).
 
 export const maxDuration = 60;
 
@@ -37,6 +40,7 @@ export async function GET(req: NextRequest) {
     alertasDia: 0,
     marcadosVencidos: 0,
     tareasVencidas: 0,
+    estadoFiscalRecalculado: 0,
     licenciaAvisada: false,
   };
 
@@ -162,6 +166,16 @@ export async function GET(req: NextRequest) {
       });
     }
   }
+
+  // ── 5. Recalcular estado fiscal de todos los clientes activos ──
+  const clientesActivos = await prisma.cliente.findMany({
+    where: { estado: "ACTIVO" },
+    select: { id: true },
+  });
+  for (const c of clientesActivos) {
+    await recalcularEstadoFiscal(c.id);
+  }
+  resumen.estadoFiscalRecalculado = clientesActivos.length;
 
   return NextResponse.json({ data: resumen });
 }
