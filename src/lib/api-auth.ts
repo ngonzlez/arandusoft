@@ -50,3 +50,14 @@ export function filtroClientesPorRol(rol: Rol): Prisma.ClienteWhereInput {
     return { tipo: { in: [TipoCliente.JURIDICO, TipoCliente.AMBOS] } };
   return {};
 }
+
+// Para modelos con clienteId OPCIONAL (Tarea, Vencimiento): visible si no
+// tiene cliente, o si el cliente es visible por rol. OJO: un filtro vacío
+// (ADMIN) nunca debe anidarse como `cliente: {}` dentro de un OR — Prisma
+// omite esa rama silenciosamente en vez de tratarla como "sin restricción",
+// dejando el OR más restrictivo de lo pensado. Por eso el early-return acá.
+export function filtroTareasPorRol(rol: Rol): Prisma.TareaWhereInput {
+  const filtroCliente = filtroClientesPorRol(rol);
+  if (Object.keys(filtroCliente).length === 0) return {};
+  return { OR: [{ clienteId: null }, { cliente: filtroCliente }] };
+}

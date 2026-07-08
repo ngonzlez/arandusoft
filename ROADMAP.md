@@ -294,3 +294,15 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 4. Verificar dominio en Resend (SPF/DKIM en Cloudflare) y cargar `RESEND_API_KEY` + `CLOUDINARY_*` — **con esto se prueba por primera vez la subida real de PDFs y el envío real de correos**.
 5. Programar el cron externo (cron-job.org o Coolify Scheduled Task).
 6. Seed + cambio de contraseñas + importación de clientes reales por Excel.
+
+---
+
+## Fix — Tareas invisibles para ADMIN (2026-07-08)
+
+**Bug reportado:** el usuario creó una tarea y no aparecía en ningún lado (ni en `/tareas` ni por API), incluso logueado como ADMIN.
+
+**Causa raíz:** `filtroTareasPorRol` (antes inline) construía `OR: [{clienteId: null}, {cliente: filtroClientesPorRol(rol)}]`. Para ADMIN, `filtroClientesPorRol` devuelve `{}` (sin restricción). Prisma, al recibir un filtro de relación vacío **dentro de un OR**, no lo traduce como "siempre verdadero" — directamente **omite esa rama de la query**. El OR quedaba reducido a `clienteId IS NULL`, así que cualquier tarea con cliente asignado desaparecía para el rol que se supone ve *todo*. Confirmado con `log:['query']` de Prisma: el SQL generado no tenía ninguna mención a `cliente`.
+
+**Fix:** nuevo helper `filtroTareasPorRol()` en `lib/api-auth.ts` con early-return explícito — si el filtro de cliente es vacío, devuelve `{}` en vez de anidarlo en el OR (mismo patrón que `filtroVencimientosPorRol`, que sí lo hacía bien desde la Fase 5). Corregidos 3 call-sites: `GET /api/tareas`, `PATCH /api/tareas/[id]`, y la query inicial de `/tareas/page.tsx`. Auditado el resto de usos de `filtroClientesPorRol` en el proyecto — ningún otro lugar tenía este patrón roto (los demás lo spreadean directo en el `where`, no anidado en un OR, donde omitirlo si está vacío es matemáticamente correcto).
+
+**Verificado:** ADMIN ve ambas tareas (una con cliente CONTABLE, otra con cliente distinto) · CONTABLE ve las suyas · JURIDICO no ve la de un cliente CONTABLE · build limpio.

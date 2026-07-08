@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { filtroClientesPorRol } from "@/lib/api-auth";
+import { filtroClientesPorRol, filtroTareasPorRol } from "@/lib/api-auth";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TareasBoard } from "@/components/tareas/TareasBoard";
 
@@ -12,9 +12,7 @@ export default async function TareasPage() {
 
   const [tareas, usuarios, clientes] = await Promise.all([
     prisma.tarea.findMany({
-      where: {
-        OR: [{ clienteId: null }, { cliente: filtroClientesPorRol(user.rol) }],
-      },
+      where: filtroTareasPorRol(user.rol),
       orderBy: [{ prioridad: "asc" }, { fechaLimite: "asc" }],
       include: {
         cliente: { select: { id: true, nombre: true } },

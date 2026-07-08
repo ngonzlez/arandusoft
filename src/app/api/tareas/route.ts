@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EstadoTarea, Prioridad } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, filtroClientesPorRol, filtroTareasPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 export async function GET(req: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       ...(responsableId ? { responsableId } : {}),
       ...(clienteId ? { clienteId } : {}),
       // tareas de clientes no visibles por rol quedan fuera; sin cliente, visibles
-      OR: [{ clienteId: null }, { cliente: filtroClientesPorRol(user.rol) }],
+      ...filtroTareasPorRol(user.rol),
     },
     orderBy: [{ prioridad: "asc" }, { fechaLimite: "asc" }],
     include: {

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EstadoTarea, Prioridad, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, filtroTareasPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 type Params = { params: Promise<{ id: string }> };
@@ -14,7 +14,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   const existente = await prisma.tarea.findFirst({
     where: {
       id,
-      OR: [{ clienteId: null }, { cliente: filtroClientesPorRol(user.rol) }],
+      ...filtroTareasPorRol(user.rol),
     },
   });
   if (!existente) {
