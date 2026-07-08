@@ -95,3 +95,24 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Nota técnica:** tras una migración con el dev server corriendo, hay que reiniciarlo y si persiste el error de "Unknown argument" borrar `.next` (bundle cachea el cliente Prisma viejo).
 
 **Pendiente / notas:** próxima fase: Estado Mensual (checklist).
+
+---
+
+## Fase 3 — Estado Mensual (2026-07-08)
+
+**Qué se construyó:**
+- **API** `GET /api/estado-mensual?mes=AAAA-MM`: matriz global del mes (clientes activos visibles por rol × obligaciones activas × estado registrado). Solo ADMIN/CONTABLE.
+- **API** `PATCH /api/estado-mensual`: upsert de una celda `{clienteId, mes, obligacion, estado}` con auditoría (`responsableId` = usuario que tilda + `fechaPresentacion` automática al marcar PRESENTADO).
+- **Estado fiscal automático:** al tildar, si el cliente tiene alguna obligación VENCIDO → pasa a ATRASADO; si ya no tiene vencidas → AL_DIA. Los estados CCT y VECTOR_FISCAL son manuales y el automático nunca los pisa.
+- **UI** `/estado-mensual`: tabla global clientes × obligaciones con semáforo (✓ verde presentado, ⏳ amarillo pendiente, ✕ rojo vencido, — gris no aplica; punto tenue si la obligación no aplica al cliente), selector de mes ‹ › , columna de cliente sticky con scroll horizontal. Clic en celda → modal con estado actual, quién/cuándo presentó, y botones para cambiar estado.
+- **Ficha del cliente:** el tab "Estado Mensual" ahora muestra la misma tabla filtrada a ese cliente (mes actual).
+
+**Migraciones:** ninguna nueva.
+
+**Usuarios/seed:** sin cambios.
+
+**Env vars nuevas:** ninguna.
+
+**Verificado (curl como CONTABLE):** GET matriz devuelve solo clientes CONTABLE/AMBOS · PATCH tilda IVA como PRESENTADO y registra `responsableId` + `fechaPresentacion` · marcar IPS VENCIDO pone al cliente ATRASADO · volver a PRESENTADO lo devuelve a AL_DIA · build limpio.
+
+**Pendiente / notas:** el adjuntar PDF desde el modal se conecta en Fase 4 (campo `declaracionId` ya existe en `EstadoMensual`). Próxima fase: Declaraciones + envío de archivos por correo interno.

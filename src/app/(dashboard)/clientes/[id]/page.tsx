@@ -12,6 +12,8 @@ import {
   type AccesosCliente,
 } from "@/lib/clientes";
 import { TIPO_CLIENTE, ESTADO_CLIENTE, ESTADO_FISCAL } from "@/lib/badges";
+import { formatInTimeZone } from "date-fns-tz";
+import { TZ_PARAGUAY } from "@/lib/format";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +21,7 @@ import { Card } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { ClienteTabs } from "@/components/clientes/ClienteTabs";
 import { AccesosPanel } from "@/components/clientes/AccesosPanel";
+import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
 
@@ -31,11 +34,22 @@ export default async function ClienteDetallePage({
   const user = session!.user;
   const { id } = await params;
 
+  const mesActual = formatInTimeZone(new Date(), TZ_PARAGUAY, "yyyy-MM");
+
   const cliente = await prisma.cliente.findFirst({
     where: { id, ...filtroClientesPorRol(user.rol) },
     include: {
       responsable: { select: { nombre: true } },
       obligaciones: { where: { activa: true }, select: { tipo: true } },
+      estadosMensuales: {
+        where: { mes: mesActual },
+        select: {
+          obligacion: true,
+          estado: true,
+          fechaPresentacion: true,
+          responsable: { select: { nombre: true } },
+        },
+      },
     },
   });
   if (!cliente) notFound();
@@ -130,7 +144,33 @@ export default async function ClienteDetallePage({
       <ClienteTabs
         tabs={[
           { key: "resumen", label: "Resumen", content: resumen },
-          { key: "estado-mensual", label: "Estado Mensual", content: placeholder("El estado mensual", "Fase 3") },
+          {
+            key: "estado-mensual",
+            label: "Estado Mensual",
+            content:
+              user.rol === "JURIDICO" || cliente.obligaciones.length === 0 ? (
+                <Card>
+                  <p className="text-sm text-ink-faint">
+                    {user.rol === "JURIDICO"
+                      ? "El estado mensual es del área contable."
+                      : "Este cliente no tiene obligaciones activas configuradas."}
+                  </p>
+                </Card>
+              ) : (
+                <EstadoMensualTabla
+                  mes={mesActual}
+                  clientes={[
+                    {
+                      id: cliente.id,
+                      nombre: cliente.nombre,
+                      ruc: cliente.ruc,
+                      obligaciones: cliente.obligaciones,
+                      estadosMensuales: cliente.estadosMensuales,
+                    },
+                  ]}
+                />
+              ),
+          },
           { key: "declaraciones", label: "Declaraciones", content: placeholder("Las declaraciones", "Fase 4") },
           { key: "vencimientos", label: "Vencimientos", content: placeholder("Los vencimientos", "Fase 5") },
           { key: "tareas", label: "Tareas", content: placeholder("Las tareas", "Fase 8") },
