@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { TipoObligacion } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
-import { subirArchivoDeclaracion, type FormatoArchivo } from "@/lib/storage";
+import { subirArchivo, type FormatoArchivo } from "@/lib/storage";
 
 const MAX_BYTES = 15 * 1024 * 1024; // 15MB
 
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
 
   let subida;
   try {
-    subida = await subirArchivoDeclaracion(
+    subida = await subirArchivo(
       buffer,
       `declaraciones/${cliente.ruc}`,
       `${tipo}-${periodo}`,

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getResend, EMAIL_FROM, plantillaEmail } from "@/lib/email";
-import { descargarArchivoDeclaracion, urlFirmadaDeclaracion, type FormatoArchivo } from "@/lib/storage";
+import { descargarArchivo, urlFirmadaArchivo, type FormatoArchivo } from "@/lib/storage";
 import { crearNotificacion } from "@/lib/notificaciones";
 import { formatFechaHora } from "@/lib/format";
 
@@ -66,7 +66,7 @@ export async function enviarDeclaracionPorCorreo({
     const resend = getResend();
 
     if (usarAdjunto) {
-      const pdf = await descargarArchivoDeclaracion(declaracion.archivoPublicId!, formato);
+      const pdf = await descargarArchivo(declaracion.archivoPublicId!, formato);
       const res = await resend.emails.send({
         from: EMAIL_FROM,
         to: destinatario.email,
@@ -84,7 +84,7 @@ export async function enviarDeclaracionPorCorreo({
       if (!declaracion.archivoPublicId) {
         throw new Error("La declaración no tiene archivo asociado en el almacenamiento");
       }
-      const link = await urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, LINK_EXPIRA_SEGUNDOS);
+      const link = await urlFirmadaArchivo(declaracion.archivoPublicId, formato, LINK_EXPIRA_SEGUNDOS);
       const res = await resend.emails.send({
         from: EMAIL_FROM,
         to: destinatario.email,

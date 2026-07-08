@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma, Rol, TipoCliente } from "@prisma/client";
 import { auth } from "@/lib/auth";
-import { getEstadoLicencia } from "@/lib/licencia";
+import { getEstadoLicencia, getConfigEstudio } from "@/lib/licencia";
 
 type SessionUser = { id: string; rol: Rol; email?: string | null; name?: string | null };
 
@@ -39,6 +39,20 @@ export async function requireApiSession(rolesPermitidos?: Rol[]): Promise<
   }
 
   return { user };
+}
+
+// Gate del módulo jurídico (Expedientes): el superadmin lo prende/apaga por
+// estudio desde /admin/licencia. Si está apagado, la API lo bloquea de
+// verdad (no alcanza con ocultar el ítem del nav).
+export async function requireModuloJuridico(): Promise<NextResponse | null> {
+  const { moduloJuridicoHabilitado } = await getConfigEstudio();
+  if (!moduloJuridicoHabilitado) {
+    return NextResponse.json(
+      { error: "El módulo jurídico no está habilitado para este estudio", code: "MODULO_DESHABILITADO" },
+      { status: 403 }
+    );
+  }
+  return null;
 }
 
 // Filtro de visibilidad de clientes según rol (regla dura del PRD):

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
-import { urlFirmadaDeclaracion, type FormatoArchivo } from "@/lib/storage";
+import { urlFirmadaArchivo, type FormatoArchivo } from "@/lib/storage";
 
 // Descarga con 1 clic: valida visibilidad por rol y redirige a URL firmada corta.
 export async function GET(
@@ -28,7 +28,7 @@ export async function GET(
 
   try {
     const formato = declaracion.archivoFormato as FormatoArchivo;
-    const url = await urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, 600);
+    const url = await urlFirmadaArchivo(declaracion.archivoPublicId, formato, 600);
     return NextResponse.redirect(url);
   } catch (e) {
     console.error("Error generando URL firmada:", e);

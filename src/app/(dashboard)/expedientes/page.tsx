@@ -1,25 +1,28 @@
+import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { filtroClientesPorRol, filtroTareasPorRol } from "@/lib/api-auth";
+import { filtroClientesPorRol } from "@/lib/api-auth";
 import { getConfigEstudio } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { TareasBoard } from "@/components/tareas/TareasBoard";
+import { ExpedientesLista } from "@/components/expedientes/ExpedientesLista";
 
-export const metadata = { title: "Tareas — ArandúSoft" };
+export const metadata = { title: "Expedientes — ArandúSoft" };
 
-export default async function TareasPage() {
+export default async function ExpedientesPage() {
   const session = await auth();
   const user = session!.user;
 
   const { moduloJuridicoHabilitado } = await getConfigEstudio();
+  if (!moduloJuridicoHabilitado) redirect("/dashboard");
 
-  const [tareas, usuarios, clientes, expedientes] = await Promise.all([
-    prisma.tarea.findMany({
-      where: filtroTareasPorRol(user.rol),
-      orderBy: [{ prioridad: "asc" }, { fechaLimite: "asc" }],
+  const [expedientes, usuarios, clientes] = await Promise.all([
+    prisma.expediente.findMany({
+      where: { cliente: { ...filtroClientesPorRol(user.rol) } },
+      orderBy: { createdAt: "desc" },
       include: {
         cliente: { select: { id: true, nombre: true } },
         responsable: { select: { id: true, nombre: true } },
+        _count: { select: { documentos: true, tareas: true } },
       },
     }),
     prisma.user.findMany({
@@ -32,23 +35,15 @@ export default async function TareasPage() {
       orderBy: { nombre: "asc" },
       select: { id: true, nombre: true },
     }),
-    moduloJuridicoHabilitado
-      ? prisma.expediente.findMany({
-          where: { cliente: { ...filtroClientesPorRol(user.rol) } },
-          orderBy: { titulo: "asc" },
-          select: { id: true, titulo: true },
-        })
-      : Promise.resolve([]),
   ]);
 
   return (
     <div>
-      <PageHeader titulo="Tareas" subtitulo={`${tareas.length} en total`} />
-      <TareasBoard
-        tareas={JSON.parse(JSON.stringify(tareas))}
+      <PageHeader titulo="Expedientes" subtitulo={`${expedientes.length} en total`} />
+      <ExpedientesLista
+        expedientes={JSON.parse(JSON.stringify(expedientes))}
         usuarios={usuarios}
         clientes={clientes}
-        expedientes={expedientes}
         miUserId={user.id}
       />
     </div>

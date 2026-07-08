@@ -13,7 +13,7 @@ import { Card } from "@/components/ui/Card";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { SlideOver } from "@/components/ui/SlideOver";
-import { NotasTarea } from "@/components/tareas/NotasTarea";
+import { NotasPanel } from "@/components/shared/NotasPanel";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
@@ -40,6 +40,7 @@ interface Props {
   tareas: Tarea[];
   usuarios: { id: string; nombre: string }[];
   clientes: { id: string; nombre: string }[];
+  expedientes: { id: string; titulo: string }[];
   miUserId: string;
 }
 
@@ -55,7 +56,7 @@ const PRIORIDAD_LABEL: Record<Prioridad, string> = {
   BAJA: "Baja",
 };
 
-export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
+export function TareasBoard({ tareas, usuarios, clientes, expedientes, miUserId }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [vista, setVista] = useState<"kanban" | "lista">("kanban");
@@ -111,6 +112,7 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
         titulo: form.get("titulo"),
         descripcion: form.get("descripcion"),
         clienteId: form.get("clienteId") || null,
+        expedienteId: form.get("expedienteId") || null,
         responsableId: form.get("responsableId"),
         prioridad: form.get("prioridad"),
         fechaLimite: form.get("fechaLimite") ? `${form.get("fechaLimite")}T12:00:00Z` : null,
@@ -352,7 +354,10 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
               </div>
             )}
 
-            <NotasTarea tareaId={detalle.id} />
+            <NotasPanel
+              endpoint={`/api/tareas/${detalle.id}/notas`}
+              placeholder="Ej: fui con el cliente a buscar tal documento, dijo que presenta el..."
+            />
 
             <div className="pt-1 border-t border-line">
               <p className="text-sm font-semibold text-primary mb-2.5 mt-4">Mover a</p>
@@ -403,6 +408,16 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
               ))}
             </Select>
             <Input label="Fecha límite" name="fechaLimite" type="date" />
+            {expedientes.length > 0 && (
+              <Select label="Expediente (opcional)" name="expedienteId" defaultValue="">
+                <option value="">Sin expediente</option>
+                {expedientes.map((e) => (
+                  <option key={e.id} value={e.id}>
+                    {e.titulo}
+                  </option>
+                ))}
+              </Select>
+            )}
           </div>
 
           <div>

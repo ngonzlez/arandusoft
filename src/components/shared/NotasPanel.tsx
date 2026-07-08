@@ -14,7 +14,15 @@ interface Nota {
   autor: { nombre: string };
 }
 
-export function NotasTarea({ tareaId }: { tareaId: string }) {
+// Historial de observaciones append-only, reusado por Tareas y Expedientes
+// (cada uno pega a su propio endpoint /api/.../[id]/notas).
+export function NotasPanel({
+  endpoint,
+  placeholder = "Escribí una observación...",
+}: {
+  endpoint: string;
+  placeholder?: string;
+}) {
   const toast = useToast();
   const [notas, setNotas] = useState<Nota[]>([]);
   const [cargando, setCargando] = useState(true);
@@ -23,7 +31,7 @@ export function NotasTarea({ tareaId }: { tareaId: string }) {
 
   async function cargar() {
     setCargando(true);
-    const res = await fetch(`/api/tareas/${tareaId}/notas`);
+    const res = await fetch(endpoint);
     const json = await res.json().catch(() => null);
     setNotas(json?.data ?? []);
     setCargando(false);
@@ -32,13 +40,13 @@ export function NotasTarea({ tareaId }: { tareaId: string }) {
   useEffect(() => {
     cargar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [tareaId]);
+  }, [endpoint]);
 
   async function agregar() {
     if (!texto.trim()) return;
     setEnviando(true);
 
-    const res = await fetch(`/api/tareas/${tareaId}/notas`, {
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ contenido: texto.trim() }),
@@ -68,10 +76,7 @@ export function NotasTarea({ tareaId }: { tareaId: string }) {
       ) : (
         <div className="space-y-3 mb-3 max-h-64 overflow-y-auto">
           {notas.length === 0 ? (
-            <p className="text-xs text-ink-faint">
-              Sin observaciones todavía. Registrá acá el seguimiento de la tarea
-              (llamadas, visitas, compromisos del cliente, etc).
-            </p>
+            <p className="text-xs text-ink-faint">Sin observaciones todavía.</p>
           ) : (
             notas.map((n) => (
               <div key={n.id} className="flex gap-2.5">
@@ -97,7 +102,7 @@ export function NotasTarea({ tareaId }: { tareaId: string }) {
         <textarea
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
-          placeholder="Ej: fui con el cliente a buscar tal documento, dijo que presenta el..."
+          placeholder={placeholder}
           rows={2}
           className="flex-1 rounded-control border border-line px-3 py-2 text-sm focus:outline-none focus:border-primary resize-none"
         />

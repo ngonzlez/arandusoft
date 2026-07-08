@@ -34,8 +34,9 @@ export async function POST(req: NextRequest) {
   if (error) return error;
 
   const body = await req.json().catch(() => null);
-  const { titulo, descripcion, clienteId, responsableId, prioridad, fechaLimite, checklist } =
+  const { titulo, descripcion, responsableId, prioridad, fechaLimite, checklist, expedienteId } =
     body ?? {};
+  let { clienteId } = body ?? {};
 
   if (!titulo?.trim() || !responsableId) {
     return NextResponse.json(
@@ -51,7 +52,18 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (clienteId) {
+  // Una tarea de expediente hereda el cliente del expediente — mantiene
+  // consistente el filtro de visibilidad por rol (que se basa en clienteId).
+  if (expedienteId) {
+    const expediente = await prisma.expediente.findFirst({
+      where: { id: expedienteId, cliente: { ...filtroClientesPorRol(user.rol) } },
+      select: { clienteId: true },
+    });
+    if (!expediente) {
+      return NextResponse.json({ error: "No encontrado" }, { status: 404 });
+    }
+    clienteId = expediente.clienteId;
+  } else if (clienteId) {
     const cliente = await prisma.cliente.findFirst({
       where: { id: clienteId, ...filtroClientesPorRol(user.rol) },
       select: { id: true },
@@ -76,6 +88,7 @@ export async function POST(req: NextRequest) {
       titulo: titulo.trim(),
       descripcion: descripcion?.trim() || null,
       clienteId: clienteId || null,
+      expedienteId: expedienteId || null,
       responsableId,
       prioridad: prioridad ?? "MEDIA",
       fechaLimite: fechaLimite ? new Date(fechaLimite) : null,

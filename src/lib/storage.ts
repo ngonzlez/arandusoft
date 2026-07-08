@@ -5,16 +5,19 @@ import {
 } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 
-// Archivos de declaraciones (PDF o el Excel de Marangatu/DNIT): se suben
+// Archivos (declaraciones de clientes, documentos de expedientes): se suben
 // PRIVADOS a MinIO (self-hosted, compatible S3). La descarga siempre pasa
 // por URL firmada con expiración corta — nunca hay acceso público directo,
-// son datos fiscales confidenciales de clientes.
+// son datos confidenciales de clientes.
 
-export type FormatoArchivo = "pdf" | "xlsx";
+export type FormatoArchivo = "pdf" | "xlsx" | "docx" | "jpg" | "png";
 
 const CONTENT_TYPE: Record<FormatoArchivo, string> = {
   pdf: "application/pdf",
   xlsx: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  docx: "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  jpg: "image/jpeg",
+  png: "image/png",
 };
 
 let cliente: S3Client | null = null;
@@ -38,7 +41,7 @@ function getBucket(): string {
   return process.env.MINIO_BUCKET || "arandufiles";
 }
 
-export async function subirArchivoDeclaracion(
+export async function subirArchivo(
   buffer: Buffer,
   carpeta: string,
   nombreBase: string,
@@ -59,7 +62,7 @@ export async function subirArchivoDeclaracion(
 }
 
 // URL firmada de descarga (default 1 hora; para links por email usar 48-72h).
-export async function urlFirmadaDeclaracion(
+export async function urlFirmadaArchivo(
   publicId: string,
   _formato: FormatoArchivo,
   expiraEnSegundos = 3600
@@ -68,11 +71,11 @@ export async function urlFirmadaDeclaracion(
   return getSignedUrl(getCliente(), command, { expiresIn: expiraEnSegundos });
 }
 
-export async function descargarArchivoDeclaracion(
+export async function descargarArchivo(
   publicId: string,
   formato: FormatoArchivo
 ): Promise<Buffer> {
-  const url = await urlFirmadaDeclaracion(publicId, formato, 300);
+  const url = await urlFirmadaArchivo(publicId, formato, 300);
   const res = await fetch(url);
   if (!res.ok) throw new Error(`No se pudo descargar el archivo (${res.status})`);
   return Buffer.from(await res.arrayBuffer());
