@@ -22,6 +22,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { ClienteTabs } from "@/components/clientes/ClienteTabs";
 import { AccesosPanel } from "@/components/clientes/AccesosPanel";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
+import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
 
@@ -171,7 +172,17 @@ export default async function ClienteDetallePage({
                 />
               ),
           },
-          { key: "declaraciones", label: "Declaraciones", content: placeholder("Las declaraciones", "Fase 4") },
+          {
+            key: "declaraciones",
+            label: "Declaraciones",
+            content: (
+              <DeclaracionesTab
+                clienteId={cliente.id}
+                clienteNombre={cliente.nombre}
+                puedeSubir={user.rol === "ADMIN" || user.rol === "CONTABLE"}
+              />
+            ),
+          },
           { key: "vencimientos", label: "Vencimientos", content: placeholder("Los vencimientos", "Fase 5") },
           { key: "tareas", label: "Tareas", content: placeholder("Las tareas", "Fase 8") },
         ]}

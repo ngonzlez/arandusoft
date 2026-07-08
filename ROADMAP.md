@@ -116,3 +116,27 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado (curl como CONTABLE):** GET matriz devuelve solo clientes CONTABLE/AMBOS · PATCH tilda IVA como PRESENTADO y registra `responsableId` + `fechaPresentacion` · marcar IPS VENCIDO pone al cliente ATRASADO · volver a PRESENTADO lo devuelve a AL_DIA · build limpio.
 
 **Pendiente / notas:** el adjuntar PDF desde el modal se conecta en Fase 4 (campo `declaracionId` ya existe en `EstadoMensual`). Próxima fase: Declaraciones + envío de archivos por correo interno.
+
+---
+
+## Fase 4 — Declaraciones + Envío por correo interno (2026-07-08)
+
+**Qué se construyó:**
+- **`lib/storage.ts`** (Cloudinary): PDFs se suben como recurso `raw` **privado**; descarga siempre vía URL firmada con expiración (10 min descarga directa, 48h para links por email).
+- **`lib/email.ts`** (Resend): cliente + plantilla HTML con identidad ArandúSoft (header azul marino + dorado).
+- **`lib/notificaciones.ts`**: helper central `crearNotificacion()` — todos los módulos lo usan de acá en más.
+- **API** `POST /api/declaraciones`: subida multipart (PDF only, máx 15MB), guarda tipo/período/tamaño/nombre original/`cargadoPor`; checkbox opcional "vincular" que tilda automáticamente la obligación del período en Estado Mensual (con `declaracionId` linkeado).
+- **API** `GET /api/clientes/[id]/declaraciones`: separadas en `recientes` e `historial` (>6 meses, computado por fecha — nunca se borra nada).
+- **API** `GET /api/declaraciones/[id]/descargar`: valida visibilidad por rol → redirect a URL firmada (descarga 1 clic).
+- **API** `POST /api/archivos/enviar` + **`lib/email-archivos.ts`** (módulo nuevo pedido fuera de los .md): envía una declaración por correo a otro usuario interno. Si el PDF ≤ `RESEND_ATTACHMENT_MAX_BYTES` (default 8MB) va **adjunto**; si es más grande va como **link firmado 48h**. `reply_to` = correo del remitente. **Auditoría total:** cada intento (éxito o fallo) queda en `EnvioArchivo` con método, destinatario snapshot, `resendMessageId` o `errorMensaje`. Al destinatario le llega también notificación in-app `ARCHIVO_RECIBIDO`.
+- **UI**: tab Declaraciones en la ficha del cliente — tabla tipo/período/fecha/cargado por + botones Descargar y ✉ Enviar por fila, modal de subida (con vinculación a Estado Mensual), sección Historial colapsable, `EnviarArchivoModal` compartido (reutilizable para documentos de expedientes en Fase 2 jurídica).
+
+**Migraciones:** ninguna nueva.
+
+**Usuarios/seed:** sin cambios.
+
+**Env vars nuevas:** ninguna nueva (usa `CLOUDINARY_*`, `RESEND_API_KEY`, `EMAIL_FROM`, `RESEND_ATTACHMENT_MAX_BYTES` ya definidas en Fase 0 — **siguen vacías en dev**).
+
+**Verificado (curl):** GET declaraciones OK · POST sin archivo → 400 claro · POST con .txt → "Solo se aceptan archivos PDF" · POST PDF sin credenciales Cloudinary → error 500 limpio y amigable (no crash) · enviarse archivo a uno mismo → 400 · build limpio.
+
+**Pendiente / notas:** ⚠️ la subida real a Cloudinary y el envío real por Resend quedan pendientes de probar cuando se carguen las credenciales (`CLOUDINARY_*`, `RESEND_API_KEY`) — el flujo completo está implementado. Próxima fase: Calendario de Vencimientos.
