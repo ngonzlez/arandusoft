@@ -26,15 +26,20 @@ export default async function AsambleasPage({
   const mesActual = formatInTimeZone(new Date(), TZ_PARAGUAY, "yyyy-MM");
   const periodo = MES_RE.test(sp.mes ?? "") ? sp.mes! : mesActual;
 
-  const clientes = await prisma.cliente.findMany({
-    where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
-    orderBy: { nombre: "asc" },
-    select: {
-      id: true,
-      nombre: true,
-      asambleas: { where: { periodo } },
-    },
-  });
+  const [clientes, usuarios] = await Promise.all([
+    prisma.cliente.findMany({
+      where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
+      orderBy: { nombre: "asc" },
+      select: {
+        id: true,
+        nombre: true,
+        asambleas: { where: { periodo } },
+      },
+    }),
+    prisma.user.findMany({ select: { id: true, nombre: true } }),
+  ]);
+
+  const nombresPorId = Object.fromEntries(usuarios.map((u) => [u.id, u.nombre]));
 
   return (
     <div>
@@ -49,7 +54,11 @@ export default async function AsambleasPage({
           <EmptyState titulo="Sin clientes activos" />
         </div>
       ) : (
-        <AsambleasTabla periodo={periodo} clientes={clientes} />
+        <AsambleasTabla
+          periodo={periodo}
+          clientes={JSON.parse(JSON.stringify(clientes))}
+          nombresPorId={nombresPorId}
+        />
       )}
     </div>
   );

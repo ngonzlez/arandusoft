@@ -4,6 +4,12 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/Toast";
+import { formatFechaHora } from "@/lib/format";
+
+interface AuditoriaCelda {
+  userId: string;
+  at: string;
+}
 
 interface RegistroAsamblea {
   fechaEEFF: string | Date | null;
@@ -15,7 +21,7 @@ interface RegistroAsamblea {
   ips: boolean;
   libros: boolean;
   contAdm: boolean;
-  auditoria: unknown;
+  auditoria: Record<string, AuditoriaCelda>;
 }
 
 interface ClienteFila {
@@ -27,6 +33,7 @@ interface ClienteFila {
 interface Props {
   periodo: string;
   clientes: ClienteFila[];
+  nombresPorId: Record<string, string>;
 }
 
 const COLUMNAS: { campo: string; label: string }[] = [
@@ -40,7 +47,7 @@ const COLUMNAS: { campo: string; label: string }[] = [
   { campo: "contAdm", label: "Cont. Adm" },
 ];
 
-export function AsambleasTabla({ periodo, clientes }: Props) {
+export function AsambleasTabla({ periodo, clientes, nombresPorId }: Props) {
   const router = useRouter();
   const toast = useToast();
   // Estado optimista local: clave "clienteId:campo" → boolean
@@ -51,6 +58,20 @@ export function AsambleasTabla({ periodo, clientes }: Props) {
     if (clave in pendientes) return pendientes[clave];
     const reg = c.asambleas[0];
     return reg ? Boolean(reg[campo as keyof RegistroAsamblea]) : false;
+  }
+
+  function auditoriaDe(c: ClienteFila, campo: string): AuditoriaCelda | null {
+    return c.asambleas[0]?.auditoria?.[campo] ?? null;
+  }
+
+  function tooltipDe(c: ClienteFila, campo: string, label: string): string {
+    const marcado = valorDe(c, campo);
+    const audit = auditoriaDe(c, campo);
+    if (marcado && audit) {
+      const nombre = nombresPorId[audit.userId] ?? "usuario eliminado";
+      return `${label}: tildado por ${nombre} el ${formatFechaHora(audit.at)}`;
+    }
+    return `${label} — clic para tildar`;
   }
 
   async function toggle(c: ClienteFila, campo: string) {
@@ -96,6 +117,15 @@ export function AsambleasTabla({ periodo, clientes }: Props) {
     return new Date(f).toISOString().slice(0, 10);
   }
 
+  function iniciales(nombre: string): string {
+    return nombre
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase())
+      .join("");
+  }
+
   return (
     <div className="overflow-x-auto rounded-card border border-line bg-white">
       <table className="w-full text-sm">
@@ -135,27 +165,42 @@ export function AsambleasTabla({ periodo, clientes }: Props) {
                   className="h-8 rounded-control border border-line px-2 text-xs text-ink-muted focus:outline-none focus:border-primary"
                 />
               </td>
-              {COLUMNAS.map((col) => (
-                <td key={col.campo} className="py-2 px-2 text-center">
-                  <button
-                    onClick={() => toggle(c, col.campo)}
-                    className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
-                      valorDe(c, col.campo)
-                        ? "border-transparent bg-[#DCFCE7] text-[#15803D]"
-                        : "border-line text-transparent hover:border-gold hover:text-ink-faint"
-                    }`}
-                    title={`${col.label} — clic para ${valorDe(c, col.campo) ? "destildar" : "tildar"}`}
-                  >
-                    ✓
-                  </button>
-                </td>
-              ))}
+              {COLUMNAS.map((col) => {
+                const marcado = valorDe(c, col.campo);
+                const audit = auditoriaDe(c, col.campo);
+                const nombreQuien = audit ? nombresPorId[audit.userId] : null;
+                return (
+                  <td key={col.campo} className="py-2 px-2 text-center">
+                    <div className="inline-flex flex-col items-center gap-0.5">
+                      <button
+                        onClick={() => toggle(c, col.campo)}
+                        className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
+                          marcado
+                            ? "border-transparent bg-[#DCFCE7] text-[#15803D]"
+                            : "border-line text-transparent hover:border-gold hover:text-ink-faint"
+                        }`}
+                        title={tooltipDe(c, col.campo, col.label)}
+                      >
+                        ✓
+                      </button>
+                      {marcado && nombreQuien && (
+                        <span
+                          className="text-[9px] text-ink-faint leading-none"
+                          title={tooltipDe(c, col.campo, col.label)}
+                        >
+                          {iniciales(nombreQuien)}
+                        </span>
+                      )}
+                    </div>
+                  </td>
+                );
+              })}
             </tr>
           ))}
         </tbody>
       </table>
       <p className="px-4 py-3 border-t border-line text-xs text-ink-faint">
-        Cada tilde registra automáticamente quién lo marcó y cuándo.
+        Pasá el mouse sobre un tilde (o mirá las iniciales debajo) para ver quién lo marcó y cuándo.
       </p>
     </div>
   );
