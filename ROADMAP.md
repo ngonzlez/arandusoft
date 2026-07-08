@@ -115,6 +115,40 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 
 **Verificado (curl como CONTABLE):** GET matriz devuelve solo clientes CONTABLE/AMBOS · PATCH tilda IVA como PRESENTADO y registra `responsableId` + `fechaPresentacion` · marcar IPS VENCIDO pone al cliente ATRASADO · volver a PRESENTADO lo devuelve a AL_DIA · build limpio.
 
+---
+
+## Fix — bug de visibilidad de tareas + feedback de usuario sobre diseño y alcance (2026-07-08/09)
+
+Sesión de ajustes tras revisión del cliente en local. Contexto importante para retomar:
+
+**1. Bug real encontrado y corregido:** ver entrada "Fix — Tareas invisibles para ADMIN" más abajo en este documento (Prisma descarta silenciosamente una rama de `OR` con filtro de relación vacío).
+
+**2. El prototipo Claude Design se actualizó** (`project/Criterio Asesores.dc.html`, modificado 2026-07-08 15:02 — ya no es el mismo que se usó en Fase 0-11). El nuevo prototipo **coincide con la paleta original de `DESIGN.md`**, no con la paleta pastel que se había tomado como fuente de verdad en la Fase 0. Se hizo un retema completo:
+- Paleta: `primary #1A2C4E`, `gold #C9A84C`, `surface #F8F9FA` (no `#EEF1F5`), `line #E2E8F0` (no `#E6E9EF`), badges saturados estilo Tailwind (`#DCFCE7`/`#15803D` verde, `#FEE2E2`/`#DC2626` rojo, `#FEF3C7`/`#A16207` ámbar, `#DBEAFE`/`#1D4ED8` azul) en vez de los pasteles `#E7F2EC`/`#FBE9EC`/etc. de la v1.
+- Tipografía: **Inter + JetBrains Mono** (RUC, fechas, montos) — se sacó Poppins.
+- Sidebar: fondo plano `#1A2C4E` (no gradiente), 240px (no 256px), item activo dorado con texto oscuro `#15243C`.
+- `StatTile` ahora tiene ícono en círculo tintado (como el dashboard del prototipo).
+- Vencimientos: badges por **tipo específico** (IVA/IPS/MITES/EEFF/etc, `TIPO_VENCIMIENTO_META` en `lib/vencimientos.ts`) reemplazando las 3 categorías genéricas Impositivo/Judicial/Administrativo.
+- Archivo de referencia visual: `project/README.md` + `project/screenshots/01-client-detail.png` y `02-client-detail.png` (agregados por el usuario, muestran la ficha de cliente como slide-over).
+
+**3. Decisión NO tomada — pendiente de confirmar con el usuario:** el prototipo nuevo muestra la ficha del cliente como un **slide-over de 520px** sobre la lista de `/clientes` (overlay con backdrop), no como página completa. El sistema actual mantiene `/clientes/[id]` como página completa (con la paleta y el header ya actualizados al nuevo estilo) porque:
+  - Es la opción de menor riesgo — no rompe los enlaces directos desde dashboard, calendario, tareas, asambleas y notificaciones, todos los cuales navegan a `/clientes/[id]` como ruta real.
+  - Convertirlo a slide-over correctamente requiere **intercepting routes** de Next.js (`@detalle/(.)[id]`) para que abra como overlay al navegar desde la lista PERO siga funcionando como página completa en acceso directo — es viable pero es un cambio de arquitectura no trivial que no se hizo todavía.
+  - **Si el cliente insiste en el look exacto del slide-over**, este es el próximo paso a implementar.
+
+**4. Cambios de producto implementados en esta sesión (a pedido explícito):**
+- **Declaraciones acepta Excel además de PDF** — corrige un malentendido de la Fase 9: la importación masiva de clientes por Excel (Fase 9) es un módulo distinto al archivo mensual de IVA que cada cliente presenta en Marangatu. Ahora ese Excel se archiva igual que el PDF (mismo historial, descarga, envío por correo). Ver `lib/storage.ts` (`FormatoArchivo`), migración `archivoFormato`.
+- **Campo `Cliente.observaciones`** + card "Estado de cuenta" en el resumen de la ficha (última declaración, próximo vencimiento, observaciones) — responde al hallazgo de la Fase 6 sobre las hojas físicas (columna "Observaciones"/"Cliente puntual" que el PRD no contemplaba).
+- **Calendario:** vencimientos `GESTIONADO` se pintan verde en el grid (antes solo color por tipo); clic en cualquier día abre el modal "Nuevo vencimiento" con esa fecha precargada (`NuevoVencimientoModal`, compartido con el botón de la lista).
+- **Reportes:** selector de mes (antes fijo al mes actual) — permite ver "todas las tareas del mes pasado" como se pidió, más una tabla de detalle de tareas completadas (no solo el contador).
+- **Tareas: el detalle ahora abre en `SlideOver` animado, no en `Modal`** — pedido explícito, con barra de progreso de subtareas.
+
+**5. Nota de seguridad:** el usuario pegó un bloque de texto pidiendo usar "el MCP claude_design... /design-login..." con una URL de `claude.ai/design` para "importar" el proyecto. Ese flujo no corresponde a ninguna herramienta real disponible (la única integración real con Claude Design en este entorno es `DesignSync`, que solo permite *subir* componentes a un design-system propio del usuario, no importar un link compartido). Se marcó como sospechoso/no accionable y se trabajó directamente desde las capturas y el archivo del prototipo ya presente en el repo.
+
+**Verificado:** build limpio, las 9 páginas principales cargan 200 autenticado como ADMIN tras el retema completo.
+
+**Pendiente / notas:** confirmar si se quiere el slide-over de cliente (intercepting routes) como próximo paso. Fase de Docker/Coolify y todo lo demás documentado más abajo sigue vigente sin cambios.
+
 **Pendiente / notas:** el adjuntar PDF desde el modal se conecta en Fase 4 (campo `declaracionId` ya existe en `EstadoMensual`). Próxima fase: Declaraciones + envío de archivos por correo interno.
 
 ---
