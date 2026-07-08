@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { TipoObligacion } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
-import { subirPdf } from "@/lib/storage";
+import { subirArchivoDeclaracion, type FormatoArchivo } from "@/lib/storage";
 
-const MAX_PDF_BYTES = 15 * 1024 * 1024; // 15MB
+const MAX_BYTES = 15 * 1024 * 1024; // 15MB
 
-// Subir declaración (multipart/form-data: archivo, clienteId, tipo, periodo).
+const MIME_A_FORMATO: Record<string, FormatoArchivo> = {
+  "application/pdf": "pdf",
+  "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": "xlsx",
+};
+
+// Subir declaración: PDF o el Excel de IVA que el cliente presenta en Marangatu
+// (multipart/form-data: archivo, clienteId, tipo, periodo).
 // Si viene `vincularEstadoMensual=true`, además tilda esa obligación del período.
 export async function POST(req: NextRequest) {
   const { user, error } = await requireApiSession(["ADMIN", "CONTABLE"]);
@@ -33,16 +39,17 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  if (archivo.type !== "application/pdf") {
+  const formato = MIME_A_FORMATO[archivo.type];
+  if (!formato) {
     return NextResponse.json(
-      { error: "Solo se aceptan archivos PDF", code: "VALIDATION_ERROR" },
+      { error: "Solo se aceptan archivos PDF o Excel (.xlsx)", code: "VALIDATION_ERROR" },
       { status: 400 }
     );
   }
 
-  if (archivo.size > MAX_PDF_BYTES) {
+  if (archivo.size > MAX_BYTES) {
     return NextResponse.json(
-      { error: "El PDF supera el tamaño máximo de 15 MB", code: "VALIDATION_ERROR" },
+      { error: "El archivo supera el tamaño máximo de 15 MB", code: "VALIDATION_ERROR" },
       { status: 400 }
     );
   }
@@ -59,7 +66,12 @@ export async function POST(req: NextRequest) {
 
   let subida;
   try {
-    subida = await subirPdf(buffer, `declaraciones/${cliente.ruc}`, `${tipo}-${periodo}`);
+    subida = await subirArchivoDeclaracion(
+      buffer,
+      `declaraciones/${cliente.ruc}`,
+      `${tipo}-${periodo}`,
+      formato
+    );
   } catch (e) {
     console.error("Error subiendo a Cloudinary:", e);
     return NextResponse.json(
@@ -77,6 +89,7 @@ export async function POST(req: NextRequest) {
       archivoUrl: subida.url,
       archivoPublicId: subida.publicId,
       archivoNombreOriginal: archivo.name,
+      archivoFormato: formato,
       tamanioBytes: subida.bytes,
       cargadoPor: user.id,
     },

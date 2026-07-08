@@ -26,27 +26,26 @@ export function Sidebar({ items, usuario, notificacionesNoLeidas = 0, onNavigate
   const pathname = usePathname();
 
   return (
-    <div
-      className="flex h-full w-64 flex-col text-white"
-      style={{ background: "linear-gradient(180deg,#192C4C 0%,#14233D 100%)" }}
-    >
-      <div className="flex items-center gap-3 px-5 py-5">
+    <div className="flex h-full w-60 flex-col bg-primary text-white">
+      <div className="flex items-center gap-3 px-5 pt-[22px] pb-5">
         <Image
           src="/brand/logo.png"
           alt="ArandúSoft"
-          width={36}
-          height={36}
-          className="rounded-lg bg-white/95 p-0.5"
+          width={38}
+          height={38}
+          className="rounded-[10px] bg-white/95 p-0.5 shrink-0"
         />
-        <div>
-          <p className="font-heading font-bold leading-tight">
+        <div className="min-w-0">
+          <p className="font-heading font-semibold text-[15px] leading-tight text-white">
             Arandú<span className="text-gold">Soft</span>
           </p>
-          <p className="text-[11px] text-white/60 leading-tight">Criterio Asesores</p>
+          <p className="text-[10px] text-gold/90 tracking-wide mt-0.5 truncate">
+            GESTIÓN INTERNA · CRITERIO ASESORES
+          </p>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-0.5 overflow-y-auto">
+      <nav className="flex-1 px-3 overflow-y-auto">
         {items.map((item) => {
           const activo = pathname.startsWith(item.href);
           return (
@@ -54,16 +53,17 @@ export function Sidebar({ items, usuario, notificacionesNoLeidas = 0, onNavigate
               key={item.href}
               href={item.href}
               onClick={onNavigate}
-              className={`flex items-center gap-3 rounded-control px-3 py-2.5 text-sm transition-colors ${
-                activo
-                  ? "bg-gold text-white font-medium"
-                  : "text-white/70 hover:bg-white/10 hover:text-white"
-              }`}
+              className="flex items-center gap-3 rounded-lg px-3.5 py-2.5 text-[13.5px] mb-[3px] transition-colors"
+              style={{
+                fontWeight: activo ? 600 : 500,
+                background: activo ? "#C9A84C" : "transparent",
+                color: activo ? "#15243C" : "rgba(226,232,240,.72)",
+              }}
             >
-              {ICONS[item.icon]}
+              <span className="flex items-center">{ICONS[item.icon]}</span>
               <span className="flex-1">{item.label}</span>
               {item.icon === "bell" && notificacionesNoLeidas > 0 && (
-                <span className="rounded-full bg-urgent px-1.5 py-0.5 text-[10px] font-semibold leading-none">
+                <span className="rounded-full bg-urgent px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
                   {notificacionesNoLeidas}
                 </span>
               )}
@@ -72,16 +72,16 @@ export function Sidebar({ items, usuario, notificacionesNoLeidas = 0, onNavigate
         })}
       </nav>
 
-      <div className="border-t border-white/10 px-4 py-4">
-        <div className="flex items-center gap-3">
+      <div className="border-t border-white/[.08] p-3">
+        <div className="flex items-center gap-[11px] px-2 py-1.5">
           <Avatar nombre={usuario.nombre} size="md" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium truncate">{usuario.nombre}</p>
-            <p className="text-[11px] text-white/60">{ROL_LABEL[usuario.rol] ?? usuario.rol}</p>
+            <p className="text-[13px] font-semibold truncate text-white">{usuario.nombre}</p>
+            <p className="text-[11px] text-white/55">{ROL_LABEL[usuario.rol] ?? usuario.rol}</p>
           </div>
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="text-white/60 hover:text-white transition-colors"
+            className="text-white/60 hover:text-white transition-colors p-1.5"
             title="Cerrar sesión"
           >
             {ICONS.logout}

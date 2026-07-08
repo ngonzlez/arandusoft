@@ -84,6 +84,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     ...(body.telefono !== undefined ? { telefono: body.telefono?.trim() || null } : {}),
     ...(body.email !== undefined ? { email: body.email?.trim() || null } : {}),
     ...(body.direccion !== undefined ? { direccion: body.direccion?.trim() || null } : {}),
+    ...(body.observaciones !== undefined ? { observaciones: body.observaciones?.trim() || null } : {}),
     ...(body.tipo !== undefined ? { tipo: body.tipo } : {}),
     ...(body.estado !== undefined ? { estado: body.estado } : {}),
     ...(body.estadoFiscal !== undefined ? { estadoFiscal: body.estadoFiscal } : {}),

@@ -29,6 +29,7 @@ export async function GET(
       periodo: true,
       fechaPresentacion: true,
       archivoNombreOriginal: true,
+      archivoFormato: true,
       tamanioBytes: true,
       createdAt: true,
       cargador: { select: { nombre: true } },

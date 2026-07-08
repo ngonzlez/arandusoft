@@ -61,7 +61,7 @@ export default async function CalendarioPage({
       />
 
       <div className="space-y-6">
-        <CalendarioGrid año={año} mes={mesNum} vencimientos={vencimientos} />
+        <CalendarioGrid año={año} mes={mesNum} vencimientos={vencimientos} clientes={clientes} />
         <VencimientosLista vencimientos={vencimientos} clientes={clientes} />
       </div>
     </div>

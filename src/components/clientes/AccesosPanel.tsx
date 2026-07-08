@@ -25,7 +25,7 @@ export function AccesosPanel({ accesos }: { accesos: AccesosCliente | null }) {
     <Card>
       <div className="flex items-center gap-2 mb-4">
         <h3 className="font-heading font-semibold text-primary">Accesos internos</h3>
-        <span className="rounded-full bg-[#FAF1D8] px-2 py-0.5 text-[10px] font-semibold text-[#866518]">
+        <span className="rounded-full bg-[#FEF3C7] px-2 py-0.5 text-[10px] font-semibold text-[#92400E]">
           SOLO ADMIN
         </span>
       </div>

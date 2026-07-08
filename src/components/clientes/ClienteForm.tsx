@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TipoObligacion } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
-import { Input, Select } from "@/components/ui/Input";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
@@ -28,6 +28,7 @@ interface ClienteFormValues {
   responsableId: string;
   obligaciones: string[];
   accesos: AccesosCliente | null;
+  observaciones: string;
 }
 
 interface ClienteFormProps {
@@ -82,6 +83,7 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
       telefono: form.get("telefono"),
       email: form.get("email"),
       direccion: form.get("direccion"),
+      observaciones: form.get("observaciones"),
       tipo: form.get("tipo"),
       estado: form.get("estado"),
       estadoFiscal: form.get("estadoFiscal"),
@@ -129,6 +131,15 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
           <div className="md:col-span-2">
             <Input label="Dirección" name="direccion" defaultValue={inicial?.direccion} />
           </div>
+          <div className="md:col-span-2">
+            <Textarea
+              label="Observaciones"
+              name="observaciones"
+              defaultValue={inicial?.observaciones}
+              placeholder='Ej: "Cliente puntual", "Falta info de X", situación de pagos...'
+              helper="Notas internas del equipo — no las ve el cliente."
+            />
+          </div>
           <Select label="Tipo" name="tipo" defaultValue={inicial?.tipo ?? "CONTABLE"} required>
             <option value="CONTABLE">Contable</option>
             <option value="JURIDICO">Jurídico</option>
@@ -169,7 +180,7 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
               key={tipo}
               className={`flex items-center gap-2 rounded-control border px-3 py-2 text-sm cursor-pointer transition-colors ${
                 obligaciones.includes(tipo)
-                  ? "border-gold bg-[#FAF1D8]/50 text-primary"
+                  ? "border-gold bg-[#FEF3C7]/50 text-primary"
                   : "border-line text-ink-muted hover:border-gold/50"
               }`}
             >
@@ -228,7 +239,7 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
       )}
 
       {error && (
-        <p className="rounded-control bg-[#FBE9EC] px-4 py-3 text-sm text-urgent">{error}</p>
+        <p className="rounded-control bg-[#FEE2E2] px-4 py-3 text-sm text-urgent">{error}</p>
       )}
 
       <div className="flex gap-2">

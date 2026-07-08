@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
-import { urlFirmadaPdf } from "@/lib/storage";
+import { urlFirmadaDeclaracion, type FormatoArchivo } from "@/lib/storage";
 
 // Descarga con 1 clic: valida visibilidad por rol y redirige a URL firmada corta.
 export async function GET(
@@ -14,7 +14,7 @@ export async function GET(
 
   const declaracion = await prisma.declaracion.findFirst({
     where: { id, cliente: { ...filtroClientesPorRol(user.rol) } },
-    select: { archivoPublicId: true, archivoUrl: true },
+    select: { archivoPublicId: true, archivoUrl: true, archivoFormato: true },
   });
 
   if (!declaracion) {
@@ -27,7 +27,8 @@ export async function GET(
   }
 
   try {
-    return NextResponse.redirect(urlFirmadaPdf(declaracion.archivoPublicId, 600));
+    const formato = declaracion.archivoFormato as FormatoArchivo;
+    return NextResponse.redirect(urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, 600));
   } catch (e) {
     console.error("Error generando URL firmada:", e);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });

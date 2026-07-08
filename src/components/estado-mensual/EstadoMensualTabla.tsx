@@ -33,10 +33,10 @@ interface Props {
 
 // Semáforo visual (prototipo): verde presentado, amarillo pendiente, rojo vencido.
 const ICONO: Record<EstadoObligacion, { simbolo: string; clase: string; label: string }> = {
-  PRESENTADO: { simbolo: "✓", clase: "bg-[#E7F2EC] text-[#2C6E4C]", label: "Presentado" },
-  PENDIENTE: { simbolo: "⏳", clase: "bg-[#FAF1D8] text-[#9A7416]", label: "Pendiente" },
-  VENCIDO: { simbolo: "✕", clase: "bg-[#FBE9EC] text-[#C0344B]", label: "Vencido" },
-  NO_APLICA: { simbolo: "—", clase: "bg-[#F0F1F4] text-[#6B7280]", label: "No aplica" },
+  PRESENTADO: { simbolo: "✓", clase: "bg-[#DCFCE7] text-[#15803D]", label: "Presentado" },
+  PENDIENTE: { simbolo: "⏳", clase: "bg-[#FEF3C7] text-[#A16207]", label: "Pendiente" },
+  VENCIDO: { simbolo: "✕", clase: "bg-[#FEE2E2] text-[#DC2626]", label: "Vencido" },
+  NO_APLICA: { simbolo: "—", clase: "bg-[#F1F5F9] text-[#64748B]", label: "No aplica" },
 };
 
 export function EstadoMensualTabla({ mes, clientes }: Props) {

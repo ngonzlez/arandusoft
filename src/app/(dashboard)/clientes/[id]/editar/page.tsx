@@ -54,6 +54,7 @@ export default async function EditarClientePage({
           telefono: cliente.telefono ?? "",
           email: cliente.email ?? "",
           direccion: cliente.direccion ?? "",
+          observaciones: cliente.observaciones ?? "",
           tipo: cliente.tipo,
           estado: cliente.estado,
           estadoFiscal: cliente.estadoFiscal,

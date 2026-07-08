@@ -139,7 +139,7 @@ export function NotificacionesLista({ notificaciones }: { notificaciones: Notif[
             return (
               <div
                 key={n.id}
-                className={`transition-colors ${!n.leida ? "bg-[#FAF1D8]/20" : ""} hover:bg-surface/50`}
+                className={`transition-colors ${!n.leida ? "bg-[#FEF3C7]/20" : ""} hover:bg-surface/50`}
                 onClick={() => !n.leida && marcarLeida(n.id)}
               >
                 {href ? <Link href={href}>{contenido}</Link> : contenido}

@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
+import { SlideOver } from "@/components/ui/SlideOver";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
@@ -268,15 +269,16 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
         </div>
       )}
 
-      {/* Detalle de tarea */}
-      <Modal
+      {/* Detalle de tarea — slide-over animado, no modal */}
+      <SlideOver
         open={!!detalle}
         onClose={() => setDetalle(null)}
-        title={detalle?.titulo ?? ""}
+        title={detalle?.titulo ?? "Tarea"}
+        width={440}
       >
         {detalle && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
+          <div className="space-y-5">
+            <div className="flex flex-wrap items-center gap-2">
               <Badge style={PRIORIDAD[detalle.prioridad]}>
                 {PRIORIDAD_LABEL[detalle.prioridad]}
               </Badge>
@@ -284,39 +286,55 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
                 {COLUMNAS.find((c) => c.estado === detalle.estado)?.label}
               </Badge>
               {detalle.fechaLimite && (
-                <span className="text-xs text-ink-muted self-center">
+                <span className="text-xs text-ink-muted ml-auto">
                   Vence {formatFecha(detalle.fechaLimite)}
                 </span>
               )}
             </div>
 
             {detalle.descripcion && (
-              <p className="text-sm text-ink-muted">{detalle.descripcion}</p>
+              <p className="text-sm text-ink-muted leading-relaxed">{detalle.descripcion}</p>
             )}
 
-            {detalle.cliente && (
-              <p className="text-sm">
-                <span className="text-ink-muted">Cliente: </span>
-                <Link href={`/clientes/${detalle.cliente.id}`} className="text-accent hover:underline">
-                  {detalle.cliente.nombre}
-                </Link>
-              </p>
-            )}
-
-            <p className="text-sm flex items-center gap-2">
-              <span className="text-ink-muted">Responsable:</span>
-              <Avatar nombre={detalle.responsable.nombre} size="sm" />
-              {detalle.responsable.nombre}
-            </p>
+            <div className="rounded-card border border-line bg-white p-4 space-y-3">
+              {detalle.cliente && (
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-ink-muted">Cliente</span>
+                  <Link href={`/clientes/${detalle.cliente.id}`} className="text-accent hover:underline font-medium">
+                    {detalle.cliente.nombre}
+                  </Link>
+                </div>
+              )}
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-ink-muted">Responsable</span>
+                <span className="flex items-center gap-2 font-medium text-ink-base">
+                  <Avatar nombre={detalle.responsable.nombre} size="sm" />
+                  {detalle.responsable.nombre}
+                </span>
+              </div>
+            </div>
 
             {detalle.checklist?.length > 0 && (
               <div>
-                <p className="text-sm font-medium text-ink-muted mb-2">Checklist</p>
-                <div className="space-y-1.5">
+                <div className="flex items-center justify-between mb-2.5">
+                  <p className="text-sm font-semibold text-primary">Subtareas</p>
+                  <span className="text-xs text-ink-faint">
+                    {detalle.checklist.filter((i) => i.hecho).length}/{detalle.checklist.length}
+                  </span>
+                </div>
+                <div className="h-1.5 rounded-full bg-line-soft overflow-hidden mb-3">
+                  <div
+                    className="h-full rounded-full bg-success transition-all"
+                    style={{
+                      width: `${(detalle.checklist.filter((i) => i.hecho).length / detalle.checklist.length) * 100}%`,
+                    }}
+                  />
+                </div>
+                <div className="space-y-1 rounded-card border border-line bg-white divide-y divide-line-soft overflow-hidden">
                   {detalle.checklist.map((item) => (
                     <label
                       key={item.id}
-                      className="flex items-center gap-2 text-sm cursor-pointer"
+                      className="flex items-center gap-2.5 text-sm cursor-pointer px-3.5 py-2.5 hover:bg-line-soft/50 transition-colors"
                     >
                       <input
                         type="checkbox"
@@ -324,7 +342,7 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
                         onChange={() => toggleChecklistItem(detalle, item.id)}
                         className="accent-[#C9A84C]"
                       />
-                      <span className={item.hecho ? "line-through text-ink-faint" : ""}>
+                      <span className={item.hecho ? "line-through text-ink-faint" : "text-ink-base"}>
                         {item.texto}
                       </span>
                     </label>
@@ -333,24 +351,27 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
               </div>
             )}
 
-            <div className="flex gap-2 pt-2 border-t border-line">
-              {COLUMNAS.filter((c) => c.estado !== detalle.estado).map((c) => (
-                <Button
-                  key={c.estado}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    moverEstado(detalle, c.estado);
-                    setDetalle(null);
-                  }}
-                >
-                  → {c.label}
-                </Button>
-              ))}
+            <div>
+              <p className="text-sm font-semibold text-primary mb-2.5">Mover a</p>
+              <div className="flex gap-2">
+                {COLUMNAS.filter((c) => c.estado !== detalle.estado).map((c) => (
+                  <Button
+                    key={c.estado}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      moverEstado(detalle, c.estado);
+                      setDetalle(null);
+                    }}
+                  >
+                    → {c.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           </div>
         )}
-      </Modal>
+      </SlideOver>
 
       {/* Nueva tarea */}
       <Modal open={modalNueva} onClose={() => setModalNueva(false)} title="Nueva tarea">
@@ -423,7 +444,7 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
           </div>
 
           {error && (
-            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">{error}</p>
+            <p className="rounded-control bg-[#FEE2E2] px-3 py-2 text-sm text-urgent">{error}</p>
           )}
 
           <div className="flex justify-end gap-2">

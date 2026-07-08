@@ -78,21 +78,34 @@ export async function generarVencimientosIvaDelMes(año: number, mes: number): P
   return creados;
 }
 
-// Categoría visual del prototipo: Impositivo / Judicial / Administrativo
-export type CategoriaVencimiento = "IMPOSITIVO" | "JUDICIAL" | "ADMINISTRATIVO";
-
-export function categoriaVencimiento(tipo: TipoVencimiento): CategoriaVencimiento {
-  if (tipo === "PLAZO_PROCESAL") return "JUDICIAL";
-  if (["IPS", "MITES", "ASAMBLEA", "RENOVACION_CONTRATO", "OTRO"].includes(tipo))
-    return "ADMINISTRATIVO";
-  return "IMPOSITIVO";
-}
-
-export const CATEGORIA_COLORES: Record<CategoriaVencimiento, { bg: string; text: string }> = {
-  IMPOSITIVO: { bg: "#FAF1D8", text: "#9A7416" },
-  JUDICIAL: { bg: "#FBE9EC", text: "#C0344B" },
-  ADMINISTRATIVO: { bg: "#E7EDF7", text: "#2F6FB0" },
+// Badge por tipo de vencimiento — pares exactos del prototipo (vtypeMeta),
+// extendidos a los tipos propios que no están en el mock original.
+export const TIPO_VENCIMIENTO_META: Record<TipoVencimiento, { bg: string; text: string }> = {
+  IVA: { bg: "#EAF0F8", text: "#22416E" },
+  IRE_SIMPLE: { bg: "#FEF3C7", text: "#A16207" },
+  IRE_GENERAL: { bg: "#FEF3C7", text: "#A16207" },
+  IRP: { bg: "#FEF3C7", text: "#A16207" },
+  EEFF: { bg: "#EDE9FE", text: "#6D28D9" },
+  AUDITORIA_EXTERNA: { bg: "#EDE9FE", text: "#6D28D9" },
+  IDU: { bg: "#FEF3C7", text: "#A16207" },
+  IUID: { bg: "#FEF3C7", text: "#A16207" },
+  IPS: { bg: "#DCFCE7", text: "#15803D" },
+  MITES: { bg: "#FFEDD5", text: "#C2410C" },
+  REG_MENSUAL_COMPROBANTES: { bg: "#EAF0F8", text: "#22416E" },
+  ASAMBLEA: { bg: "#EDE9FE", text: "#6D28D9" },
+  RENOVACION_CONTRATO: { bg: "#FFEDD5", text: "#C2410C" },
+  PLAZO_PROCESAL: { bg: "#FEE2E2", text: "#DC2626" },
+  OTRO: { bg: "#F1F5F9", text: "#64748B" },
 };
+
+// Color por urgencia (días hasta el vencimiento) — igual al prototipo:
+// vencido/hoy rojo, ≤3 días naranja, resto azul.
+export function colorUrgencia(fecha: Date | string): string {
+  const dias = Math.floor((new Date(fecha).getTime() - Date.now()) / 86_400_000);
+  if (dias <= 0) return "#DC2626";
+  if (dias <= 3) return "#D97706";
+  return "#2563EB";
+}
 
 // Filtro de vencimientos visibles por rol: los de clientes visibles + los sin cliente.
 export function filtroVencimientosPorRol(rol: Rol) {

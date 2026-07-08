@@ -141,7 +141,7 @@ export function AsambleasTabla({ periodo, clientes }: Props) {
                     onClick={() => toggle(c, col.campo)}
                     className={`inline-flex h-7 w-7 items-center justify-center rounded-md border text-sm font-semibold transition-colors ${
                       valorDe(c, col.campo)
-                        ? "border-transparent bg-[#E7F2EC] text-[#2C6E4C]"
+                        ? "border-transparent bg-[#DCFCE7] text-[#15803D]"
                         : "border-line text-transparent hover:border-gold hover:text-ink-faint"
                     }`}
                     title={`${col.label} — clic para ${valorDe(c, col.campo) ? "destildar" : "tildar"}`}

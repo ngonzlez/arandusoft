@@ -1,7 +1,10 @@
 import { v2 as cloudinary } from "cloudinary";
 
-// PDFs de declaraciones: se suben como recurso raw PRIVADO en Cloudinary.
-// La descarga siempre pasa por URL firmada con expiración corta.
+// Archivos de declaraciones (PDF o el Excel de Marangatu/DNIT): se suben como
+// recurso raw PRIVADO en Cloudinary. La descarga siempre pasa por URL firmada
+// con expiración corta.
+
+export type FormatoArchivo = "pdf" | "xlsx";
 
 let configurado = false;
 
@@ -20,10 +23,11 @@ function ensureConfig() {
   configurado = true;
 }
 
-export async function subirPdf(
+export async function subirArchivoDeclaracion(
   buffer: Buffer,
   carpeta: string,
-  nombreBase: string
+  nombreBase: string,
+  formato: FormatoArchivo
 ): Promise<{ url: string; publicId: string; bytes: number }> {
   ensureConfig();
 
@@ -36,7 +40,7 @@ export async function subirPdf(
           public_id: publicId,
           resource_type: "raw",
           type: "private",
-          format: "pdf",
+          format: formato,
         },
         (err, res) => {
           if (err || !res) reject(err ?? new Error("Upload sin respuesta"));
@@ -55,17 +59,24 @@ export async function subirPdf(
 }
 
 // URL firmada de descarga (default 1 hora; para links por email usar 48-72h).
-export function urlFirmadaPdf(publicId: string, expiraEnSegundos = 3600): string {
+export function urlFirmadaDeclaracion(
+  publicId: string,
+  formato: FormatoArchivo,
+  expiraEnSegundos = 3600
+): string {
   ensureConfig();
-  return cloudinary.utils.private_download_url(publicId, "pdf", {
+  return cloudinary.utils.private_download_url(publicId, formato, {
     resource_type: "raw",
     expires_at: Math.floor(Date.now() / 1000) + expiraEnSegundos,
   });
 }
 
-export async function descargarPdf(publicId: string): Promise<Buffer> {
-  const url = urlFirmadaPdf(publicId, 300);
+export async function descargarArchivoDeclaracion(
+  publicId: string,
+  formato: FormatoArchivo
+): Promise<Buffer> {
+  const url = urlFirmadaDeclaracion(publicId, formato, 300);
   const res = await fetch(url);
-  if (!res.ok) throw new Error(`No se pudo descargar el PDF (${res.status})`);
+  if (!res.ok) throw new Error(`No se pudo descargar el archivo (${res.status})`);
   return Buffer.from(await res.arrayBuffer());
 }

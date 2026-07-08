@@ -11,10 +11,10 @@ interface ToastItem {
 }
 
 const ESTILOS: Record<ToastTipo, { bg: string; border: string; text: string }> = {
-  exito: { bg: "#E7F2EC", border: "#3A9E6B", text: "#2C6E4C" },
-  error: { bg: "#FBE9EC", border: "#C0344B", text: "#C0344B" },
-  advertencia: { bg: "#FAF1D8", border: "#9A7416", text: "#9A7416" },
-  info: { bg: "#E7EDF7", border: "#2F6FB0", text: "#2F6FB0" },
+  exito: { bg: "#DCFCE7", border: "#3A9E6B", text: "#15803D" },
+  error: { bg: "#FEE2E2", border: "#DC2626", text: "#DC2626" },
+  advertencia: { bg: "#FEF3C7", border: "#A16207", text: "#A16207" },
+  info: { bg: "#DBEAFE", border: "#1D4ED8", text: "#1D4ED8" },
 };
 
 const ToastContext = createContext<(tipo: ToastTipo, mensaje: string) => void>(

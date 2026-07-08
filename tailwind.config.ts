@@ -7,7 +7,6 @@ const config: Config = {
   ],
   theme: {
     screens: {
-      // breakpoint real del prototipo aprobado (no el 768/1024 de DESIGN.md)
       mobile: { max: "919px" },
       sm: "480px",
       md: "768px",
@@ -16,37 +15,40 @@ const config: Config = {
     },
     extend: {
       colors: {
+        // Paleta real del prototipo Claude Design (actualizado 2026-07-08) —
+        // coincide con DESIGN.md, reemplaza la paleta pastel de la v1.
         primary: {
           DEFAULT: "#1A2C4E",
           dark: "#12203A",
           light: "#243d6b",
         },
-        sidebar: {
-          from: "#192C4C",
-          to: "#14233D",
-        },
         gold: {
           DEFAULT: "#C9A84C",
           dark: "#b8963d",
+          ink: "#15243C", // texto sobre fondo dorado (nav activo)
         },
-        accent: "#22416E",
-        surface: "#EEF1F5",
-        line: "#E6E9EF",
+        accent: "#2563EB",
+        surface: "#F8F9FA",
+        line: "#E2E8F0",
+        "line-soft": "#F1F5F9",
         ink: {
-          base: "#2D2D2D",
-          muted: "#5A6473",
-          faint: "#9AA3AF",
+          base: "#1E293B",
+          muted: "#64748B",
+          faint: "#94A3B8",
         },
-        urgent: "#C0344B",
-        success: "#2C6E4C",
+        urgent: "#DC2626",
+        warning: "#D97706",
+        success: "#16A34A",
+        info: "#2563EB",
       },
       fontFamily: {
-        heading: ["var(--font-poppins)", "sans-serif"],
+        heading: ["var(--font-inter)", "sans-serif"],
         sans: ["var(--font-inter)", "sans-serif"],
+        mono: ["var(--font-jetbrains)", "monospace"],
       },
       borderRadius: {
-        card: "16px",
-        control: "10px",
+        card: "12px",
+        control: "8px",
       },
     },
   },

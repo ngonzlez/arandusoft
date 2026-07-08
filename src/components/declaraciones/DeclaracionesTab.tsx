@@ -19,8 +19,11 @@ interface Declaracion {
   periodo: string;
   fechaPresentacion: string;
   archivoNombreOriginal: string | null;
+  archivoFormato: "pdf" | "xlsx";
   cargador: { nombre: string };
 }
+
+const ICONO_FORMATO: Record<string, string> = { pdf: "📄", xlsx: "📊" };
 
 interface Props {
   clienteId: string;
@@ -77,7 +80,12 @@ export function DeclaracionesTab({ clienteId, clienteNombre, puedeSubir }: Props
   function Fila({ d }: { d: Declaracion }) {
     return (
       <tr className="border-b border-line/60 last:border-0">
-        <td className="py-2.5 px-4 font-medium text-primary">{OBLIGACIONES_LABELS[d.tipo]}</td>
+        <td className="py-2.5 px-4 font-medium text-primary">
+          <span className="mr-1.5" title={d.archivoFormato === "xlsx" ? "Excel" : "PDF"}>
+            {ICONO_FORMATO[d.archivoFormato] ?? "📄"}
+          </span>
+          {OBLIGACIONES_LABELS[d.tipo]}
+        </td>
         <td className="py-2.5 px-4 text-ink-muted">{d.periodo}</td>
         <td className="py-2.5 px-4 text-ink-muted">{formatFecha(d.fechaPresentacion)}</td>
         <td className="py-2.5 px-4 text-ink-muted">{d.cargador.nombre}</td>
@@ -183,15 +191,19 @@ export function DeclaracionesTab({ clienteId, clienteNombre, puedeSubir }: Props
           />
           <div>
             <label className="block text-sm font-medium text-ink-muted mb-1.5">
-              Archivo PDF
+              Archivo (PDF o Excel)
             </label>
             <input
               type="file"
               name="archivo"
-              accept="application/pdf"
+              accept=".pdf,.xlsx,application/pdf,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
               required
               className="block w-full text-sm text-ink-muted file:mr-3 file:rounded-control file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-primary-light"
             />
+            <p className="text-xs text-ink-faint mt-1">
+              Subí el PDF de la declaración o el Excel que el cliente presenta en
+              Marangatu — ambos quedan archivados acá.
+            </p>
           </div>
           <label className="flex items-center gap-2 text-sm text-ink-muted">
             <input type="checkbox" name="vincularEstadoMensual" value="true" defaultChecked className="accent-[#C9A84C]" />
@@ -199,7 +211,7 @@ export function DeclaracionesTab({ clienteId, clienteNombre, puedeSubir }: Props
           </label>
 
           {errorSubida && (
-            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">
+            <p className="rounded-control bg-[#FEE2E2] px-3 py-2 text-sm text-urgent">
               {errorSubida}
             </p>
           )}

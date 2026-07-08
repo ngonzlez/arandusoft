@@ -6,15 +6,14 @@ import Link from "next/link";
 import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatFecha } from "@/lib/format";
 import { ESTADO_VENCIMIENTO } from "@/lib/badges";
-import { categoriaVencimiento, CATEGORIA_COLORES } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { Input, Select } from "@/components/ui/Input";
-import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
+import { NuevoVencimientoModal } from "@/components/calendario/NuevoVencimientoModal";
 
 interface VencimientoItem {
   id: string;
@@ -49,8 +48,6 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [modalNuevo, setModalNuevo] = useState(false);
-  const [guardando, setGuardando] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [gestionando, setGestionando] = useState<string | null>(null);
 
   async function marcarGestionado(id: string) {
@@ -66,35 +63,6 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
       return;
     }
     toast("exito", "Vencimiento gestionado");
-    router.refresh();
-  }
-
-  async function crearVencimiento(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    setGuardando(true);
-
-    const form = new FormData(e.currentTarget);
-    const res = await fetch("/api/vencimientos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        clienteId: form.get("clienteId") || null,
-        tipo: form.get("tipo"),
-        fechaVencimiento: `${form.get("fecha")}T12:00:00Z`,
-      }),
-    });
-
-    const json = await res.json().catch(() => null);
-    setGuardando(false);
-
-    if (!res.ok) {
-      setError(json?.error ?? "No se pudo crear");
-      return;
-    }
-
-    toast("exito", "Vencimiento creado");
-    setModalNuevo(false);
     router.refresh();
   }
 
@@ -120,7 +88,7 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
         <div className="overflow-x-auto rounded-card border border-line bg-white">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-line bg-surface/60">
+              <tr className="border-b border-line bg-line-soft">
                 {["", "Fecha", "Tipo", "Cliente", "Estado", "Responsable", ""].map((h, i) => (
                   <th
                     key={i}
@@ -133,17 +101,17 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
             </thead>
             <tbody>
               {vencimientos.map((v) => {
-                const cat = CATEGORIA_COLORES[categoriaVencimiento(v.tipo)];
+                const estilo = TIPO_VENCIMIENTO_META[v.tipo];
                 return (
                   <tr key={v.id} className="border-b border-line/60 last:border-0">
                     <td className="py-2.5 px-3 w-8">{urgencia(v.fechaVencimiento, v.estado)}</td>
-                    <td className="py-2.5 px-3 font-medium text-primary whitespace-nowrap">
+                    <td className="py-2.5 px-3 font-medium text-primary whitespace-nowrap font-mono">
                       {formatFecha(v.fechaVencimiento)}
                     </td>
                     <td className="py-2.5 px-3">
                       <span
-                        className="rounded-full px-2.5 py-0.5 text-xs font-medium"
-                        style={{ backgroundColor: cat.bg, color: cat.text }}
+                        className="rounded-md px-2.5 py-0.5 text-xs font-semibold"
+                        style={{ backgroundColor: estilo.bg, color: estilo.text }}
                       >
                         {v.tipo}
                       </span>
@@ -179,41 +147,7 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
         </div>
       )}
 
-      <Modal open={modalNuevo} onClose={() => setModalNuevo(false)} title="Nuevo vencimiento">
-        <form onSubmit={crearVencimiento} className="space-y-4">
-          <Select label="Cliente (opcional)" name="clienteId" defaultValue="">
-            <option value="">Sin cliente (general)</option>
-            {clientes.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.nombre}
-              </option>
-            ))}
-          </Select>
-          <Select label="Tipo" name="tipo" defaultValue="IPS" required>
-            {Object.values(TipoVencimiento)
-              .filter((t) => t !== "PLAZO_PROCESAL") // Fase 2 jurídico
-              .map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-          </Select>
-          <Input label="Fecha de vencimiento" name="fecha" type="date" required />
-
-          {error && (
-            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">{error}</p>
-          )}
-
-          <div className="flex justify-end gap-2">
-            <Button type="button" variant="ghost" onClick={() => setModalNuevo(false)} disabled={guardando}>
-              Cancelar
-            </Button>
-            <Button type="submit" disabled={guardando}>
-              {guardando ? <Spinner className="text-white" /> : "Crear"}
-            </Button>
-          </div>
-        </form>
-      </Modal>
+      <NuevoVencimientoModal open={modalNuevo} onClose={() => setModalNuevo(false)} clientes={clientes} />
     </div>
   );
 }

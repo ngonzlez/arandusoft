@@ -7,11 +7,10 @@ import { desencriptar } from "@/lib/crypto";
 import {
   OBLIGACIONES_LABELS,
   TIPO_CLIENTE_LABELS,
-  ESTADO_CLIENTE_LABELS,
   ESTADO_FISCAL_LABELS,
   type AccesosCliente,
 } from "@/lib/clientes";
-import { TIPO_CLIENTE, ESTADO_CLIENTE, ESTADO_FISCAL } from "@/lib/badges";
+import { TIPO_CLIENTE, ESTADO_FISCAL } from "@/lib/badges";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -24,10 +23,12 @@ import { AccesosPanel } from "@/components/clientes/AccesosPanel";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
-import { categoriaVencimiento, CATEGORIA_COLORES } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
 import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
+
+const ICONO_FORMATO: Record<string, string> = { pdf: "📄", xlsx: "📊" };
 
 export default async function ClienteDetallePage({
   params,
@@ -60,6 +61,11 @@ export default async function ClienteDetallePage({
         take: 15,
         select: { id: true, tipo: true, estado: true, fechaVencimiento: true },
       },
+      declaraciones: {
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: { tipo: true, periodo: true, fechaPresentacion: true, archivoFormato: true },
+      },
       tareas: {
         orderBy: [{ estado: "asc" }, { fechaLimite: "asc" }],
         take: 20,
@@ -86,8 +92,52 @@ export default async function ClienteDetallePage({
     }
   }
 
+  const ultimaDeclaracion = cliente.declaraciones[0] ?? null;
+  const proximoVencimiento = cliente.vencimientos[0] ?? null;
+
   const resumen = (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <Card className="lg:col-span-2">
+        <h3 className="font-heading font-semibold text-primary mb-4">Estado de cuenta</h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div>
+            <p className="text-xs text-ink-muted uppercase tracking-wide">Última declaración</p>
+            {ultimaDeclaracion ? (
+              <p className="text-sm font-medium text-ink-base mt-1">
+                {ICONO_FORMATO[ultimaDeclaracion.archivoFormato] ?? "📄"}{" "}
+                {OBLIGACIONES_LABELS[ultimaDeclaracion.tipo]} · {ultimaDeclaracion.periodo}
+                <br />
+                <span className="text-xs text-ink-faint font-normal">
+                  {formatFecha(ultimaDeclaracion.fechaPresentacion)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-sm text-ink-faint mt-1">Sin declaraciones cargadas</p>
+            )}
+          </div>
+          <div>
+            <p className="text-xs text-ink-muted uppercase tracking-wide">Próximo vencimiento</p>
+            {proximoVencimiento ? (
+              <p className="text-sm font-medium text-ink-base mt-1">
+                {proximoVencimiento.tipo}
+                <br />
+                <span className="text-xs text-ink-faint font-normal">
+                  {formatFecha(proximoVencimiento.fechaVencimiento)}
+                </span>
+              </p>
+            ) : (
+              <p className="text-sm text-ink-faint mt-1">Ninguno próximo</p>
+            )}
+          </div>
+          <div>
+            <p className="text-xs text-ink-muted uppercase tracking-wide">Observaciones</p>
+            <p className="text-sm text-ink-base mt-1 whitespace-pre-wrap">
+              {cliente.observaciones || <span className="text-ink-faint">Sin observaciones</span>}
+            </p>
+          </div>
+        </div>
+      </Card>
+
       <Card>
         <h3 className="font-heading font-semibold text-primary mb-4">Datos de contacto</h3>
         <dl className="space-y-3 text-sm">
@@ -139,20 +189,32 @@ export default async function ClienteDetallePage({
 
   return (
     <div>
-      <PageHeader
-        titulo={cliente.nombre}
-        subtitulo={`RUC ${cliente.ruc}`}
-        acciones={
-          <Link href={`/clientes/${cliente.id}/editar`}>
-            <Button variant="outline">Editar</Button>
-          </Link>
-        }
-      />
-
-      <div className="flex flex-wrap gap-2 mb-5">
-        <Badge style={TIPO_CLIENTE[cliente.tipo]}>{TIPO_CLIENTE_LABELS[cliente.tipo]}</Badge>
-        <Badge style={ESTADO_CLIENTE[cliente.estado]}>{ESTADO_CLIENTE_LABELS[cliente.estado]}</Badge>
-        <Badge style={ESTADO_FISCAL[cliente.estadoFiscal]}>{ESTADO_FISCAL_LABELS[cliente.estadoFiscal]}</Badge>
+      <div className="flex items-start justify-between gap-4 mb-5">
+        <div className="flex items-center gap-[15px]">
+          <span
+            className="flex h-14 w-14 shrink-0 items-center justify-center rounded-[14px] font-heading text-lg font-semibold"
+            style={{ backgroundColor: "#EAF0F8", color: "#22416E" }}
+          >
+            {cliente.nombre
+              .split(/\s+/)
+              .slice(0, 2)
+              .map((p) => p[0]?.toUpperCase())
+              .join("")}
+          </span>
+          <div>
+            <h1 className="font-heading text-lg font-bold text-primary leading-tight">
+              {cliente.nombre}
+            </h1>
+            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+              <Badge style={TIPO_CLIENTE[cliente.tipo]}>{TIPO_CLIENTE_LABELS[cliente.tipo]}</Badge>
+              <Badge style={ESTADO_FISCAL[cliente.estadoFiscal]}>{ESTADO_FISCAL_LABELS[cliente.estadoFiscal]}</Badge>
+              <span className="font-mono text-xs text-ink-muted">{cliente.ruc}</span>
+            </div>
+          </div>
+        </div>
+        <Link href={`/clientes/${cliente.id}/editar`}>
+          <Button variant="outline">Editar</Button>
+        </Link>
       </div>
 
       <ClienteTabs
@@ -211,7 +273,7 @@ export default async function ClienteDetallePage({
                 <Card>
                   <ul className="divide-y divide-line/60">
                     {cliente.vencimientos.map((v) => {
-                      const cat = CATEGORIA_COLORES[categoriaVencimiento(v.tipo)];
+                      const cat = TIPO_VENCIMIENTO_META[v.tipo];
                       return (
                         <li key={v.id} className="flex items-center gap-3 py-2.5 text-sm">
                           <span className="font-medium text-primary w-24 shrink-0">

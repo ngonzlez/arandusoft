@@ -93,6 +93,7 @@ export async function POST(req: NextRequest) {
       telefono: body.telefono?.trim() || null,
       email: body.email?.trim() || null,
       direccion: body.direccion?.trim() || null,
+      observaciones: body.observaciones?.trim() || null,
       tipo: body.tipo,
       estado: body.estado ?? "ACTIVO",
       estadoFiscal: body.estadoFiscal ?? "AL_DIA",

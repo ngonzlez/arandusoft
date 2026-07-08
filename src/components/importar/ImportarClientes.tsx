@@ -143,14 +143,14 @@ export function ImportarClientes() {
       )}
 
       {error && (
-        <p className="rounded-control bg-[#FBE9EC] px-4 py-3 text-sm text-urgent">{error}</p>
+        <p className="rounded-control bg-[#FEE2E2] px-4 py-3 text-sm text-urgent">{error}</p>
       )}
 
       {paso === "preview" && (
         <>
           <div className="flex items-center justify-between">
             <p className="text-sm text-ink-muted">
-              <span className="font-semibold text-[#2C6E4C]">{validas.length} válidas</span>
+              <span className="font-semibold text-[#15803D]">{validas.length} válidas</span>
               {" · "}
               <span className={`font-semibold ${errores.length ? "text-urgent" : "text-ink-faint"}`}>
                 {errores.length} con error
@@ -181,7 +181,7 @@ export function ImportarClientes() {
             <div className="overflow-x-auto rounded-card border border-line bg-white">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-line bg-[#E7F2EC]/50">
+                  <tr className="border-b border-line bg-[#DCFCE7]/50">
                     {["Fila", "Nombre", "RUC", "Tipo", "Obligaciones"].map((h) => (
                       <th key={h} className="py-2.5 px-4 text-left font-medium text-ink-muted text-xs uppercase">
                         {h}
@@ -210,7 +210,7 @@ export function ImportarClientes() {
             <div className="overflow-x-auto rounded-card border border-urgent/30 bg-white">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-line bg-[#FBE9EC]/50">
+                  <tr className="border-b border-line bg-[#FEE2E2]/50">
                     {["Fila", "Nombre", "RUC", "Errores"].map((h) => (
                       <th key={h} className="py-2.5 px-4 text-left font-medium text-ink-muted text-xs uppercase">
                         {h}

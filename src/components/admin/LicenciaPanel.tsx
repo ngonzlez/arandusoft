@@ -29,9 +29,9 @@ interface Licencia {
 }
 
 const ESTADO_BADGE: Record<EstadoLicencia, { bg: string; text: string }> = {
-  ACTIVA: { bg: "#E7F2EC", text: "#2C6E4C" },
-  POR_VENCER: { bg: "#FAF1D8", text: "#9A7416" },
-  SUSPENDIDA: { bg: "#FBE9EC", text: "#C0344B" },
+  ACTIVA: { bg: "#DCFCE7", text: "#15803D" },
+  POR_VENCER: { bg: "#FEF3C7", text: "#A16207" },
+  SUSPENDIDA: { bg: "#FEE2E2", text: "#DC2626" },
 };
 
 export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
@@ -209,7 +209,7 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
           <Input label="Nota (opcional)" name="nota" placeholder="Ej: Mantenimiento julio 2026" />
 
           {error && (
-            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">{error}</p>
+            <p className="rounded-control bg-[#FEE2E2] px-3 py-2 text-sm text-urgent">{error}</p>
           )}
 
           <div className="flex justify-end gap-2">

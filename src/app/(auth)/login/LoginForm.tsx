@@ -54,7 +54,7 @@ export function LoginForm() {
       />
 
       {error && (
-        <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">
+        <p className="rounded-control bg-[#FEE2E2] px-3 py-2 text-sm text-urgent">
           {error}
         </p>
       )}

@@ -104,12 +104,12 @@ export function EquipoGrid({ usuarios, miUserId }: { usuarios: Usuario[]; miUser
                 <div className="flex items-center gap-2">
                   <p className="font-heading font-semibold text-primary truncate">{u.nombre}</p>
                   {u.rol === "ADMIN" && (
-                    <span className="rounded-full bg-[#FAF1D8] px-2 py-0.5 text-[10px] font-semibold text-[#866518]">
+                    <span className="rounded-full bg-[#FEF3C7] px-2 py-0.5 text-[10px] font-semibold text-[#92400E]">
                       Admin
                     </span>
                   )}
                   {!u.activo && (
-                    <span className="rounded-full bg-[#F0F1F4] px-2 py-0.5 text-[10px] font-semibold text-[#6B7280]">
+                    <span className="rounded-full bg-[#F1F5F9] px-2 py-0.5 text-[10px] font-semibold text-[#64748B]">
                       Inactivo
                     </span>
                   )}
@@ -164,7 +164,7 @@ export function EquipoGrid({ usuarios, miUserId }: { usuarios: Usuario[]; miUser
           </Select>
 
           {error && (
-            <p className="rounded-control bg-[#FBE9EC] px-3 py-2 text-sm text-urgent">{error}</p>
+            <p className="rounded-control bg-[#FEE2E2] px-3 py-2 text-sm text-urgent">{error}</p>
           )}
 
           <div className="flex justify-end gap-2">

@@ -29,7 +29,7 @@ export default async function SuspendidoPage() {
         </p>
 
         {mensaje && (
-          <p className="mt-4 rounded-control bg-[#FAF1D8] px-4 py-3 text-sm text-[#866518]">
+          <p className="mt-4 rounded-control bg-[#FEF3C7] px-4 py-3 text-sm text-[#92400E]">
             {mensaje}
           </p>
         )}

@@ -1,6 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { getResend, EMAIL_FROM, plantillaEmail } from "@/lib/email";
-import { descargarPdf, urlFirmadaPdf } from "@/lib/storage";
+import { descargarArchivoDeclaracion, urlFirmadaDeclaracion, type FormatoArchivo } from "@/lib/storage";
 import { crearNotificacion } from "@/lib/notificaciones";
 import { formatFechaHora } from "@/lib/format";
 
@@ -42,18 +42,19 @@ export async function enviarDeclaracionPorCorreo({
   const usarAdjunto =
     (declaracion.tamanioBytes ?? 0) <= maxAdjuntoBytes() && !!declaracion.archivoPublicId;
 
+  const formato = declaracion.archivoFormato as FormatoArchivo;
   const nombreArchivo =
-    declaracion.archivoNombreOriginal ?? `${declaracion.tipo}-${declaracion.periodo}.pdf`;
+    declaracion.archivoNombreOriginal ?? `${declaracion.tipo}-${declaracion.periodo}.${formato}`;
 
   const cuerpoBase = `
     <p><strong>${remitente.nombre}</strong> te envió una declaración desde el sistema:</p>
     <table style="margin:12px 0;font-size:14px;color:#2D2D2D;">
-      <tr><td style="padding:2px 12px 2px 0;color:#5A6473;">Cliente</td><td><strong>${declaracion.cliente.nombre}</strong></td></tr>
-      <tr><td style="padding:2px 12px 2px 0;color:#5A6473;">Tipo</td><td>${declaracion.tipo}</td></tr>
-      <tr><td style="padding:2px 12px 2px 0;color:#5A6473;">Período</td><td>${declaracion.periodo}</td></tr>
-      <tr><td style="padding:2px 12px 2px 0;color:#5A6473;">Presentada</td><td>${formatFechaHora(declaracion.fechaPresentacion)}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748B;">Cliente</td><td><strong>${declaracion.cliente.nombre}</strong></td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748B;">Tipo</td><td>${declaracion.tipo}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748B;">Período</td><td>${declaracion.periodo}</td></tr>
+      <tr><td style="padding:2px 12px 2px 0;color:#64748B;">Presentada</td><td>${formatFechaHora(declaracion.fechaPresentacion)}</td></tr>
     </table>
-    ${mensaje ? `<p style="border-left:3px solid #C9A84C;padding-left:12px;color:#5A6473;">${mensaje}</p>` : ""}
+    ${mensaje ? `<p style="border-left:3px solid #C9A84C;padding-left:12px;color:#64748B;">${mensaje}</p>` : ""}
   `;
 
   let enviado = false;
@@ -65,13 +66,16 @@ export async function enviarDeclaracionPorCorreo({
     const resend = getResend();
 
     if (usarAdjunto) {
-      const pdf = await descargarPdf(declaracion.archivoPublicId!);
+      const pdf = await descargarArchivoDeclaracion(declaracion.archivoPublicId!, formato);
       const res = await resend.emails.send({
         from: EMAIL_FROM,
         to: destinatario.email,
         replyTo: remitente.email,
         subject: `${declaracion.cliente.nombre} — ${declaracion.tipo} ${declaracion.periodo}`,
-        html: plantillaEmail("Declaración compartida", cuerpoBase + `<p>El archivo va adjunto.</p>`),
+        html: plantillaEmail(
+          "Declaración compartida",
+          cuerpoBase + `<p>El archivo (${formato.toUpperCase()}) va adjunto.</p>`
+        ),
         attachments: [{ filename: nombreArchivo, content: pdf.toString("base64") }],
       });
       if (res.error) throw new Error(res.error.message);
@@ -80,7 +84,7 @@ export async function enviarDeclaracionPorCorreo({
       if (!declaracion.archivoPublicId) {
         throw new Error("La declaración no tiene archivo asociado en el almacenamiento");
       }
-      const link = urlFirmadaPdf(declaracion.archivoPublicId, LINK_EXPIRA_SEGUNDOS);
+      const link = urlFirmadaDeclaracion(declaracion.archivoPublicId, formato, LINK_EXPIRA_SEGUNDOS);
       const res = await resend.emails.send({
         from: EMAIL_FROM,
         to: destinatario.email,
@@ -91,10 +95,10 @@ export async function enviarDeclaracionPorCorreo({
           cuerpoBase +
             `<p style="margin:20px 0;">
               <a href="${link}" style="background:#1A2C4E;color:#ffffff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">
-                Descargar PDF
+                Descargar archivo
               </a>
             </p>
-            <p style="color:#9AA3AF;font-size:12px;">El enlace vence en 48 horas.</p>`
+            <p style="color:#94A3B8;font-size:12px;">El enlace vence en 48 horas.</p>`
         ),
       });
       if (res.error) throw new Error(res.error.message);

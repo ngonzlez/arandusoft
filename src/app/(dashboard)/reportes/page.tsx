@@ -83,7 +83,7 @@ export default async function ReportesPage() {
           label="Vencimientos gestionados (mes)"
           value={vencimientosGestionados}
           sub={vencimientosVencidos > 0 ? `${vencimientosVencidos} vencidos sin gestionar` : "sin vencidos"}
-          subColor={vencimientosVencidos > 0 ? "#C0344B" : "#2C6E4C"}
+          subColor={vencimientosVencidos > 0 ? "#DC2626" : "#15803D"}
         />
         <StatTile label="Tareas completadas (mes)" value={tareasCompletadasMes} />
       </div>

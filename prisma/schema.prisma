@@ -212,6 +212,7 @@ model Cliente {
   responsableId String
   responsable   User          @relation("ClienteResponsable", fields: [responsableId], references: [id])
   accesos        String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
+  observaciones  String? // notas libres de la ficha (ej: "cliente puntual", "falta info de X")
   actualizadoPor String? // userId de la última modificación (auditoría PRD)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
@@ -270,6 +271,7 @@ model Declaracion {
   archivoUrl            String
   archivoPublicId       String?
   archivoNombreOriginal String?
+  archivoFormato        String   @default("pdf") // "pdf" | "xlsx" (excel de Marangatu/DNIT)
   tamanioBytes          Int?
   archivado             Boolean        @default(false)
   cargadoPor            String
