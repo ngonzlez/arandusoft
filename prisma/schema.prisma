@@ -301,6 +301,7 @@ model Vencimiento {
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
 
+  @@unique([clienteId, tipo, fechaVencimiento]) // idempotencia de generación automática
   @@index([fechaVencimiento, estado])
   @@index([clienteId])
 }

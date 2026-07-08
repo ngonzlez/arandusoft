@@ -23,6 +23,9 @@ import { ClienteTabs } from "@/components/clientes/ClienteTabs";
 import { AccesosPanel } from "@/components/clientes/AccesosPanel";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
+import { formatFecha } from "@/lib/format";
+import { categoriaVencimiento, CATEGORIA_COLORES } from "@/lib/vencimientos";
+import { ESTADO_VENCIMIENTO } from "@/lib/badges";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
 
@@ -50,6 +53,12 @@ export default async function ClienteDetallePage({
           fechaPresentacion: true,
           responsable: { select: { nombre: true } },
         },
+      },
+      vencimientos: {
+        where: { fechaVencimiento: { gte: new Date() } },
+        orderBy: { fechaVencimiento: "asc" },
+        take: 15,
+        select: { id: true, tipo: true, estado: true, fechaVencimiento: true },
       },
     },
   });
@@ -183,7 +192,43 @@ export default async function ClienteDetallePage({
               />
             ),
           },
-          { key: "vencimientos", label: "Vencimientos", content: placeholder("Los vencimientos", "Fase 5") },
+          {
+            key: "vencimientos",
+            label: "Vencimientos",
+            content:
+              cliente.vencimientos.length === 0 ? (
+                <Card>
+                  <p className="text-sm text-ink-faint">
+                    Sin vencimientos próximos. Los de IVA se generan automáticamente
+                    al visitar el calendario del mes correspondiente.
+                  </p>
+                </Card>
+              ) : (
+                <Card>
+                  <ul className="divide-y divide-line/60">
+                    {cliente.vencimientos.map((v) => {
+                      const cat = CATEGORIA_COLORES[categoriaVencimiento(v.tipo)];
+                      return (
+                        <li key={v.id} className="flex items-center gap-3 py-2.5 text-sm">
+                          <span className="font-medium text-primary w-24 shrink-0">
+                            {formatFecha(v.fechaVencimiento)}
+                          </span>
+                          <span
+                            className="rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0"
+                            style={{ backgroundColor: cat.bg, color: cat.text }}
+                          >
+                            {v.tipo}
+                          </span>
+                          <span className="ml-auto">
+                            <Badge style={ESTADO_VENCIMIENTO[v.estado]}>{v.estado}</Badge>
+                          </span>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </Card>
+              ),
+          },
           { key: "tareas", label: "Tareas", content: placeholder("Las tareas", "Fase 8") },
         ]}
       />

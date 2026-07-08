@@ -140,3 +140,26 @@ Registro vivo de avance del proyecto. Cada fase agrega una entrada acá al cerra
 **Verificado (curl):** GET declaraciones OK · POST sin archivo → 400 claro · POST con .txt → "Solo se aceptan archivos PDF" · POST PDF sin credenciales Cloudinary → error 500 limpio y amigable (no crash) · enviarse archivo a uno mismo → 400 · build limpio.
 
 **Pendiente / notas:** ⚠️ la subida real a Cloudinary y el envío real por Resend quedan pendientes de probar cuando se carguen las credenciales (`CLOUDINARY_*`, `RESEND_API_KEY`) — el flujo completo está implementado. Próxima fase: Calendario de Vencimientos.
+
+---
+
+## Fase 5 — Calendario de Vencimientos (2026-07-08)
+
+**Qué se construyó:**
+- **`lib/vencimientos.ts`**: tabla DNIT perpetua (terminación RUC 0→día 7 … 9→día 25), `terminacionRuc()` (usa el último dígito **antes** del dígito verificador: `80012345-7` → terminación 5), `calcularVencimientoIVA()` (vence el día DNIT del mes siguiente al período, guardado 12:00 UTC = 08:00 Paraguay), `generarVencimientosIvaDelMes()` idempotente (upsert por unique `clienteId+tipo+fecha`), categorías visuales del prototipo (Impositivo/Judicial/Administrativo) y filtro de visibilidad por rol.
+- **Generación automática:** al visitar `/calendario` de un mes se generan los IVA de ese mes para todos los clientes activos con obligación IVA. **Solo IVA es automático** (única tabla oficial del PRD); IPS/MITES/EEFF/etc. se cargan a mano o por importación (Fase 9).
+- **API** `GET/POST /api/vencimientos` (rango de fechas + filtros; alta manual con validación de visibilidad) y `PATCH /api/vencimientos/[id]` (PENDIENTE/GESTIONADO/VENCIDO, registra quién).
+- **UI `/calendario`**: grid mensual 7 columnas (lunes primero) con chips de color por categoría, día de hoy resaltado en dorado, leyenda; listado del mes debajo con urgencia (🔴 hoy/vencido, 🟡 ≤3 días, 🔵 normal), botón "✓ Gestionar" por fila y modal "+ Nuevo vencimiento" (PLAZO_PROCESAL excluido hasta Fase 2 jurídica).
+- **Dashboard**: widget "Vencimientos — próximos 7 días" real.
+- **Ficha del cliente**: tab Vencimientos con los próximos 15 del cliente.
+
+**Migraciones:**
+- `20260708105031_vencimiento_unique` — unique `[clienteId, tipo, fechaVencimiento]` (idempotencia de generación). *Nota:* creada vía `prisma migrate diff` + `migrate deploy` porque `migrate dev` exige TTY interactivo.
+
+**Usuarios/seed:** sin cambios.
+
+**Env vars nuevas:** ninguna.
+
+**Verificado:** visita a `/calendario?mes=2026-08` genera IVA correcto por terminación de RUC (5→17/08, 7→21/08, 8→23/08; el cliente jurídico sin IVA no genera) · 3 visitas seguidas → siguen siendo 3 registros (idempotente) · PATCH gestiona · POST manual IPS OK · build limpio.
+
+**Pendiente / notas:** las alertas 7d/3d/día-de se implementan con el cron en Fase 11 (flags `notificado7d/3d/Dia` ya existen). Próxima fase: Asambleas.
