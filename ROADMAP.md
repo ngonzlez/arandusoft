@@ -362,3 +362,34 @@ Sesión de ajustes tras revisión del cliente en local. Contexto importante para
 **Verificado:** login SUPERADMIN → PATCH toggle a `true` → login como `juridico@criterioasesores.com.py` → "Expedientes" aparece en el nav sin reiniciar el server (cache de 30s se invalida al guardar) → toggle a `false` → desaparece · nombreEstudio actualizado se refleja en Sidebar y en el footer de `/login` · build limpio.
 
 **Pendiente (según lo acordado con el cliente, orden explícito):** con este toggle ya funcionando, sigue la Fase 2 liviana (Expediente + Documentos + Notas + vínculo con Tarea), gateada por `moduloJuridicoHabilitado`.
+
+---
+
+## Fase 2 liviana — Expedientes (2026-07-08)
+
+**Contexto:** el cliente ya usa **Judisoft** para el seguimiento oficial de causas y plazos procesales — no se duplica esa función acá. Esta fase es el seguimiento *interno* del estudio sobre un caso: quién lo lleva, qué documentos internos tiene, qué se conversó, qué tareas genera. El modelo (`Expediente`, `Documento`, `HistorialExpediente`) ya estaba en el schema desde la Fase 0, sin usar.
+
+**Qué se construyó:**
+- `GET/POST /api/expedientes`, `GET/PATCH /api/expedientes/[id]`: CRUD con visibilidad por rol (mismo patrón que Declaraciones — filtro directo `cliente: {...filtroClientesPorRol(rol)}`, no anidado en un OR). Cambiar `estado` deja rastro en `HistorialExpediente` (estado anterior/nuevo, quién, cuándo).
+- `GET/POST /api/expedientes/[id]/documentos` + `GET .../documentos/[docId]/descargar`: sube a MinIO y descarga por URL firmada, igual que Declaraciones.
+- `GET/POST /api/expedientes/[id]/notas`: observaciones append-only, mismo patrón que las de Tareas.
+- **Gate real del módulo**, no solo cosmético: nuevo `requireModuloJuridico()` en `lib/api-auth.ts` — si `Licencia.moduloJuridicoHabilitado` es `false`, todas las rutas de expedientes devuelven 403 y las páginas redirigen a `/dashboard`, sin importar si alguien pega la URL directo u oculta/muestra el nav a mano.
+- `Tarea` ahora puede vincularse a un expediente desde el form de "Nueva tarea" (select nuevo, solo visible si el módulo está habilitado). Al crear con `expedienteId`, el `clienteId` de la tarea se **deriva del expediente** (ignora cualquier cliente elegido a mano) — necesario porque `filtroTareasPorRol` decide visibilidad por `clienteId`, no por `expedienteId`.
+- UI: `/expedientes` (tabla + modal alta) y `/expedientes/[id]` (tabs Resumen/Documentos/Observaciones/Tareas, reusando `ClienteTabs`).
+
+**Refactors de paso:**
+- `lib/storage.ts`: `subirArchivoDeclaracion`/`urlFirmadaDeclaracion`/`descargarArchivoDeclaracion` → `subirArchivo`/`urlFirmadaArchivo`/`descargarArchivo` (genéricos, ahora los usan tanto Declaraciones como Documentos de expediente). `FormatoArchivo` ampliado con `docx`/`jpg`/`png`.
+- `NotasTarea.tsx` → `components/shared/NotasPanel.tsx` (recibe `endpoint` por prop en vez de `tareaId` fijo) — mismo componente para Tareas y Expedientes.
+
+**Migraciones:** ninguna — el schema de Expediente/Documento/HistorialExpediente ya existía desde `20260707211648_init`.
+
+**Verificado end-to-end (con clientes reales de tipos distintos — Villalba y Asociados es JURIDICO, Distribuidora San Roque es AMBOS):**
+- JURIDICO crea expediente de un cliente JURIDICO · CONTABLE no lo ve en la lista ni puede crearlo (404) — pero sí ve y puede crear uno para un cliente AMBOS.
+- Documento subido y descargado: bytes idénticos al original (`diff` limpio) vía URL firmada de MinIO · CONTABLE sin acceso al documento de un expediente que no puede ver (404).
+- Nota agregada y visible en el detalle.
+- Tarea creada con `expedienteId` y sin `clienteId` manual → `clienteId` quedó igual al del expediente (San Roque), confirmando la herencia.
+- Cambio de estado NUEVO→EN_PROCESO quedó en el historial con usuario y fecha.
+- Con `moduloJuridicoHabilitado=false`: `GET /api/expedientes` → 403 `MODULO_DESHABILITADO`, `GET /expedientes` → redirect 307 a `/dashboard`.
+- `npm run build` limpio (sin warnings nuevos).
+
+**Pendiente / no incluido en esta fase (evaluar con el cliente más adelante):** honorarios/facturación por expediente (no está en el PRD original); reportes por abogado responsable.
