@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { TZ_PARAGUAY, formatPeriodo } from "@/lib/format";
 import {
-  generarVencimientosIvaDelMes,
+  generarVencimientosDelMes,
   filtroVencimientosPorRol,
 } from "@/lib/vencimientos";
 import { PageHeader } from "@/components/layout/PageHeader";
@@ -29,7 +29,7 @@ export default async function CalendarioPage({
   const [año, mesNum] = mes.split("-").map(Number);
 
   // Generación automática idempotente de IVA por RUC para el mes visible
-  await generarVencimientosIvaDelMes(año, mesNum);
+  await generarVencimientosDelMes(año, mesNum);
 
   const desde = new Date(Date.UTC(año, mesNum - 1, 1));
   const hasta = new Date(Date.UTC(año, mesNum, 0, 23, 59, 59));

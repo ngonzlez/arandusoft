@@ -22,7 +22,7 @@ import { AccesosPanel } from "@/components/clientes/AccesosPanel";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
-import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, generarVencimientosClienteDelMes } from "@/lib/vencimientos";
 import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
 import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 
@@ -52,6 +52,12 @@ export default async function ClienteDetallePage({
   });
   if (clientePreObligaciones) {
     await sincronizarVencidosEstadoMensual([clientePreObligaciones], mesActual);
+    // Genera este mes y el siguiente para que "Próximo vencimiento" esté
+    // siempre al día, sin depender de haber visitado el Calendario antes.
+    await generarVencimientosClienteDelMes(id, añoActual, mesNumActual);
+    const sigMes = mesNumActual === 12 ? 1 : mesNumActual + 1;
+    const sigAño = mesNumActual === 12 ? añoActual + 1 : añoActual;
+    await generarVencimientosClienteDelMes(id, sigAño, sigMes);
   }
 
   const cliente = await prisma.cliente.findFirst({

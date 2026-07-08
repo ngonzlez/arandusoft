@@ -6,6 +6,7 @@ import { getResend, EMAIL_FROM, plantillaEmail } from "@/lib/email";
 import { formatFecha } from "@/lib/format";
 import { recalcularEstadoFiscal } from "@/lib/clientes";
 import { sincronizarVencidosEstadoMensual } from "@/lib/estado-mensual";
+import { generarVencimientosDelMes } from "@/lib/vencimientos";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
 
@@ -181,6 +182,11 @@ export async function GET(req: NextRequest) {
     },
   });
   const mesActualCron = formatInTimeZone(hoy, TZ_PARAGUAY, "yyyy-MM");
+  const [añoCron, mesNumCron] = mesActualCron.split("-").map(Number);
+  const sigMesCron = mesNumCron === 12 ? 1 : mesNumCron + 1;
+  const sigAñoCron = mesNumCron === 12 ? añoCron + 1 : añoCron;
+  await generarVencimientosDelMes(añoCron, mesNumCron);
+  await generarVencimientosDelMes(sigAñoCron, sigMesCron);
   await sincronizarVencidosEstadoMensual(clientesActivos, mesActualCron);
   for (const c of clientesActivos) {
     await recalcularEstadoFiscal(c.id);

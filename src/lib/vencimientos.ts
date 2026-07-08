@@ -1,4 +1,4 @@
-import { TipoVencimiento } from "@prisma/client";
+import { TipoObligacion, TipoVencimiento } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
 import type { Rol } from "@prisma/client";
@@ -35,45 +35,112 @@ export function calcularVencimientoIVA(ruc: string, año: number, mes: number): 
   return new Date(Date.UTC(año, mes, dia, 12, 0, 0));
 }
 
-// Genera (idempotente) los vencimientos de IVA cuyo vencimiento cae en el mes dado,
-// para todos los clientes activos con obligación IVA activa.
-// Solo IVA se calcula automáticamente (única tabla oficial en el PRD);
-// el resto de los tipos se cargan manualmente o por importación.
-export async function generarVencimientosIvaDelMes(año: number, mes: number): Promise<number> {
+// Fecha de vencimiento de una obligación para el período (año, mes 1-12).
+// IVA sin día configurado → calendario DNIT automático por RUC.
+// Cualquier otra obligación (o IVA con override manual del cliente) → día
+// `diaVencimiento` del mes SIGUIENTE al período, mismo criterio que IVA.
+// Sin día configurado y no es IVA → no hay forma de saber si está atrasada.
+export function calcularFechaVencimientoObligacion(
+  ruc: string,
+  tipo: TipoObligacion,
+  diaVencimiento: number | null,
+  año: number,
+  mes: number
+): Date | null {
+  if (diaVencimiento == null) {
+    return tipo === "IVA" ? calcularVencimientoIVA(ruc, año, mes) : null;
+  }
+  return new Date(Date.UTC(año, mes, diaVencimiento, 12, 0, 0));
+}
+
+// Igual que generarVencimientosDelMes pero para un solo cliente — se usa en
+// su ficha para que "Próximo vencimiento" esté al día sin depender de que
+// alguien haya visitado el Calendario primero.
+export async function generarVencimientosClienteDelMes(
+  clienteId: string,
+  año: number,
+  mes: number
+): Promise<number> {
+  const periodoAño = mes === 1 ? año - 1 : año;
+  const periodoMes = mes === 1 ? 12 : mes - 1;
+
+  const cliente = await prisma.cliente.findUnique({
+    where: { id: clienteId },
+    select: {
+      id: true,
+      ruc: true,
+      responsableId: true,
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
+    },
+  });
+  if (!cliente) return 0;
+
+  let creados = 0;
+  for (const o of cliente.obligaciones) {
+    const fecha = calcularFechaVencimientoObligacion(cliente.ruc, o.tipo, o.diaVencimiento, periodoAño, periodoMes);
+    if (!fecha) continue;
+
+    await prisma.vencimiento.upsert({
+      where: {
+        clienteId_tipo_fechaVencimiento: { clienteId: cliente.id, tipo: o.tipo, fechaVencimiento: fecha },
+      },
+      create: {
+        clienteId: cliente.id,
+        tipo: o.tipo,
+        fechaVencimiento: fecha,
+        responsableId: cliente.responsableId,
+      },
+      update: {},
+    });
+    creados++;
+  }
+  return creados;
+}
+
+// Genera (idempotente) los vencimientos del Calendario cuya fecha cae en el
+// mes dado, para toda obligación activa que tenga fecha calculable (IVA
+// siempre; el resto solo si el cliente le configuró un día). Es la MISMA
+// fuente de fecha que usa Estado Mensual (calcularFechaVencimientoObligacion)
+// — así el Calendario, "Próximo vencimiento" y el checklist siempre coinciden.
+export async function generarVencimientosDelMes(año: number, mes: number): Promise<number> {
   // Vencimiento en (año, mes) corresponde al período (año, mes-1)
   const periodoAño = mes === 1 ? año - 1 : año;
   const periodoMes = mes === 1 ? 12 : mes - 1;
 
   const clientes = await prisma.cliente.findMany({
-    where: {
-      estado: "ACTIVO",
-      obligaciones: { some: { tipo: "IVA", activa: true } },
+    where: { estado: "ACTIVO" },
+    select: {
+      id: true,
+      ruc: true,
+      responsableId: true,
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
     },
-    select: { id: true, ruc: true, responsableId: true },
   });
 
   let creados = 0;
   for (const c of clientes) {
-    const fecha = calcularVencimientoIVA(c.ruc, periodoAño, periodoMes);
-    if (!fecha) continue;
+    for (const o of c.obligaciones) {
+      const fecha = calcularFechaVencimientoObligacion(c.ruc, o.tipo, o.diaVencimiento, periodoAño, periodoMes);
+      if (!fecha) continue;
 
-    await prisma.vencimiento.upsert({
-      where: {
-        clienteId_tipo_fechaVencimiento: {
-          clienteId: c.id,
-          tipo: "IVA",
-          fechaVencimiento: fecha,
+      await prisma.vencimiento.upsert({
+        where: {
+          clienteId_tipo_fechaVencimiento: {
+            clienteId: c.id,
+            tipo: o.tipo,
+            fechaVencimiento: fecha,
+          },
         },
-      },
-      create: {
-        clienteId: c.id,
-        tipo: "IVA",
-        fechaVencimiento: fecha,
-        responsableId: c.responsableId,
-      },
-      update: {}, // ya existe: no tocar estado ni flags de notificación
-    });
-    creados++;
+        create: {
+          clienteId: c.id,
+          tipo: o.tipo,
+          fechaVencimiento: fecha,
+          responsableId: c.responsableId,
+        },
+        update: {}, // ya existe: no tocar estado ni flags de notificación
+      });
+      creados++;
+    }
   }
   return creados;
 }

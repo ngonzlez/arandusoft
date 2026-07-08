@@ -1,25 +1,9 @@
 import { TipoObligacion } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { calcularVencimientoIVA } from "@/lib/vencimientos";
+import { calcularFechaVencimientoObligacion } from "@/lib/vencimientos";
 import { recalcularEstadoFiscal } from "@/lib/clientes";
 
-// Fecha de vencimiento de una obligación para el período (año, mes 1-12).
-// IVA sin día configurado → calendario DNIT automático por RUC.
-// Cualquier otra obligación (o IVA con override manual) → día `diaVencimiento`
-// del mes SIGUIENTE al período, mismo criterio que IVA.
-// Sin día configurado y no es IVA → no hay forma de saber si está atrasada.
-export function calcularFechaVencimientoObligacion(
-  ruc: string,
-  tipo: TipoObligacion,
-  diaVencimiento: number | null,
-  año: number,
-  mes: number
-): Date | null {
-  if (diaVencimiento == null) {
-    return tipo === "IVA" ? calcularVencimientoIVA(ruc, año, mes) : null;
-  }
-  return new Date(Date.UTC(año, mes, diaVencimiento, 12, 0, 0));
-}
+export { calcularFechaVencimientoObligacion };
 
 interface ClienteConObligaciones {
   id: string;

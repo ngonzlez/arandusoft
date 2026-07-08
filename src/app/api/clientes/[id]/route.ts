@@ -116,6 +116,21 @@ export async function PATCH(req: NextRequest, { params }: Params) {
           where: { id: actual.id },
           data: { activa: true, diaVencimiento: o.diaVencimiento },
         });
+        // Cambió el día de vencimiento: el/los Vencimiento ya generados con
+        // la fecha vieja quedarían huérfanos (la clave incluye la fecha, así
+        // que un upsert nunca los actualiza solo). Se borran los futuros que
+        // sigan PENDIENTE — se regeneran con la fecha correcta al ver el
+        // calendario/estado mensual. Nunca se toca uno ya GESTIONADO/VENCIDO.
+        if (actual.diaVencimiento !== o.diaVencimiento) {
+          await prisma.vencimiento.deleteMany({
+            where: {
+              clienteId: id,
+              tipo: o.tipo,
+              estado: "PENDIENTE",
+              fechaVencimiento: { gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1) },
+            },
+          });
+        }
       }
     }
     for (const actual of actuales) {
