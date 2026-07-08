@@ -231,13 +231,17 @@ model Cliente {
 }
 
 model ClienteObligacion {
-  id        String         @id @default(cuid())
-  clienteId String
-  cliente   Cliente        @relation(fields: [clienteId], references: [id])
-  tipo      TipoObligacion
-  activa    Boolean        @default(true)
-  createdAt DateTime       @default(now())
-  updatedAt DateTime       @updatedAt
+  id             String         @id @default(cuid())
+  clienteId      String
+  cliente        Cliente        @relation(fields: [clienteId], references: [id])
+  tipo           TipoObligacion
+  activa         Boolean        @default(true)
+  // Día del mes (1-31) en que vence esta obligación — vence el mes siguiente
+  // al período, mismo criterio que IVA. NULL en IVA = usar cálculo automático
+  // por terminación de RUC; NULL en el resto = sin vencimiento configurado.
+  diaVencimiento Int?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
 
   @@unique([clienteId, tipo])
 }

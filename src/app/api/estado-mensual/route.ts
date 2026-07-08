@@ -3,6 +3,7 @@ import { EstadoObligacion, TipoObligacion } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
 import { recalcularEstadoFiscal } from "@/lib/clientes";
+import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 
 const MES_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 
@@ -18,6 +19,17 @@ export async function GET(req: NextRequest) {
       { status: 400 }
     );
   }
+  const [año, mesNum] = mes.split("-").map(Number);
+
+  const clientesBase = await prisma.cliente.findMany({
+    where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
+    select: {
+      id: true,
+      ruc: true,
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
+    },
+  });
+  await sincronizarVencidosEstadoMensual(clientesBase, mes);
 
   const clientes = await prisma.cliente.findMany({
     where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
@@ -26,7 +38,7 @@ export async function GET(req: NextRequest) {
       id: true,
       nombre: true,
       ruc: true,
-      obligaciones: { where: { activa: true }, select: { tipo: true } },
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
       estadosMensuales: {
         where: { mes },
         select: {
@@ -39,7 +51,12 @@ export async function GET(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ data: { mes, clientes } });
+  const clientesConFechas = clientes.map((c) => ({
+    ...c,
+    fechasVencimiento: mapaFechasVencimiento(c.ruc, c.obligaciones, año, mesNum),
+  }));
+
+  return NextResponse.json({ data: { mes, clientes: clientesConFechas } });
 }
 
 // Tildar/cambiar el estado de una celda (upsert) con auditoría userId+timestamp.

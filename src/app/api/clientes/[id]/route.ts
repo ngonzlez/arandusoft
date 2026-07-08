@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Prisma, TipoObligacion } from "@prisma/client";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
 import { encriptar, desencriptar } from "@/lib/crypto";
-import { validarRuc } from "@/lib/clientes";
+import { validarRuc, parseObligaciones } from "@/lib/clientes";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -16,7 +16,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     where: { id, ...filtroClientesPorRol(user.rol) },
     include: {
       responsable: { select: { id: true, nombre: true } },
-      obligaciones: { where: { activa: true }, select: { tipo: true } },
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
     },
   });
 
@@ -100,26 +100,26 @@ export async function PATCH(req: NextRequest, { params }: Params) {
 
   await prisma.cliente.update({ where: { id }, data });
 
-  // Sincronizar obligaciones (soft: desactiva las que ya no están)
+  // Sincronizar obligaciones (soft: desactiva las que ya no están) + su día de vencimiento
   if (Array.isArray(body.obligaciones)) {
-    const nuevas: TipoObligacion[] = body.obligaciones.filter((o: string) =>
-      Object.values(TipoObligacion).includes(o as TipoObligacion)
-    );
+    const nuevas = parseObligaciones(body.obligaciones);
     const actuales = await prisma.clienteObligacion.findMany({ where: { clienteId: id } });
 
-    for (const tipo of nuevas) {
-      const actual = actuales.find((a) => a.tipo === tipo);
+    for (const o of nuevas) {
+      const actual = actuales.find((a) => a.tipo === o.tipo);
       if (!actual) {
-        await prisma.clienteObligacion.create({ data: { clienteId: id, tipo } });
-      } else if (!actual.activa) {
+        await prisma.clienteObligacion.create({
+          data: { clienteId: id, tipo: o.tipo, diaVencimiento: o.diaVencimiento },
+        });
+      } else if (!actual.activa || actual.diaVencimiento !== o.diaVencimiento) {
         await prisma.clienteObligacion.update({
           where: { id: actual.id },
-          data: { activa: true },
+          data: { activa: true, diaVencimiento: o.diaVencimiento },
         });
       }
     }
     for (const actual of actuales) {
-      if (actual.activa && !nuevas.includes(actual.tipo)) {
+      if (actual.activa && !nuevas.some((n) => n.tipo === actual.tipo)) {
         await prisma.clienteObligacion.update({
           where: { id: actual.id },
           data: { activa: false },

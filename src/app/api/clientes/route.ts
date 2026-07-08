@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { EstadoCliente, Prisma, TipoCliente, TipoObligacion } from "@prisma/client";
+import { EstadoCliente, Prisma, TipoCliente } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
 import { encriptar } from "@/lib/crypto";
-import { validarRuc } from "@/lib/clientes";
+import { validarRuc, parseObligaciones } from "@/lib/clientes";
 
 export async function GET(req: NextRequest) {
   const { user, error } = await requireApiSession();
@@ -79,11 +79,7 @@ export async function POST(req: NextRequest) {
       ? encriptar(JSON.stringify(body.accesos))
       : undefined;
 
-  const obligaciones: TipoObligacion[] = Array.isArray(body.obligaciones)
-    ? body.obligaciones.filter((o: string) =>
-        Object.values(TipoObligacion).includes(o as TipoObligacion)
-      )
-    : [];
+  const obligaciones = parseObligaciones(body.obligaciones);
 
   const cliente = await prisma.cliente.create({
     data: {
@@ -101,7 +97,7 @@ export async function POST(req: NextRequest) {
       accesos,
       actualizadoPor: user.id,
       obligaciones: {
-        create: obligaciones.map((tipo) => ({ tipo })),
+        create: obligaciones.map((o) => ({ tipo: o.tipo, diaVencimiento: o.diaVencimiento })),
       },
     },
     select: { id: true },

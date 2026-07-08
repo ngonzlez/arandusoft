@@ -24,6 +24,7 @@ import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
 import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
 import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
+import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 
 export const metadata = { title: "Cliente — ArandúSoft" };
 
@@ -39,12 +40,25 @@ export default async function ClienteDetallePage({
   const { id } = await params;
 
   const mesActual = formatInTimeZone(new Date(), TZ_PARAGUAY, "yyyy-MM");
+  const [añoActual, mesNumActual] = mesActual.split("-").map(Number);
+
+  const clientePreObligaciones = await prisma.cliente.findFirst({
+    where: { id, ...filtroClientesPorRol(user.rol) },
+    select: {
+      id: true,
+      ruc: true,
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
+    },
+  });
+  if (clientePreObligaciones) {
+    await sincronizarVencidosEstadoMensual([clientePreObligaciones], mesActual);
+  }
 
   const cliente = await prisma.cliente.findFirst({
     where: { id, ...filtroClientesPorRol(user.rol) },
     include: {
       responsable: { select: { nombre: true } },
-      obligaciones: { where: { activa: true }, select: { tipo: true } },
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
       estadosMensuales: {
         where: { mes: mesActual },
         select: {
@@ -241,6 +255,12 @@ export default async function ClienteDetallePage({
                       ruc: cliente.ruc,
                       obligaciones: cliente.obligaciones,
                       estadosMensuales: cliente.estadosMensuales,
+                      fechasVencimiento: mapaFechasVencimiento(
+                        cliente.ruc,
+                        cliente.obligaciones,
+                        añoActual,
+                        mesNumActual
+                      ),
                     },
                   ]}
                 />

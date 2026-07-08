@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EstadoObligacion, TipoObligacion } from "@prisma/client";
 import { OBLIGACIONES_LABELS } from "@/lib/clientes";
-import { formatFechaHora } from "@/lib/format";
+import { formatFecha, formatFechaHora } from "@/lib/format";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";
 import { Spinner } from "@/components/ui/Spinner";
@@ -22,8 +22,9 @@ interface ClienteFila {
   id: string;
   nombre: string;
   ruc: string;
-  obligaciones: { tipo: TipoObligacion }[];
+  obligaciones: { tipo: TipoObligacion; diaVencimiento: number | null }[];
   estadosMensuales: EstadoCelda[];
+  fechasVencimiento?: Record<string, string | null>;
 }
 
 interface Props {
@@ -85,6 +86,7 @@ export function EstadoMensualTabla({ mes, clientes }: Props) {
   }
 
   const detalle = celda ? estadoDe(celda.cliente, celda.obligacion) : null;
+  const fechaVencCelda = celda?.cliente.fechasVencimiento?.[celda.obligacion];
 
   return (
     <>
@@ -125,12 +127,16 @@ export function EstadoMensualTabla({ mes, clientes }: Props) {
                   }
                   const est = estadoDe(c, col);
                   const icono = ICONO[est?.estado ?? "PENDIENTE"];
+                  const fechaVenc = c.fechasVencimiento?.[col];
+                  const tooltip = fechaVenc
+                    ? `${OBLIGACIONES_LABELS[col]}: ${icono.label} — vence ${formatFecha(fechaVenc)}`
+                    : `${OBLIGACIONES_LABELS[col]}: ${icono.label}`;
                   return (
                     <td key={col} className="py-2.5 px-2 text-center">
                       <button
                         onClick={() => setCelda({ cliente: c, obligacion: col })}
                         className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-transform hover:scale-110 ${icono.clase}`}
-                        title={`${OBLIGACIONES_LABELS[col]}: ${icono.label}`}
+                        title={tooltip}
                       >
                         {icono.simbolo}
                       </button>
@@ -150,13 +156,26 @@ export function EstadoMensualTabla({ mes, clientes }: Props) {
       >
         {celda && (
           <div className="space-y-4">
-            <div className="rounded-control bg-surface px-4 py-3 text-sm">
+            <div className="rounded-control bg-surface px-4 py-3 text-sm space-y-1">
               <p>
                 <span className="text-ink-muted">Estado actual: </span>
                 <span className="font-medium">{ICONO[detalle?.estado ?? "PENDIENTE"].label}</span>
               </p>
+              {fechaVencCelda ? (
+                <p>
+                  <span className="text-ink-muted">Vencimiento: </span>
+                  <span className={`font-medium ${detalle?.estado === "VENCIDO" ? "text-urgent" : ""}`}>
+                    {formatFecha(fechaVencCelda)}
+                  </span>
+                </p>
+              ) : (
+                <p className="text-xs text-ink-faint">
+                  Sin día de vencimiento configurado — editá el cliente para
+                  que el sistema avise solo cuando se atrase.
+                </p>
+              )}
               {detalle?.fechaPresentacion && (
-                <p className="mt-1">
+                <p>
                   <span className="text-ink-muted">Presentado: </span>
                   <span className="font-medium">{formatFechaHora(detalle.fechaPresentacion)}</span>
                   {detalle.responsable && (

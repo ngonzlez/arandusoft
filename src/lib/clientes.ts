@@ -79,6 +79,27 @@ export async function recalcularEstadoFiscal(clienteId: string, actualizadoPor?:
   }
 }
 
+export interface ObligacionInput {
+  tipo: TipoObligacion;
+  diaVencimiento: number | null;
+}
+
+// Acepta el body crudo del form: [{tipo, diaVencimiento}, ...]. Descarta
+// tipos inválidos y normaliza el día (1-31 o null = sin configurar / auto-RUC).
+export function parseObligaciones(raw: unknown): ObligacionInput[] {
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .filter(
+      (o): o is { tipo: string; diaVencimiento?: unknown } =>
+        o && typeof o === "object" && Object.values(TipoObligacion).includes(o.tipo)
+    )
+    .map((o) => {
+      const dia = Number(o.diaVencimiento);
+      const diaVencimiento = Number.isInteger(dia) && dia >= 1 && dia <= 31 ? dia : null;
+      return { tipo: o.tipo as TipoObligacion, diaVencimiento };
+    });
+}
+
 export function validarRuc(ruc: string): boolean {
   // RUC paraguayo: dígitos con guión y dígito verificador (ej. 80012345-7),
   // o CI numérica. Validación laxa: 4-15 caracteres, dígitos y un guión opcional.

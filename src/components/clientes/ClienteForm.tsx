@@ -26,7 +26,7 @@ interface ClienteFormValues {
   estado: string;
   estadoFiscal: string;
   responsableId: string;
-  obligaciones: string[];
+  obligaciones: { tipo: string; diaVencimiento: number | null }[];
   accesos: AccesosCliente | null;
   observaciones: string;
 }
@@ -50,13 +50,24 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
   const toast = useToast();
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [obligaciones, setObligaciones] = useState<string[]>(inicial?.obligaciones ?? []);
+  const [obligaciones, setObligaciones] = useState<Record<string, number | null>>(
+    Object.fromEntries((inicial?.obligaciones ?? []).map((o) => [o.tipo, o.diaVencimiento]))
+  );
   const [accesos, setAccesos] = useState<AccesosCliente>(inicial?.accesos ?? {});
 
   function toggleObligacion(tipo: string) {
-    setObligaciones((prev) =>
-      prev.includes(tipo) ? prev.filter((t) => t !== tipo) : [...prev, tipo]
-    );
+    setObligaciones((prev) => {
+      if (tipo in prev) {
+        const { [tipo]: _quitado, ...resto } = prev;
+        return resto;
+      }
+      return { ...prev, [tipo]: null };
+    });
+  }
+
+  function setDiaVencimiento(tipo: string, valor: string) {
+    const dia = valor === "" ? null : Number(valor);
+    setObligaciones((prev) => ({ ...prev, [tipo]: dia }));
   }
 
   function setAcceso(sistema: string, campo: "usuario" | "clave", valor: string) {
@@ -88,7 +99,10 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
       estado: form.get("estado"),
       estadoFiscal: form.get("estadoFiscal"),
       responsableId: form.get("responsableId"),
-      obligaciones,
+      obligaciones: Object.entries(obligaciones).map(([tipo, diaVencimiento]) => ({
+        tipo,
+        diaVencimiento,
+      })),
       ...(esAdmin ? { accesos } : {}),
     };
 
@@ -172,29 +186,50 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
       <Card>
         <h3 className="font-heading font-semibold text-primary mb-1">Obligaciones activas</h3>
         <p className="text-xs text-ink-muted mb-4">
-          Determinan el checklist mensual y los vencimientos automáticos.
+          Determinan el checklist mensual. Configurá el día de vencimiento de
+          cada una (vence el mes siguiente al período) para que el sistema
+          avise solo cuando se atrasan — dejalo vacío en IVA para usar el
+          calendario automático por RUC.
         </p>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-          {Object.entries(OBLIGACIONES_LABELS).map(([tipo, label]) => (
-            <label
-              key={tipo}
-              className={`flex items-center gap-2 rounded-control border px-3 py-2 text-sm cursor-pointer transition-colors ${
-                obligaciones.includes(tipo)
-                  ? "border-gold bg-[#FEF3C7]/50 text-primary"
-                  : "border-line text-ink-muted hover:border-gold/50"
-              }`}
-            >
-              <input
-                type="checkbox"
-                checked={obligaciones.includes(tipo)}
-                onChange={() => toggleObligacion(tipo)}
-                className="accent-[#C9A84C]"
-              />
-              {label}
-            </label>
-          ))}
+        <div className="space-y-2">
+          {Object.entries(OBLIGACIONES_LABELS).map(([tipo, label]) => {
+            const marcada = tipo in obligaciones;
+            return (
+              <div
+                key={tipo}
+                className={`flex items-center gap-3 rounded-control border px-3 py-2 transition-colors ${
+                  marcada ? "border-gold bg-[#FEF3C7]/40" : "border-line"
+                }`}
+              >
+                <label className="flex items-center gap-2 text-sm cursor-pointer flex-1">
+                  <input
+                    type="checkbox"
+                    checked={marcada}
+                    onChange={() => toggleObligacion(tipo)}
+                    className="accent-[#C9A84C]"
+                  />
+                  <span className={marcada ? "text-primary font-medium" : "text-ink-muted"}>
+                    {label}
+                  </span>
+                </label>
+                {marcada && (
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <span className="text-xs text-ink-faint whitespace-nowrap">Vence día</span>
+                    <input
+                      type="number"
+                      min={1}
+                      max={31}
+                      value={obligaciones[tipo] ?? ""}
+                      onChange={(e) => setDiaVencimiento(tipo, e.target.value)}
+                      placeholder={tipo === "IVA" ? "auto" : "—"}
+                      className="w-16 h-8 rounded-control border border-line px-2 text-sm text-center focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-        <input type="hidden" name="_obligaciones" value={obligaciones.join(",")} />
       </Card>
 
       {esAdmin && (

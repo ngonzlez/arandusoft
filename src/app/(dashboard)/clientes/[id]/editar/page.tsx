@@ -20,7 +20,9 @@ export default async function EditarClientePage({
 
   const cliente = await prisma.cliente.findFirst({
     where: { id, ...filtroClientesPorRol(user.rol) },
-    include: { obligaciones: { where: { activa: true }, select: { tipo: true } } },
+    include: {
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
+    },
   });
   if (!cliente) notFound();
 
@@ -59,7 +61,7 @@ export default async function EditarClientePage({
           estado: cliente.estado,
           estadoFiscal: cliente.estadoFiscal,
           responsableId: cliente.responsableId,
-          obligaciones: cliente.obligaciones.map((o) => o.tipo),
+          obligaciones: cliente.obligaciones,
           accesos,
         }}
       />

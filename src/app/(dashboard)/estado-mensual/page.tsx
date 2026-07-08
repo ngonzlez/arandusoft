@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
 import { TZ_PARAGUAY, formatPeriodo } from "@/lib/format";
+import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { MesSelector } from "@/components/estado-mensual/MesSelector";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
@@ -25,6 +26,21 @@ export default async function EstadoMensualPage({
   const sp = await searchParams;
   const mesActual = formatInTimeZone(new Date(), TZ_PARAGUAY, "yyyy-MM");
   const mes = MES_RE.test(sp.mes ?? "") ? sp.mes! : mesActual;
+  const [año, mesNum] = mes.split("-").map(Number);
+
+  const clientesBase = await prisma.cliente.findMany({
+    where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
+    orderBy: { nombre: "asc" },
+    select: {
+      id: true,
+      ruc: true,
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
+    },
+  });
+
+  // Marca VENCIDO lo que corresponda antes de mostrar la grilla — así el
+  // sistema avisa solo, sin depender de que alguien tilde algo.
+  await sincronizarVencidosEstadoMensual(clientesBase, mes);
 
   const clientes = await prisma.cliente.findMany({
     where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
@@ -33,7 +49,7 @@ export default async function EstadoMensualPage({
       id: true,
       nombre: true,
       ruc: true,
-      obligaciones: { where: { activa: true }, select: { tipo: true } },
+      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
       estadosMensuales: {
         where: { mes },
         select: {
@@ -46,7 +62,12 @@ export default async function EstadoMensualPage({
     },
   });
 
-  const conObligaciones = clientes.filter((c) => c.obligaciones.length > 0);
+  const conObligaciones = clientes
+    .filter((c) => c.obligaciones.length > 0)
+    .map((c) => ({
+      ...c,
+      fechasVencimiento: mapaFechasVencimiento(c.ruc, c.obligaciones, año, mesNum),
+    }));
 
   return (
     <div>
