@@ -13,6 +13,7 @@ import { Card } from "@/components/ui/Card";
 import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { SlideOver } from "@/components/ui/SlideOver";
+import { NotasTarea } from "@/components/tareas/NotasTarea";
 import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
@@ -351,8 +352,10 @@ export function TareasBoard({ tareas, usuarios, clientes, miUserId }: Props) {
               </div>
             )}
 
-            <div>
-              <p className="text-sm font-semibold text-primary mb-2.5">Mover a</p>
+            <NotasTarea tareaId={detalle.id} />
+
+            <div className="pt-1 border-t border-line">
+              <p className="text-sm font-semibold text-primary mb-2.5 mt-4">Mover a</p>
               <div className="flex gap-2">
                 {COLUMNAS.filter((c) => c.estado !== detalle.estado).map((c) => (
                   <Button
