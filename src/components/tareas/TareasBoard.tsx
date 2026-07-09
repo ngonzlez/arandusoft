@@ -99,6 +99,21 @@ export function TareasBoard({ tareas, usuarios, clientes, expedientes, miUserId 
     router.refresh();
   }
 
+  async function cambiarFechaLimite(tarea: Tarea, fecha: string) {
+    const fechaLimite = fecha ? `${fecha}T12:00:00Z` : null;
+    const res = await fetch(`/api/tareas/${tarea.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ fechaLimite }),
+    });
+    if (!res.ok) {
+      toast("error", "No se pudo cambiar la fecha límite");
+      return;
+    }
+    setDetalle({ ...tarea, fechaLimite });
+    router.refresh();
+  }
+
   async function crearTarea(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
@@ -314,6 +329,15 @@ export function TareasBoard({ tareas, usuarios, clientes, expedientes, miUserId 
                   <Avatar nombre={detalle.responsable.nombre} size="sm" />
                   {detalle.responsable.nombre}
                 </span>
+              </div>
+              <div className="flex items-center justify-between text-sm gap-3">
+                <span className="text-ink-muted shrink-0">Fecha límite</span>
+                <input
+                  type="date"
+                  value={detalle.fechaLimite ? detalle.fechaLimite.slice(0, 10) : ""}
+                  onChange={(e) => cambiarFechaLimite(detalle, e.target.value)}
+                  className="h-8 rounded-control border border-line px-2 text-sm text-ink-base focus:outline-none focus:border-primary"
+                />
               </div>
             </div>
 
