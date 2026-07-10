@@ -31,3 +31,19 @@ html {
 .animate-slide-in-left {
   animation: slide-in-left 0.25s ease-out;
 }
+
+/* Impresión de documentos (presupuestos) */
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  .no-print {
+    display: none !important;
+  }
+  body {
+    /* Sin esto el header azul de la tabla sale blanco al imprimir */
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}
