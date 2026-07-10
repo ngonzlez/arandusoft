@@ -47,6 +47,12 @@ export const ESTADO_VENCIMIENTO: Record<string, BadgeStyle> = {
   VENCIDO: { bg: "#FEE2E2", text: "#DC2626" },
 };
 
+export const ESTADO_PRESUPUESTO: Record<string, BadgeStyle> = {
+  BORRADOR: { bg: "#F1F5F9", text: "#64748B" },
+  EMITIDO: { bg: "#DCFCE7", text: "#15803D" },
+  ANULADO: { bg: "#FEE2E2", text: "#DC2626" },
+};
+
 export const ESTADO_EXPEDIENTE: Record<string, BadgeStyle> = {
   NUEVO: { bg: "#DBEAFE", text: "#1D4ED8" },
   EN_PROCESO: { bg: "#FEF3C7", text: "#A16207" },

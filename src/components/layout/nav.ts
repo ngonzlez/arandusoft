@@ -17,6 +17,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/asambleas", label: "Asambleas", icon: "flag", roles: ["ADMIN", "CONTABLE"] },
   { href: "/tareas", label: "Tareas", icon: "clipboard", roles: ["ADMIN", "CONTABLE", "JURIDICO"] },
   { href: "/expedientes", label: "Expedientes", icon: "folder", roles: ["ADMIN", "JURIDICO"], feature: "juridico" },
+  { href: "/presupuestos", label: "Presupuestos", icon: "receipt", roles: ["ADMIN", "CONTABLE", "JURIDICO"], feature: "presupuestos" },
   { href: "/notificaciones", label: "Notificaciones", icon: "bell", roles: ["ADMIN", "CONTABLE", "JURIDICO"] },
   { href: "/reportes", label: "Reportes", icon: "chart", roles: ["ADMIN", "CONTABLE", "JURIDICO"] },
   { href: "/usuarios", label: "Equipo", icon: "briefcase", roles: ["ADMIN"] },
