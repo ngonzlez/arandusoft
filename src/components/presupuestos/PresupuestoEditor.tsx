@@ -50,6 +50,7 @@ export interface PresupuestoInicial {
   destTelefono: string | null;
   destEmail: string | null;
   validezDias: number;
+  serviciosIncluidos: string | null;
   items: { id: string; descripcion: string; detalle?: string; cantidad: number; unidad?: string; precioUnitario: number }[];
   descuento: number;
   notas: string | null;
@@ -103,6 +104,7 @@ export function PresupuestoEditor({
   );
   const [descuento, setDescuento] = useState(String(inicial?.descuento ?? 0));
   const [validezDias, setValidezDias] = useState(String(inicial?.validezDias ?? 10));
+  const [serviciosIncluidos, setServiciosIncluidos] = useState(inicial?.serviciosIncluidos ?? "");
   const [notas, setNotas] = useState(inicial?.notas ?? "");
   const [datosBancarios, setDatosBancarios] = useState(inicial?.datosBancarios ?? "");
   const [firmaDataUrl, setFirmaDataUrl] = useState<string | null>(inicial?.firmaDataUrl ?? null);
@@ -163,6 +165,7 @@ export function PresupuestoEditor({
         })),
       descuento: Number(descuento) || 0,
       validezDias: Number(validezDias) || 10,
+      serviciosIncluidos,
       notas,
       datosBancarios,
       firmaDataUrl,
@@ -319,9 +322,23 @@ export function PresupuestoEditor({
         </Card>
       </div>
 
+      {/* Servicios incluidos (opcional) */}
+      <Card>
+        <h3 className="font-heading font-semibold text-primary mb-1">Servicios incluidos (opcional)</h3>
+        <p className="text-xs text-ink-muted mb-3">
+          Lista de lo que incluye el servicio. Aparece arriba de la tabla de precios, una línea por servicio.
+        </p>
+        <Textarea
+          value={serviciosIncluidos}
+          onChange={(e) => setServiciosIncluidos(e.target.value)}
+          rows={5}
+          placeholder={"Redacción y gestión de la documentación exigida.\nElaboración de plano arquitectónico.\nAsesoría técnica y acompañamiento integral.\nSeguimiento del expediente hasta su resolución."}
+        />
+      </Card>
+
       {/* Ítems */}
       <Card>
-        <h3 className="font-heading font-semibold text-primary mb-4">Ítems</h3>
+        <h3 className="font-heading font-semibold text-primary mb-4">Detalle de servicios y montos</h3>
         <div className="space-y-3">
           {items.map((it, idx) => (
             <div key={it.id} className="rounded-card border border-line p-3 space-y-2">

@@ -50,6 +50,7 @@ export default async function EditarPresupuestoPage({
     destTelefono: presupuesto.destTelefono,
     destEmail: presupuesto.destEmail,
     validezDias: presupuesto.validezDias,
+    serviciosIncluidos: presupuesto.serviciosIncluidos,
     items: JSON.parse(JSON.stringify(presupuesto.items)),
     descuento: presupuesto.descuento,
     notas: presupuesto.notas,

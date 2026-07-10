@@ -45,6 +45,7 @@ export async function POST(req: NextRequest, { params }: Params) {
       destEmail: original.destEmail,
       fechaEmision: new Date(),
       validezDias: original.validezDias,
+      serviciosIncluidos: original.serviciosIncluidos,
       items: original.items as Prisma.InputJsonValue,
       descuento: original.descuento,
       subtotal: original.subtotal,

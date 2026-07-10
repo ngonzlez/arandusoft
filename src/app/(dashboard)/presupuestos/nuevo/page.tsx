@@ -45,6 +45,7 @@ export default async function NuevoPresupuestoPage({
         destTelefono: plantilla.destTelefono,
         destEmail: plantilla.destEmail,
         validezDias: plantilla.validezDias,
+        serviciosIncluidos: plantilla.serviciosIncluidos,
         items: JSON.parse(JSON.stringify(plantilla.items)),
         descuento: plantilla.descuento,
         notas: plantilla.notas,

@@ -221,6 +221,10 @@ model Presupuesto {
   fechaEmision DateTime @default(now())
   validezDias  Int      @default(10)
 
+  // Lista opcional de servicios incluidos (bullets), una línea por servicio.
+  // Va arriba de la tabla de ítems con precios (como el modelo de Ferraso).
+  serviciosIncluidos String?
+
   // [{ id, descripcion, detalle?, cantidad, unidad?, precioUnitario }]
   items     Json @default("[]")
   descuento Int  @default(0)

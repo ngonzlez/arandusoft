@@ -27,6 +27,7 @@ interface Doc {
   destEmail: string | null;
   fechaEmision: string | Date;
   validezDias: number;
+  serviciosIncluidos: string | null;
   items: ItemPresupuestos[];
   descuento: number;
   subtotal: number;
@@ -120,6 +121,25 @@ export function PresupuestoDocumento({ doc, emisor }: { doc: Doc; emisor: Emisor
           </p>
         </div>
       </div>
+
+      {/* Servicios incluidos */}
+      {doc.serviciosIncluidos && (
+        <div className="mb-6">
+          <p className="text-[10px] uppercase tracking-wide text-ink-faint mb-2">Servicios incluidos</p>
+          <ul className="space-y-1">
+            {doc.serviciosIncluidos
+              .split("\n")
+              .map((l) => l.trim())
+              .filter(Boolean)
+              .map((linea, i) => (
+                <li key={i} className="flex gap-2 text-sm text-ink-base">
+                  <span className="text-gold-dark mt-0.5">•</span>
+                  <span>{linea}</span>
+                </li>
+              ))}
+          </ul>
+        </div>
+      )}
 
       {/* Ítems */}
       <table className="w-full text-sm">

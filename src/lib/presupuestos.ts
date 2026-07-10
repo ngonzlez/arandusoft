@@ -174,6 +174,8 @@ export async function armarDataPresupuesto(
     if (!Number.isInteger(v) || v < 1 || v > 365) throw new Error("La validez debe ser de 1 a 365 días");
     data.validezDias = v;
   }
+  if (body.serviciosIncluidos !== undefined)
+    data.serviciosIncluidos = String(body.serviciosIncluidos).trim() || null;
   if (body.notas !== undefined) data.notas = String(body.notas).trim() || null;
   if (body.datosBancarios !== undefined) data.datosBancarios = String(body.datosBancarios).trim() || null;
   if (body.firmante !== undefined) data.firmante = String(body.firmante).trim() || null;
