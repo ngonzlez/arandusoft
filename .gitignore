@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Plantilla de produccion con secretos reales — NUNCA commitear
 .env.produccion
+
+# bundle del seed generado en build
+prisma/seed.cjs

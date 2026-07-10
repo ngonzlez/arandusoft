@@ -78,8 +78,12 @@ En la zona `criterioasesores.com.py`:
 Desde la terminal de la app en Coolify (o localmente apuntando `DATABASE_URL` a producción):
 
 ```bash
-node_modules/.bin/prisma db seed   # si falla, correr: npx tsx prisma/seed.ts
+node prisma/seed.cjs
 ```
+
+> `seed.cjs` es un bundle auto-suficiente generado en el build (no depende de
+> `tsx`, `npx` ni de `npm install` en el contenedor). Toma `SUPERADMIN_EMAIL`,
+> `SUPERADMIN_PASSWORD_HASH` y `DATABASE_URL` de las env vars.
 
 Crea: SUPERADMIN (desde env), ADMIN de prueba (`admin@criterioasesores.com.py` / `cambiar123` — **cambiar la contraseña de inmediato** desde /usuarios), licencia activa 30 días y clientes de ejemplo (borrarlos antes de la carga real, o directamente importar los reales por Excel).
 

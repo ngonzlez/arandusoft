@@ -14,6 +14,10 @@ COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npx prisma generate
 RUN npm run build
+# Seed auto-suficiente para producción: bcryptjs empaquetado adentro,
+# @prisma/client queda externo (existe en el runtime standalone).
+# Correr en el contenedor con: node prisma/seed.cjs
+RUN node_modules/.bin/esbuild prisma/seed.ts --bundle --platform=node --target=node22 --external:@prisma/client --outfile=prisma/seed.cjs
 
 # CLI de Prisma aislado con TODAS sus dependencias (para migrate deploy)
 FROM node:22-alpine AS prismacli
