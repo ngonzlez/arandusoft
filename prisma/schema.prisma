@@ -191,6 +191,24 @@ model Licencia {
   pagos             PagoLicencia[]
 }
 
+// Identidad del estudio como emisor de documentos (presupuestos, etc).
+// Singleton editable por el ADMIN del estudio en /configuracion — a
+// diferencia de Licencia, que es territorio exclusivo del superadmin.
+model PerfilEstudio {
+  id             String   @id @default(cuid())
+  razonSocial    String? // si null → fallback a Licencia.nombreEstudio
+  ruc            String?
+  telefono       String?
+  email          String?
+  direccion      String?
+  ciudad         String?
+  logoPublicId   String? // key en MinIO (carpeta "estudio/")
+  logoFormato    String? // "png" | "jpg"
+  actualizadoPor String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model PagoLicencia {
   id            String   @id @default(cuid())
   licenciaId    String

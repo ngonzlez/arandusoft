@@ -20,6 +20,7 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/notificaciones", label: "Notificaciones", icon: "bell", roles: ["ADMIN", "CONTABLE", "JURIDICO"] },
   { href: "/reportes", label: "Reportes", icon: "chart", roles: ["ADMIN", "CONTABLE", "JURIDICO"] },
   { href: "/usuarios", label: "Equipo", icon: "briefcase", roles: ["ADMIN"] },
+  { href: "/configuracion", label: "Configuración", icon: "settings", roles: ["ADMIN"] },
 ];
 
 // features viene de Licencia.features (DB, editable desde el panel superadmin).
