@@ -156,6 +156,7 @@ model User {
   archivosEnviados     EnvioArchivo[]        @relation("ArchivosEnviados")
   archivosRecibidos    EnvioArchivo[]        @relation("ArchivosRecibidos")
   resetTokens          PasswordResetToken[]
+  presupuestosCreados  Presupuesto[]         @relation("PresupuestoCreadoPor")
 
   @@index([rol])
 }
@@ -189,6 +190,66 @@ model Licencia {
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   pagos             PagoLicencia[]
+}
+
+enum EstadoPresupuesto {
+  BORRADOR
+  EMITIDO
+  ANULADO // soft delete — conserva su número, como una factura anulada
+}
+
+// Presupuesto que el estudio emite a SUS clientes (feature "presupuestos").
+model Presupuesto {
+  id     String            @id @default(cuid())
+  estado EstadoPresupuesto @default(BORRADOR)
+
+  // Numeración "700/26": correlativo por año, asignado recién al EMITIR.
+  // Borradores y plantillas no consumen número.
+  numero Int?
+  anio   Int?
+
+  // Receptor: FK opcional + SNAPSHOT en columnas. Editar el Cliente después
+  // NO altera presupuestos ya emitidos. clienteId null = cargado a mano.
+  clienteId     String?
+  cliente       Cliente? @relation(fields: [clienteId], references: [id])
+  destNombre    String
+  destRuc       String?
+  destDireccion String?
+  destTelefono  String?
+  destEmail     String?
+
+  fechaEmision DateTime @default(now())
+  validezDias  Int      @default(10)
+
+  // [{ id, descripcion, detalle?, cantidad, unidad?, precioUnitario }]
+  items     Json @default("[]")
+  descuento Int  @default(0)
+  subtotal  Int  @default(0) // desnormalizados: SIEMPRE recalculados server-side
+  total     Int  @default(0)
+
+  notas          String?
+  datosBancarios String?
+
+  firmaDataUrl String? // imagen PNG/JPG chica (≤200KB) — dataURL en DB, print-safe
+  firmante     String?
+
+  esPlantilla     Boolean @default(false)
+  nombrePlantilla String?
+
+  creadoPor      String
+  creador        User      @relation("PresupuestoCreadoPor", fields: [creadoPor], references: [id])
+  actualizadoPor String?
+  emitidoEl      DateTime?
+  emitidoPor     String?
+  anuladoEl      DateTime?
+  anuladoPor     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@unique([anio, numero]) // red de seguridad del correlativo (NULLs no chocan)
+  @@index([estado])
+  @@index([esPlantilla])
+  @@index([clienteId])
 }
 
 // Identidad del estudio como emisor de documentos (presupuestos, etc).
@@ -251,6 +312,7 @@ model Cliente {
   tareas           Tarea[]
   asambleas        AsambleaPrioridad[]
   expedientes      Expediente[]
+  presupuestos     Presupuesto[]
 
   @@index([tipo])
   @@index([estado])

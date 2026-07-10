@@ -78,3 +78,11 @@ export function filtroTareasPorRol(rol: Rol): Prisma.TareaWhereInput {
   if (Object.keys(filtroCliente).length === 0) return {};
   return { OR: [{ clienteId: null }, { cliente: filtroCliente }] };
 }
+
+// Mismo patrón para Presupuesto (clienteId opcional — destinatario manual
+// es visible para todos los roles).
+export function filtroPresupuestosPorRol(rol: Rol): Prisma.PresupuestoWhereInput {
+  const filtroCliente = filtroClientesPorRol(rol);
+  if (Object.keys(filtroCliente).length === 0) return {};
+  return { OR: [{ clienteId: null }, { cliente: filtroCliente }] };
+}
