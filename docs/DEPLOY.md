@@ -50,7 +50,11 @@ cron-job.org (o Coolify Scheduled Task): GET /api/cron/daily diario 12:00 UTC
 | `ENCRYPTION_KEY` | `openssl rand -base64 32` (32 bytes — cifra los accesos de clientes). **Guardar copia segura: si se pierde, los accesos cifrados son irrecuperables** |
 | `CRON_SECRET` | `openssl rand -hex 24` |
 | `RESEND_ATTACHMENT_MAX_BYTES` | `8388608` |
-| `NEXT_PUBLIC_ENABLE_JURIDICO` | `false` (cambiar a `true` al lanzar Fase 2) |
+
+> Las features (Módulo Jurídico, Generador de Presupuestos) ya **no** se
+> controlan por env var — se prenden/apagan desde `/admin/licencia` (SUPERADMIN)
+> y viven en la DB (`Licencia.features`). La vieja `NEXT_PUBLIC_ENABLE_JURIDICO`
+> quedó obsoleta, no hace falta cargarla.
 
 3. **Dominio**: Coolify → app → Domains → `https://panel.criterioasesores.com.py` (Coolify emite el certificado Let's Encrypt automáticamente si el DNS ya apunta).
 4. **Deploy**. Las migraciones Prisma corren solas en cada arranque (`prisma migrate deploy` en el CMD del Dockerfile — idempotente).
@@ -102,6 +106,60 @@ Verificar: la respuesta es JSON `{"data":{"alertas7d":...}}`; sin el header devu
 - [ ] Cron responde 401 sin header y JSON con header
 - [ ] Importar clientes reales por Excel (`/clientes/importar`, plantilla descargable)
 - [ ] Borrar clientes de ejemplo del seed
+- [ ] SUPERADMIN → `/admin/licencia` → prender las features contratadas por Criterio
+      (Módulo Jurídico y/o Generador de Presupuestos)
+- [ ] Backups automáticos diarios de la DB activados en Coolify
+
+## 8. Migraciones seguras sobre datos reales (LEER antes de cada actualización)
+
+El contenedor corre **`prisma migrate deploy`** al arrancar — el comando seguro
+de producción: solo aplica los archivos ya commiteados en `prisma/migrations/`,
+es idempotente y **nunca** resetea ni borra datos por su cuenta. El riesgo no es
+el comando: es escribir una migración destructiva. Reglas:
+
+**1. Solo migraciones ADITIVAS.** Antes de commitear un `.sql` nuevo, revisar que
+no contenga ninguna de estas líneas sobre tablas con datos reales:
+- `DROP TABLE` / `DROP COLUMN`
+- `ALTER COLUMN ... SET NOT NULL` sin un `DEFAULT` (falla si ya hay filas)
+- renombrar columna/tabla (Prisma lo genera como drop + add → **pierde los datos**)
+- cambiar el tipo de una columna
+
+Aditivo y seguro: `CREATE TABLE`, `ADD COLUMN` (NULL o con DEFAULT), `CREATE INDEX`,
+nuevo enum o valor de enum. Todas las migraciones actuales del repo son aditivas.
+
+**2. Cambios NO aditivos → patrón expand-contract, en dos deploys.** Ej. renombrar
+`x` a `y`: (deploy 1) agregar `y`, copiar `x→y`, empezar a leer/escribir `y`;
+(deploy 2, cuando ya está estable) recién ahí `DROP COLUMN x`. Nunca en un solo paso.
+
+**3. NUNCA correr en producción:** `prisma migrate reset` (borra todo),
+`prisma migrate dev` (puede resetear), `prisma db push` (aplica sin migración y
+puede dropear columnas para "ajustar"). Esos son de desarrollo local. En prod solo
+existe `migrate deploy`, que ya corre automático.
+
+**4. Backup ANTES de cada deploy que incluya una migración nueva.** Coolify → la DB
+→ Backups → botón de backup manual (además del diario automático). Si algo sale mal,
+se restaura desde ahí. Regla práctica: si el deploy trae un `.sql` nuevo, backup manual primero.
+
+**5. Probar la migración localmente contra una copia de los datos reales** antes de
+subirla: restaurá el backup de producción en tu Postgres local, corré
+`npx prisma migrate deploy`, y verificá que la app arranca y los datos siguen ahí.
+
+**6. Flujo de una actualización con cambio de esquema:**
+```
+1. En local: editar schema.prisma → npx prisma migrate dev --name <descriptivo>
+   (genera el .sql; revisar que sea aditivo)
+2. Verificar contra copia de datos reales (punto 5)
+3. git commit + push
+4. Coolify → backup manual de la DB
+5. Coolify → deploy (migrate deploy corre solo al arrancar, aplica solo lo nuevo)
+6. Verificar que la app arranca y los datos están intactos
+```
+
+**7. Si una migración falla a mitad**, `migrate deploy` marca ese estado y no arranca
+la app (falla el CMD). No deja la DB "a medias" de forma silenciosa. Se diagnostica
+con `prisma migrate status`, se corrige el `.sql` o se hace
+`prisma migrate resolve --rolled-back <nombre>`, y se reintenta. Por eso el backup del
+punto 4 es la red de seguridad real.
 
 ## Desarrollo local (referencia)
 
