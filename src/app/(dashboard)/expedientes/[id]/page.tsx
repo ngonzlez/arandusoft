@@ -15,6 +15,7 @@ import { ClienteTabs } from "@/components/clientes/ClienteTabs";
 import { NotasPanel } from "@/components/shared/NotasPanel";
 import { DocumentosExpediente } from "@/components/expedientes/DocumentosExpediente";
 import { EstadoExpedienteControl } from "@/components/expedientes/EstadoExpedienteControl";
+import { FechaLimiteControl } from "@/components/expedientes/FechaLimiteControl";
 
 export const metadata = { title: "Expediente — ArandúSoft" };
 
@@ -78,10 +79,13 @@ export default async function ExpedienteDetallePage({
             <dt className="text-ink-muted">Fecha de inicio</dt>
             <dd className="text-ink-base font-medium">{formatFecha(expediente.fechaInicio)}</dd>
           </div>
-          <div className="flex justify-between gap-4">
+          <div className="flex justify-between gap-4 items-center">
             <dt className="text-ink-muted">Fecha límite</dt>
-            <dd className="text-ink-base font-medium">
-              {expediente.fechaLimite ? formatFecha(expediente.fechaLimite) : "—"}
+            <dd>
+              <FechaLimiteControl
+                expedienteId={expediente.id}
+                fechaLimite={expediente.fechaLimite?.toISOString() ?? null}
+              />
             </dd>
           </div>
           <div className="flex justify-between gap-4 items-center">
