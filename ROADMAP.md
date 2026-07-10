@@ -393,3 +393,34 @@ Sesión de ajustes tras revisión del cliente en local. Contexto importante para
 - `npm run build` limpio (sin warnings nuevos).
 
 **Pendiente / no incluido en esta fase (evaluar con el cliente más adelante):** honorarios/facturación por expediente (no está en el PRD original); reportes por abogado responsable.
+
+---
+
+## Feature — Sistema de features por estudio + Generador de Presupuestos (2026-07-10)
+
+**Contexto:** el producto se vende a varios estudios con distintos paquetes. Decisión de arquitectura: **una sola base de código y features prendibles por DB** (no ramas git por cliente — merge hell garantizado). El boolean único `moduloJuridicoHabilitado` se reemplazó por `Licencia.features String[]`, y sobre ese sistema se construyó la primera feature nueva: **Generador de Presupuestos** (estilo invoice-maker, basado en el presupuesto real de Ferraso Consulting "N° 700/26" que usa un cliente).
+
+**Sistema de features:**
+- `Licencia.features String[]` + backfill (`juridico=true` → `['juridico']`). El boolean queda deprecado en DB, nadie lo lee.
+- `lib/features.ts`: catálogo central `FEATURES_DISPONIBLES` (hoy: `juridico`, `presupuestos`) — única fuente para la validación del PATCH y los toggles del panel superadmin (se generan en loop, agregar una feature nueva = 1 entrada en el catálogo).
+- `requireFeature(f)` reemplaza a `requireModuloJuridico()`; `navParaRol(rol, features[])`; `tieneFeature(f)` en el cache de licencia (TTL 30s, se invalida al guardar).
+
+**Perfil del estudio (`/configuracion`, solo ADMIN):**
+- Modelo `PerfilEstudio` (singleton): razón social, RUC, teléfono, email, dirección, ciudad, logo. Separado de `Licencia` a propósito: la Licencia es territorio del superadmin; los datos del emisor los edita el estudio sin depender del proveedor.
+- Logo en MinIO (carpeta `estudio/`), servido por proxy `GET /api/estudio/logo` (streamea por sesión, cache 1h) — no URL firmada porque expiraría en una pestaña de impresión abierta.
+
+**Generador de Presupuestos (feature `presupuestos`):**
+- Modelo `Presupuesto`: snapshot del destinatario en columnas `dest*` (editar el Cliente después NO altera documentos emitidos; también acepta destinatario manual sin Cliente), numeración correlativa **por año** asignada recién al emitir (borradores/plantillas no consumen número; primera emisión puede ser manual, ej. 700, y el correlativo sigue desde ahí), `items` Json validado server-side, totales SIEMPRE recalculados en el server, firma como dataURL (≤200KB) en DB, plantillas (`esPlantilla`).
+- Emisión anti-carrera: transacción + `@@unique([anio, numero])` + retry en P2002; año calculado en hora Paraguay.
+- Endpoints: `GET/POST /api/presupuestos`, `GET/PATCH /api/presupuestos/[id]` (PATCH solo borradores/plantillas → 409 `NO_EDITABLE`), `POST .../emitir` (número manual opcional → 409 `NUMERO_DUPLICADO`), `POST .../anular` (soft, conserva número), `POST .../duplicar` (cubre duplicar / guardar-como-plantilla / crear-desde-plantilla). Visibilidad por rol: `filtroPresupuestosPorRol` (patrón early-return).
+- UI: `/presupuestos` (tabs Presupuestos/Plantillas, búsqueda, acciones), `/presupuestos/nuevo` (editor invoice-maker con cliente del sistema o manual, ítems inline, totales en vivo, firma por imagen, `?plantilla=` precarga), `/presupuestos/[id]/editar`, `/presupuestos/[id]/imprimir` (route group `(print)` sin sidebar, documento A4 con logo/header azul/totales/firma/marca ANULADO, `@media print` en globals.css con `print-color-adjust: exact`). PDF = imprimir del navegador, sin libs nuevas.
+
+**Migraciones:** `20260710150000_licencia_features` · `20260710153000_perfil_estudio` · `20260710160000_presupuesto`.
+
+**Env vars:** ninguna nueva.
+
+**Verificado end-to-end (curl):** features `[]` → API 403 + nav sin ítems; feature inválida → 400; perfil PATCH solo ADMIN (CONTABLE 403); logo subido/descargado byte-idéntico; snapshot del cliente correcto; total falso del client ignorado; emisión manual 700; **2 emisiones paralelas → 701/702 sin colisión**; número duplicado → 409; PATCH sobre EMITIDO → 409; anulado conserva número; plantilla → usar → nuevo borrador → firma → emitir 703 → vista de impresión con firma y firmante; JURIDICO no ve presupuestos de clientes CONTABLE pero sí los manuales; feature apagada → página redirige + API 403.
+
+**Pendiente/notas:**
+- Al desplegar: correr las 3 migraciones (automático en el arranque del contenedor) y prender `presupuestos` en `/admin/licencia` del deploy que corresponda.
+- Posibles siguientes pasos (no pedidos): enviar presupuesto por email al cliente (reusa `EnvioArchivo`/Resend), convertir presupuesto aceptado en algo facturable, moneda USD.
