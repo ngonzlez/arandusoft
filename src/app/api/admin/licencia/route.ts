@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession } from "@/lib/api-auth";
 import { invalidarCacheLicencia } from "@/lib/licencia";
+import { esFeature } from "@/lib/features";
 
 export async function GET() {
   const { error } = await requireApiSession(["SUPERADMIN"]);
@@ -85,14 +86,21 @@ export async function PATCH(req: NextRequest) {
     );
   }
 
+  if (body.features !== undefined) {
+    if (!Array.isArray(body.features) || !body.features.every((f: unknown) => typeof f === "string" && esFeature(f))) {
+      return NextResponse.json(
+        { error: "Lista de features inválida", code: "VALIDATION_ERROR" },
+        { status: 400 }
+      );
+    }
+  }
+
   const actualizada = await prisma.licencia.update({
     where: { id: licencia.id },
     data: {
       ...(body.nombreEstudio !== undefined ? { nombreEstudio: body.nombreEstudio.trim() } : {}),
       ...(body.dominio !== undefined ? { dominio: body.dominio?.trim() || null } : {}),
-      ...(body.moduloJuridicoHabilitado !== undefined
-        ? { moduloJuridicoHabilitado: !!body.moduloJuridicoHabilitado }
-        : {}),
+      ...(body.features !== undefined ? { features: body.features } : {}),
     },
   });
 

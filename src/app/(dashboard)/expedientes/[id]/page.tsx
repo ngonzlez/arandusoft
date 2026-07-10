@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
-import { getConfigEstudio } from "@/lib/licencia";
+import { tieneFeature } from "@/lib/licencia";
 import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS } from "@/lib/expedientes";
 import { ESTADO_TAREA } from "@/lib/badges";
 import { formatFecha, formatFechaHora } from "@/lib/format";
@@ -28,8 +28,8 @@ export default async function ExpedienteDetallePage({
   const user = session!.user;
   const { id } = await params;
 
-  const { moduloJuridicoHabilitado } = await getConfigEstudio();
-  if (!moduloJuridicoHabilitado) redirect("/dashboard");
+  const juridicoActivo = await tieneFeature("juridico");
+  if (!juridicoActivo) redirect("/dashboard");
 
   const expediente = await prisma.expediente.findFirst({
     where: { id, cliente: { ...filtroClientesPorRol(user.rol) } },

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { TipoExpediente } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireModuloJuridico, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 export async function GET(req: NextRequest) {
   const { user, error } = await requireApiSession();
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
 
   const sp = req.nextUrl.searchParams;
@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const { user, error } = await requireApiSession(["ADMIN", "CONTABLE", "JURIDICO"]);
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
 
   const body = await req.json().catch(() => null);

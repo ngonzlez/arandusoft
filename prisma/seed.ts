@@ -41,7 +41,7 @@ async function main() {
   const licenciaExistente = await prisma.licencia.findFirst();
   if (!licenciaExistente) {
     await prisma.licencia.create({
-      data: { estado: "ACTIVA", venceEl },
+      data: { estado: "ACTIVA", venceEl, features: [] },
     });
   }
 

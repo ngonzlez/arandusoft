@@ -30,7 +30,7 @@ export default async function DashboardLayout({
   return (
     <ToastProvider>
       <AppShell
-        items={navParaRol(rol, config.moduloJuridicoHabilitado)}
+        items={navParaRol(rol, config.features)}
         usuario={{ nombre: name ?? "Usuario", rol }}
         nombreEstudio={config.nombreEstudio}
         notificacionesNoLeidas={noLeidas}

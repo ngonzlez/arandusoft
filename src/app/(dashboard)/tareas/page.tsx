@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol, filtroTareasPorRol } from "@/lib/api-auth";
-import { getConfigEstudio } from "@/lib/licencia";
+import { tieneFeature } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { TareasBoard } from "@/components/tareas/TareasBoard";
 
@@ -11,7 +11,7 @@ export default async function TareasPage() {
   const session = await auth();
   const user = session!.user;
 
-  const { moduloJuridicoHabilitado } = await getConfigEstudio();
+  const juridicoActivo = await tieneFeature("juridico");
 
   const [tareas, usuarios, clientes, expedientes] = await Promise.all([
     prisma.tarea.findMany({
@@ -32,7 +32,7 @@ export default async function TareasPage() {
       orderBy: { nombre: "asc" },
       select: { id: true, nombre: true },
     }),
-    moduloJuridicoHabilitado
+    juridicoActivo
       ? prisma.expediente.findMany({
           where: { cliente: { ...filtroClientesPorRol(user.rol) } },
           orderBy: { titulo: "asc" },

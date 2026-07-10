@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireModuloJuridico, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
 import { urlFirmadaArchivo } from "@/lib/storage";
 
 type Params = { params: Promise<{ id: string; docId: string }> };
@@ -8,7 +8,7 @@ type Params = { params: Promise<{ id: string; docId: string }> };
 export async function GET(_req: NextRequest, { params }: Params) {
   const { user, error } = await requireApiSession();
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
   const { id, docId } = await params;
 

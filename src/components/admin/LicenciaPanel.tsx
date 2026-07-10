@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EstadoLicencia } from "@prisma/client";
+import { FEATURES_DISPONIBLES, type Feature } from "@/lib/features";
 import { formatFecha, formatGuaranies } from "@/lib/format";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +28,7 @@ interface Licencia {
   mensajeSuspension: string | null;
   nombreEstudio: string;
   dominio: string | null;
-  moduloJuridicoHabilitado: boolean;
+  features: string[];
   pagos: Pago[];
 }
 
@@ -45,7 +46,7 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [guardandoConfig, setGuardandoConfig] = useState(false);
-  const [moduloJuridico, setModuloJuridico] = useState(licencia?.moduloJuridicoHabilitado ?? false);
+  const [features, setFeatures] = useState<string[]>(licencia?.features ?? []);
 
   if (!licencia) {
     return (
@@ -119,7 +120,7 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
       body: JSON.stringify({
         nombreEstudio: form.get("nombreEstudio"),
         dominio: form.get("dominio"),
-        moduloJuridicoHabilitado: moduloJuridico,
+        features,
       }),
     });
     setGuardandoConfig(false);
@@ -172,9 +173,9 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
       <Card>
         <h3 className="font-heading font-semibold text-primary mb-1">Configuración del estudio</h3>
         <p className="text-xs text-ink-muted mb-4">
-          Nombre y dominio son solo informativos (branding). El módulo
-          jurídico prende/apaga el menú de Expedientes para este cliente —
-          así vendés &quot;solo contable&quot; o &quot;contable + jurídico&quot; sin redeploy.
+          Nombre y dominio son solo informativos (branding). Los módulos
+          prenden/apagan features completas para este cliente (menú + API) —
+          así vendés distintos planes sin redeploy.
         </p>
         <form onSubmit={guardarConfig} className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -187,27 +188,43 @@ export function LicenciaPanel({ licencia }: { licencia: Licencia | null }) {
             />
           </div>
 
-          <label className="flex items-center justify-between rounded-control border border-line px-4 py-3 cursor-pointer">
-            <div>
-              <p className="text-sm font-medium text-ink-base">Módulo Jurídico</p>
-              <p className="text-xs text-ink-muted">Expedientes, documentos y notas de casos legales</p>
-            </div>
-            <button
-              type="button"
-              onClick={() => setModuloJuridico((v) => !v)}
-              className={`relative h-6 w-11 rounded-full transition-colors shrink-0 ${
-                moduloJuridico ? "bg-success" : "bg-line"
-              }`}
-              role="switch"
-              aria-checked={moduloJuridico}
-            >
-              <span
-                className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
-                  moduloJuridico ? "translate-x-5" : "translate-x-0"
-                }`}
-              />
-            </button>
-          </label>
+          <div className="space-y-2">
+            {(Object.entries(FEATURES_DISPONIBLES) as [Feature, { label: string; descripcion: string }][]).map(
+              ([key, meta]) => {
+                const activa = features.includes(key);
+                return (
+                  <label
+                    key={key}
+                    className="flex items-center justify-between rounded-control border border-line px-4 py-3 cursor-pointer"
+                  >
+                    <div>
+                      <p className="text-sm font-medium text-ink-base">{meta.label}</p>
+                      <p className="text-xs text-ink-muted">{meta.descripcion}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setFeatures((prev) =>
+                          activa ? prev.filter((f) => f !== key) : [...prev, key]
+                        )
+                      }
+                      className={`relative h-6 w-11 rounded-full transition-colors shrink-0 ${
+                        activa ? "bg-success" : "bg-line"
+                      }`}
+                      role="switch"
+                      aria-checked={activa}
+                    >
+                      <span
+                        className={`absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                          activa ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </button>
+                  </label>
+                );
+              }
+            )}
+          </div>
 
           <div className="flex justify-end">
             <Button type="submit" disabled={guardandoConfig}>

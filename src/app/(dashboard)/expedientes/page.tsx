@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
-import { getConfigEstudio } from "@/lib/licencia";
+import { tieneFeature } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ExpedientesLista } from "@/components/expedientes/ExpedientesLista";
 
@@ -12,8 +12,8 @@ export default async function ExpedientesPage() {
   const session = await auth();
   const user = session!.user;
 
-  const { moduloJuridicoHabilitado } = await getConfigEstudio();
-  if (!moduloJuridicoHabilitado) redirect("/dashboard");
+  const juridicoActivo = await tieneFeature("juridico");
+  if (!juridicoActivo) redirect("/dashboard");
 
   const [expedientes, usuarios, clientes] = await Promise.all([
     prisma.expediente.findMany({

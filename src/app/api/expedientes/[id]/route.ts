@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EstadoExpediente, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireModuloJuridico, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 type Params = { params: Promise<{ id: string }> };
@@ -9,7 +9,7 @@ type Params = { params: Promise<{ id: string }> };
 export async function GET(_req: NextRequest, { params }: Params) {
   const { user, error } = await requireApiSession();
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
   const { id } = await params;
 
@@ -43,7 +43,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export async function PATCH(req: NextRequest, { params }: Params) {
   const { user, error } = await requireApiSession(["ADMIN", "CONTABLE", "JURIDICO"]);
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
   const { id } = await params;
 

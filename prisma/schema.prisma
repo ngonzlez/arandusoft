@@ -182,7 +182,10 @@ model Licencia {
   // de módulo jurídico por variable de entorno estática.
   nombreEstudio            String  @default("Mi Estudio")
   dominio                  String?
-  moduloJuridicoHabilitado Boolean @default(false)
+  moduloJuridicoHabilitado Boolean @default(false) // DEPRECADO: no se lee más — usar features[]
+  // Features habilitadas para este estudio (keys de FEATURES_DISPONIBLES en
+  // lib/features.ts). El superadmin las prende/apaga desde /admin/licencia.
+  features                 String[] @default([])
   createdAt         DateTime       @default(now())
   updatedAt         DateTime       @updatedAt
   pagos             PagoLicencia[]

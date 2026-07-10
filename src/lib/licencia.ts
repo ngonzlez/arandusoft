@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { EstadoLicencia } from "@prisma/client";
+import type { Feature } from "@/lib/features";
 
 // Cache en memoria con TTL corto: evita golpear la DB en cada request
 // manteniendo la suspensión efectiva en segundos.
@@ -10,7 +11,7 @@ interface CacheLicencia {
   mensaje: string | null;
   nombreEstudio: string;
   dominio: string | null;
-  moduloJuridicoHabilitado: boolean;
+  features: string[];
   at: number;
 }
 
@@ -25,7 +26,7 @@ async function leerCache(): Promise<CacheLicencia> {
       mensaje: licencia?.mensajeSuspension ?? null,
       nombreEstudio: licencia?.nombreEstudio ?? "Mi Estudio",
       dominio: licencia?.dominio ?? null,
-      moduloJuridicoHabilitado: licencia?.moduloJuridicoHabilitado ?? false,
+      features: licencia?.features ?? [],
       at: ahora,
     };
   }
@@ -40,19 +41,24 @@ export async function getEstadoLicencia(): Promise<{
   return { activa: c.estado !== "SUSPENDIDA", mensaje: c.mensaje };
 }
 
-// Config del estudio (Opción A: 1 deploy = 1 cliente) — branding + módulos
-// habilitados, editable desde el panel superadmin sin redeploy.
+// Config del estudio (Opción A: 1 deploy = 1 cliente) — branding + features
+// habilitadas, editable desde el panel superadmin sin redeploy.
 export async function getConfigEstudio(): Promise<{
   nombreEstudio: string;
   dominio: string | null;
-  moduloJuridicoHabilitado: boolean;
+  features: string[];
 }> {
   const c = await leerCache();
   return {
     nombreEstudio: c.nombreEstudio,
     dominio: c.dominio,
-    moduloJuridicoHabilitado: c.moduloJuridicoHabilitado,
+    features: c.features,
   };
+}
+
+export async function tieneFeature(f: Feature): Promise<boolean> {
+  const c = await leerCache();
+  return c.features.includes(f);
 }
 
 // Llamar tras suspender/reactivar/editar config desde el panel superadmin

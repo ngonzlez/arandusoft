@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireModuloJuridico, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
 import { subirArchivo, type FormatoArchivo } from "@/lib/storage";
 
 type Params = { params: Promise<{ id: string }> };
@@ -25,7 +25,7 @@ async function expedienteVisible(id: string, rol: Parameters<typeof filtroClient
 export async function GET(_req: NextRequest, { params }: Params) {
   const { user, error } = await requireApiSession();
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
   const { id } = await params;
 
@@ -45,7 +45,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
 export async function POST(req: NextRequest, { params }: Params) {
   const { user, error } = await requireApiSession(["ADMIN", "CONTABLE", "JURIDICO"]);
   if (error) return error;
-  const gate = await requireModuloJuridico();
+  const gate = await requireFeature("juridico");
   if (gate) return gate;
   const { id } = await params;
 

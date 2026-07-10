@@ -1,11 +1,12 @@
 import type { Rol } from "@prisma/client";
+import type { Feature } from "@/lib/features";
 
 export interface NavItem {
   href: string;
   label: string;
   icon: string; // key de ICONS en Sidebar
   roles: Rol[];
-  feature?: "juridico";
+  feature?: Feature;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -21,11 +22,10 @@ export const NAV_ITEMS: NavItem[] = [
   { href: "/usuarios", label: "Equipo", icon: "briefcase", roles: ["ADMIN"] },
 ];
 
-// juridicoActivo viene de Licencia.moduloJuridicoHabilitado (DB, editable
-// desde el panel superadmin) — ya no es una env var estática.
-export function navParaRol(rol: Rol, juridicoActivo: boolean): NavItem[] {
+// features viene de Licencia.features (DB, editable desde el panel superadmin).
+export function navParaRol(rol: Rol, features: string[]): NavItem[] {
   return NAV_ITEMS.filter((item) => {
-    if (item.feature === "juridico" && !juridicoActivo) return false;
+    if (item.feature && !features.includes(item.feature)) return false;
     return item.roles.includes(rol);
   });
 }
