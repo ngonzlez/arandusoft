@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
-import { getConfigEstudio } from "@/lib/licencia";
 import { LoginForm } from "./LoginForm";
 
 export const metadata = { title: "Ingresar — ArandúSoft" };
@@ -11,8 +10,6 @@ export default async function LoginPage() {
   if (session?.user) {
     redirect(session.user.rol === "SUPERADMIN" ? "/admin/licencia" : "/dashboard");
   }
-
-  const { nombreEstudio } = await getConfigEstudio();
 
   return (
     <div className="min-h-screen flex">
@@ -50,7 +47,7 @@ export default async function LoginPage() {
         </div>
 
         <p className="relative text-xs text-white/40">
-          © {new Date().getFullYear()} {nombreEstudio}
+          © {new Date().getFullYear()} Ngitalpy · ArandúSoft
         </p>
       </div>
 

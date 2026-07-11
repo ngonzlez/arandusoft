@@ -38,10 +38,10 @@ export default async function AdminLicenciaPage() {
               />
               <div>
                 <p className="font-heading font-bold leading-tight">
-                  Arandú<span className="text-gold">Soft</span> — Panel del proveedor
+                  Arandú<span className="text-gold">Soft</span> — Panel de Ngitalpy
                 </p>
                 <p className="text-[11px] text-white/60">
-                  Control de licencia · Criterio Asesores S.R.L
+                  Control de licencia{licencia?.nombreEstudio ? ` · ${licencia.nombreEstudio}` : ""}
                 </p>
               </div>
             </div>
