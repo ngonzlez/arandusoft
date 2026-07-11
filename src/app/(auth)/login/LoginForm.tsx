@@ -40,7 +40,7 @@ export function LoginForm() {
         label="Correo electrónico"
         name="email"
         type="email"
-        placeholder="tu@criterioasesores.com.py"
+        placeholder="tu@correo.com"
         autoComplete="email"
         required
       />
