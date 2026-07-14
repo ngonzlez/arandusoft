@@ -4,12 +4,13 @@ import { useState } from "react";
 import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
-import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos";
 import { NuevoVencimientoModal } from "@/components/calendario/NuevoVencimientoModal";
 
 interface VencimientoItem {
   id: string;
   tipo: TipoVencimiento;
+  descripcion?: string | null;
   estado: EstadoVencimiento;
   fechaVencimiento: Date;
   cliente: { nombre: string } | null;
@@ -97,9 +98,9 @@ export function CalendarioGrid({ año, mes, vencimientos, clientes }: Props) {
                         key={v.id}
                         className="truncate rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight"
                         style={{ backgroundColor: estilo.bg, color: estilo.text }}
-                        title={`${v.tipo} — ${v.cliente?.nombre ?? "General"} (${v.estado})`}
+                        title={`${etiquetaVencimiento(v.tipo, v.descripcion)} — ${v.cliente?.nombre ?? "General"} (${v.estado})`}
                       >
-                        {v.tipo} · {v.cliente?.nombre ?? "General"}
+                        {etiquetaVencimiento(v.tipo, v.descripcion)} · {v.cliente?.nombre ?? "General"}
                       </div>
                     );
                   })}

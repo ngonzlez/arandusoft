@@ -6,7 +6,7 @@ import { getResend, EMAIL_FROM, plantillaEmail } from "@/lib/email";
 import { formatFecha } from "@/lib/format";
 import { recalcularEstadoFiscal } from "@/lib/clientes";
 import { sincronizarVencidosEstadoMensual } from "@/lib/estado-mensual";
-import { generarVencimientosDelMes } from "@/lib/vencimientos";
+import { generarVencimientosDelMes, etiquetaVencimiento } from "@/lib/vencimientos";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
 
@@ -81,7 +81,8 @@ export async function GET(req: NextRequest) {
       const destino = p.responsable;
       const nombreCliente = p.cliente?.nombre ?? "General";
       const cuando = v.dias === 0 ? "HOY" : `en ${v.dias} días`;
-      const mensaje = `Vencimiento ${cuando}: ${p.tipo} — ${nombreCliente} (${formatFecha(p.fechaVencimiento)})`;
+      const etiqueta = etiquetaVencimiento(p.tipo, p.descripcion);
+      const mensaje = `Vencimiento ${cuando}: ${etiqueta} — ${nombreCliente} (${formatFecha(p.fechaVencimiento)})`;
 
       if (destino) {
         await crearNotificacion({
@@ -95,7 +96,7 @@ export async function GET(req: NextRequest) {
         if (v.email) {
           await enviarEmailSeguro(
             destino.email,
-            `${v.dias === 0 ? "⚠️ VENCE HOY" : "Vencimiento próximo"}: ${p.tipo} — ${nombreCliente}`,
+            `${v.dias === 0 ? "⚠️ VENCE HOY" : "Vencimiento próximo"}: ${etiqueta} — ${nombreCliente}`,
             plantillaEmail(
               v.dias === 0 ? "⚠️ Vencimiento HOY" : `Vencimiento en ${v.dias} días`,
               `<p>${mensaje}</p><p>Ingresá al sistema para gestionarlo.</p>`

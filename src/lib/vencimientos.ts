@@ -165,6 +165,14 @@ export const TIPO_VENCIMIENTO_META: Record<TipoVencimiento, { bg: string; text: 
   OTRO: { bg: "#F1F5F9", text: "#64748B" },
 };
 
+// Etiqueta legible de un vencimiento: para OTRO con descripción se usa la
+// descripción como nombre principal (si no, se vería el crudo "OTRO"); para
+// el resto de tipos se muestra el tipo. Reusado en todas las vistas y el cron.
+export function etiquetaVencimiento(tipo: TipoVencimiento, descripcion?: string | null): string {
+  if (tipo === "OTRO" && descripcion?.trim()) return descripcion.trim();
+  return tipo;
+}
+
 // Color por urgencia (días hasta el vencimiento) — igual al prototipo:
 // vencido/hoy rojo, ≤3 días naranja, resto azul.
 export function colorUrgencia(fecha: Date | string): string {

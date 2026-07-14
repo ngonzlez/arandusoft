@@ -22,7 +22,7 @@ import { AccesosPanel } from "@/components/clientes/AccesosPanel";
 import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTabla";
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
-import { TIPO_VENCIMIENTO_META, generarVencimientosClienteDelMes } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, etiquetaVencimiento, generarVencimientosClienteDelMes } from "@/lib/vencimientos";
 import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
 import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 
@@ -78,7 +78,7 @@ export default async function ClienteDetallePage({
         where: { fechaVencimiento: { gte: new Date() } },
         orderBy: { fechaVencimiento: "asc" },
         take: 15,
-        select: { id: true, tipo: true, estado: true, fechaVencimiento: true },
+        select: { id: true, tipo: true, descripcion: true, estado: true, fechaVencimiento: true },
       },
       declaraciones: {
         orderBy: { createdAt: "desc" },
@@ -308,7 +308,7 @@ export default async function ClienteDetallePage({
                             className="rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0"
                             style={{ backgroundColor: cat.bg, color: cat.text }}
                           >
-                            {v.tipo}
+                            {etiquetaVencimiento(v.tipo, v.descripcion)}
                           </span>
                           <span className="ml-auto">
                             <Badge style={ESTADO_VENCIMIENTO[v.estado]}>{v.estado}</Badge>

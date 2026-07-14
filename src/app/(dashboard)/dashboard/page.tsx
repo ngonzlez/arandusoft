@@ -3,7 +3,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
 import { formatFecha, formatFechaLarga } from "@/lib/format";
-import { filtroVencimientosPorRol, TIPO_VENCIMIENTO_META, colorUrgencia } from "@/lib/vencimientos";
+import { filtroVencimientosPorRol, TIPO_VENCIMIENTO_META, colorUrgencia, etiquetaVencimiento } from "@/lib/vencimientos";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, StatTile } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
                   >
                     <span className="h-2.5 w-2.5 rounded-full shrink-0" style={{ backgroundColor: urg }} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-ink-base truncate">{v.tipo}</p>
+                      <p className="text-sm font-medium text-ink-base truncate">{etiquetaVencimiento(v.tipo, v.descripcion)}</p>
                       <p className="text-xs text-ink-muted truncate">
                         {v.cliente?.nombre ?? "General"}
                       </p>

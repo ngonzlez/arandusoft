@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { TipoVencimiento } from "@prisma/client";
 import { Button } from "@/components/ui/Button";
-import { Input, Select } from "@/components/ui/Input";
+import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
@@ -21,19 +21,28 @@ export function NuevoVencimientoModal({ open, onClose, clientes, fechaInicial }:
   const toast = useToast();
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [tipo, setTipo] = useState<string>("IPS");
 
   async function crear(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
-    setGuardando(true);
 
     const form = new FormData(e.currentTarget);
+    const descripcion = (form.get("descripcion")?.toString() ?? "").trim();
+
+    if (form.get("tipo") === "OTRO" && !descripcion) {
+      setError("Poné una descripción para el vencimiento de tipo OTRO");
+      return;
+    }
+
+    setGuardando(true);
     const res = await fetch("/api/vencimientos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         clienteId: form.get("clienteId") || null,
         tipo: form.get("tipo"),
+        descripcion: descripcion || null,
         fechaVencimiento: `${form.get("fecha")}T12:00:00Z`,
       }),
     });
@@ -63,7 +72,13 @@ export function NuevoVencimientoModal({ open, onClose, clientes, fechaInicial }:
             </option>
           ))}
         </Select>
-        <Select label="Tipo" name="tipo" defaultValue="IPS" required>
+        <Select
+          label="Tipo"
+          name="tipo"
+          value={tipo}
+          onChange={(e) => setTipo(e.target.value)}
+          required
+        >
           {Object.values(TipoVencimiento)
             .filter((t) => t !== "PLAZO_PROCESAL") // Fase 2 jurídico
             .map((t) => (
@@ -72,6 +87,12 @@ export function NuevoVencimientoModal({ open, onClose, clientes, fechaInicial }:
               </option>
             ))}
         </Select>
+        <Textarea
+          label={tipo === "OTRO" ? "Descripción (obligatoria)" : "Descripción (opcional)"}
+          name="descripcion"
+          rows={2}
+          placeholder={tipo === "OTRO" ? "Ej: Renovación de patente municipal" : "Detalle adicional del vencimiento"}
+        />
         <Input label="Fecha de vencimiento" name="fecha" type="date" defaultValue={fechaInicial} required />
 
         {error && (

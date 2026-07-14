@@ -6,7 +6,7 @@ import Link from "next/link";
 import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatFecha } from "@/lib/format";
 import { ESTADO_VENCIMIENTO } from "@/lib/badges";
-import { TIPO_VENCIMIENTO_META } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -18,6 +18,7 @@ import { NuevoVencimientoModal } from "@/components/calendario/NuevoVencimientoM
 interface VencimientoItem {
   id: string;
   tipo: TipoVencimiento;
+  descripcion?: string | null;
   estado: EstadoVencimiento;
   fechaVencimiento: Date;
   cliente: { id: string; nombre: string } | null;
@@ -112,8 +113,9 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
                       <span
                         className="rounded-md px-2.5 py-0.5 text-xs font-semibold"
                         style={{ backgroundColor: estilo.bg, color: estilo.text }}
+                        title={v.descripcion ?? undefined}
                       >
-                        {v.tipo}
+                        {etiquetaVencimiento(v.tipo, v.descripcion)}
                       </span>
                     </td>
                     <td className="py-2.5 px-3">

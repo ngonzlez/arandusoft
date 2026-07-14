@@ -48,10 +48,18 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => null);
   const { clienteId, tipo, fechaVencimiento, responsableId } = body ?? {};
+  const descripcion = typeof body?.descripcion === "string" ? body.descripcion.trim() : "";
 
   if (!Object.values(TipoVencimiento).includes(tipo) || !fechaVencimiento) {
     return NextResponse.json(
       { error: "Tipo y fecha son obligatorios", code: "VALIDATION_ERROR" },
+      { status: 400 }
+    );
+  }
+
+  if (tipo === "OTRO" && !descripcion) {
+    return NextResponse.json(
+      { error: "La descripción es obligatoria para el tipo OTRO", code: "VALIDATION_ERROR" },
       { status: 400 }
     );
   }
@@ -78,6 +86,7 @@ export async function POST(req: NextRequest) {
     data: {
       clienteId: clienteId || null,
       tipo,
+      descripcion: descripcion || null,
       fechaVencimiento: fecha,
       responsableId: responsableId || user.id,
     },

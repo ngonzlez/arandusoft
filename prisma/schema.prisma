@@ -390,6 +390,7 @@ model Vencimiento {
   expedienteId     String?
   expediente       Expediente?       @relation(fields: [expedienteId], references: [id])
   tipo             TipoVencimiento
+  descripcion      String? // detalle libre; obligatorio en la UI cuando tipo = OTRO
   fechaVencimiento DateTime
   estado           EstadoVencimiento @default(PENDIENTE)
   responsableId    String?
