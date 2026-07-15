@@ -63,6 +63,9 @@ export default async function EditarClientePage({
           responsableId: cliente.responsableId,
           obligaciones: cliente.obligaciones,
           accesos,
+          timbradoNumero: cliente.timbradoNumero ?? "",
+          timbradoVencimiento: cliente.timbradoVencimiento?.toISOString().slice(0, 10) ?? "",
+          firmaDigitalVencimiento: cliente.firmaDigitalVencimiento?.toISOString().slice(0, 10) ?? "",
         }}
       />
     </div>

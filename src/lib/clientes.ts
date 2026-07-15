@@ -1,51 +1,19 @@
-import { TipoObligacion } from "@prisma/client";
+import "server-only";
+import { TipoVencimiento } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import { prisma } from "@/lib/prisma";
 import { TZ_PARAGUAY } from "@/lib/format";
 
-// Estructura del JSON de accesos (se guarda cifrado con lib/crypto).
-// Solo ADMIN lo ve — jamás debe salir en una respuesta API para otro rol.
-export interface AccesosCliente {
-  marangatu?: { usuario: string; clave: string };
-  set?: { usuario: string; clave: string };
-  ips?: { usuario: string; clave: string };
-  mites?: { usuario: string; clave: string };
-  otros?: string;
-}
-
-export const OBLIGACIONES_LABELS: Record<TipoObligacion, string> = {
-  IVA: "IVA",
-  IRE_SIMPLE: "IRE Simple",
-  IRE_GENERAL: "IRE General",
-  IRP: "IRP",
-  EEFF: "Estados Financieros",
-  AUDITORIA_EXTERNA: "Auditoría Externa",
-  IDU: "IDU",
-  IUID: "IUID",
-  IPS: "IPS",
-  MITES: "MITES",
-  REG_MENSUAL_COMPROBANTES: "Reg. Mensual Comprobantes",
-  OTRO: "Otro",
-};
-
-export const TIPO_CLIENTE_LABELS: Record<string, string> = {
-  CONTABLE: "Contable",
-  JURIDICO: "Jurídico",
-  AMBOS: "Mixto",
-};
-
-export const ESTADO_CLIENTE_LABELS: Record<string, string> = {
-  ACTIVO: "Activo",
-  INACTIVO: "Inactivo",
-  PROSPECTO: "Prospecto",
-};
-
-export const ESTADO_FISCAL_LABELS: Record<string, string> = {
-  AL_DIA: "Al día",
-  ATRASADO: "Atrasado",
-  CCT: "CCT",
-  VECTOR_FISCAL: "Vector Fiscal",
-};
+export {
+  type AccesosCliente,
+  OBLIGACIONES_LABELS,
+  TIPO_CLIENTE_LABELS,
+  ESTADO_CLIENTE_LABELS,
+  ESTADO_FISCAL_LABELS,
+  type ObligacionInput,
+  parseObligaciones,
+  validarRuc,
+} from "@/lib/clientes-ui";
 
 // Recalcula AL_DIA/ATRASADO real (no solo lo que alguien tildó a mano).
 // "Atrasado" = tiene alguna obligación VENCIDO, O quedó PENDIENTE de un mes
@@ -79,29 +47,50 @@ export async function recalcularEstadoFiscal(clienteId: string, actualizadoPor?:
   }
 }
 
-export interface ObligacionInput {
-  tipo: TipoObligacion;
-  diaVencimiento: number | null;
-}
+// Timbrado/Firma Digital: fecha fija (no mensual), una sola vigente por
+// cliente+tipo. NO usar upsert por la clave compuesta (clienteId,tipo,fecha)
+// — al cambiar la fecha crearía una fila nueva en vez de reemplazar la
+// vigente, dejando la vieja como Vencimiento PENDIENTE huérfano.
+export async function sincronizarVencimientoFijo(
+  clienteId: string,
+  tipo: Extract<TipoVencimiento, "TIMBRADO" | "FIRMA_DIGITAL">,
+  fecha: Date | null,
+  responsableId: string
+) {
+  const existente = await prisma.vencimiento.findFirst({ where: { clienteId, tipo } });
 
-// Acepta el body crudo del form: [{tipo, diaVencimiento}, ...]. Descarta
-// tipos inválidos y normaliza el día (1-31 o null = sin configurar / auto-RUC).
-export function parseObligaciones(raw: unknown): ObligacionInput[] {
-  if (!Array.isArray(raw)) return [];
-  return raw
-    .filter(
-      (o): o is { tipo: string; diaVencimiento?: unknown } =>
-        o && typeof o === "object" && Object.values(TipoObligacion).includes(o.tipo)
-    )
-    .map((o) => {
-      const dia = Number(o.diaVencimiento);
-      const diaVencimiento = Number.isInteger(dia) && dia >= 1 && dia <= 31 ? dia : null;
-      return { tipo: o.tipo as TipoObligacion, diaVencimiento };
+  if (!fecha) {
+    // Se borró la fecha desde el form: solo se quita si sigue PENDIENTE —
+    // un vencimiento ya GESTIONADO/VENCIDO es historial, no se toca.
+    if (existente?.estado === "PENDIENTE") {
+      await prisma.vencimiento.delete({ where: { id: existente.id } });
+    }
+    return;
+  }
+
+  if (!existente) {
+    await prisma.vencimiento.create({
+      data: { clienteId, tipo, fechaVencimiento: fecha, responsableId, estado: "PENDIENTE" },
     });
-}
+    return;
+  }
 
-export function validarRuc(ruc: string): boolean {
-  // RUC paraguayo: dígitos con guión y dígito verificador (ej. 80012345-7),
-  // o CI numérica. Validación laxa: 4-15 caracteres, dígitos y un guión opcional.
-  return /^\d{1,12}(-\d)?$/.test(ruc.trim());
+  // Reemplaza la vigente (nunca hay más de una por cliente+tipo, por diseño)
+  // y resetea los flags de notificación — es un vencimiento nuevo, no debe
+  // heredar que ya se avisó del anterior.
+  if (existente.fechaVencimiento.getTime() !== fecha.getTime()) {
+    await prisma.vencimiento.update({
+      where: { id: existente.id },
+      data: {
+        fechaVencimiento: fecha,
+        responsableId,
+        estado: "PENDIENTE",
+        notificado7d: false,
+        notificado3d: false,
+        notificadoDia: false,
+      },
+    });
+  } else if (existente.responsableId !== responsableId) {
+    await prisma.vencimiento.update({ where: { id: existente.id }, data: { responsableId } });
+  }
 }

@@ -22,6 +22,8 @@ export const TIPO_VENCIMIENTO_META: Record<TipoVencimiento, { bg: string; text: 
   ASAMBLEA: { bg: "#EDE9FE", text: "#6D28D9" },
   RENOVACION_CONTRATO: { bg: "#FFEDD5", text: "#C2410C" },
   PLAZO_PROCESAL: { bg: "#FEE2E2", text: "#DC2626" },
+  TIMBRADO: { bg: "#E0F2FE", text: "#0369A1" },
+  FIRMA_DIGITAL: { bg: "#FCE7F3", text: "#BE185D" },
   OTRO: { bg: "#F1F5F9", text: "#64748B" },
 };
 

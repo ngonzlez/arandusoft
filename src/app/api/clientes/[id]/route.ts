@@ -3,7 +3,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
 import { encriptar, desencriptar } from "@/lib/crypto";
-import { validarRuc, parseObligaciones } from "@/lib/clientes";
+import { validarRuc, parseObligaciones } from "@/lib/clientes-ui";
+import { sincronizarVencimientoFijo } from "@/lib/clientes";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -95,10 +96,35 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     ...(user.rol === "ADMIN" && body.accesos !== undefined
       ? { accesos: body.accesos ? encriptar(JSON.stringify(body.accesos)) : null }
       : {}),
+    ...(body.timbradoNumero !== undefined ? { timbradoNumero: body.timbradoNumero?.trim() || null } : {}),
+    ...(body.timbradoVencimiento !== undefined
+      ? { timbradoVencimiento: body.timbradoVencimiento ? new Date(body.timbradoVencimiento) : null }
+      : {}),
+    ...(body.firmaDigitalVencimiento !== undefined
+      ? { firmaDigitalVencimiento: body.firmaDigitalVencimiento ? new Date(body.firmaDigitalVencimiento) : null }
+      : {}),
     actualizadoPor: user.id,
   };
 
   await prisma.cliente.update({ where: { id }, data });
+
+  const responsableIdVigente = body.responsableId ?? existente.responsableId;
+  if (body.timbradoVencimiento !== undefined) {
+    await sincronizarVencimientoFijo(
+      id,
+      "TIMBRADO",
+      body.timbradoVencimiento ? new Date(body.timbradoVencimiento) : null,
+      responsableIdVigente
+    );
+  }
+  if (body.firmaDigitalVencimiento !== undefined) {
+    await sincronizarVencimientoFijo(
+      id,
+      "FIRMA_DIGITAL",
+      body.firmaDigitalVencimiento ? new Date(body.firmaDigitalVencimiento) : null,
+      responsableIdVigente
+    );
+  }
 
   // Sincronizar obligaciones (soft: desactiva las que ya no están) + su día de vencimiento
   if (Array.isArray(body.obligaciones)) {

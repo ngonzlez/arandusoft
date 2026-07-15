@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { EstadoObligacion, TipoObligacion } from "@prisma/client";
-import { OBLIGACIONES_LABELS } from "@/lib/clientes";
+import { OBLIGACIONES_LABELS } from "@/lib/clientes-ui";
 import { formatFecha, formatFechaHora } from "@/lib/format";
 import { Modal } from "@/components/ui/Modal";
 import { Button } from "@/components/ui/Button";

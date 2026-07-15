@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Card } from "@/components/ui/Card";
-import type { AccesosCliente } from "@/lib/clientes";
+import type { AccesosCliente } from "@/lib/clientes-ui";
 
 const SISTEMAS: { key: keyof AccesosCliente; label: string }[] = [
   { key: "marangatu", label: "Marangatu" },

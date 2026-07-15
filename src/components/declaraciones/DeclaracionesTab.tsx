@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { TipoObligacion } from "@prisma/client";
-import { OBLIGACIONES_LABELS } from "@/lib/clientes";
+import { OBLIGACIONES_LABELS } from "@/lib/clientes-ui";
 import { formatFecha } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";

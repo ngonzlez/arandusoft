@@ -72,6 +72,8 @@ enum TipoVencimiento {
   ASAMBLEA
   RENOVACION_CONTRATO
   PLAZO_PROCESAL
+  TIMBRADO
+  FIRMA_DIGITAL
   OTRO
 }
 
@@ -306,6 +308,14 @@ model Cliente {
   accesos        String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
   observaciones  String? // notas libres de la ficha (ej: "cliente puntual", "falta info de X")
   actualizadoPor String? // userId de la última modificación (auditoría PRD)
+
+  // Facturación electrónica: se sincronizan con un Vencimiento (TIMBRADO /
+  // FIRMA_DIGITAL) vía sincronizarVencimientoFijo() — una sola firma por
+  // cliente, no una lista.
+  timbradoNumero          String?
+  timbradoVencimiento     DateTime?
+  firmaDigitalVencimiento DateTime?
+
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

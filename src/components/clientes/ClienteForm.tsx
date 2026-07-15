@@ -8,7 +8,7 @@ import { Input, Select, Textarea } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/components/ui/Toast";
-import { OBLIGACIONES_LABELS, type AccesosCliente } from "@/lib/clientes";
+import { OBLIGACIONES_LABELS, type AccesosCliente } from "@/lib/clientes-ui";
 
 interface UsuarioOption {
   id: string;
@@ -29,6 +29,9 @@ interface ClienteFormValues {
   obligaciones: { tipo: string; diaVencimiento: number | null }[];
   accesos: AccesosCliente | null;
   observaciones: string;
+  timbradoNumero: string;
+  timbradoVencimiento: string; // yyyy-MM-dd, para <input type="date">
+  firmaDigitalVencimiento: string;
 }
 
 interface ClienteFormProps {
@@ -103,6 +106,13 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
         tipo,
         diaVencimiento,
       })),
+      timbradoNumero: form.get("timbradoNumero"),
+      timbradoVencimiento: form.get("timbradoVencimiento")
+        ? `${form.get("timbradoVencimiento")}T12:00:00Z`
+        : null,
+      firmaDigitalVencimiento: form.get("firmaDigitalVencimiento")
+        ? `${form.get("firmaDigitalVencimiento")}T12:00:00Z`
+        : null,
       ...(esAdmin ? { accesos } : {}),
     };
 
@@ -180,6 +190,30 @@ export function ClienteForm({ usuarios, esAdmin, clienteId, inicial }: ClienteFo
             <option value="CCT">CCT</option>
             <option value="VECTOR_FISCAL">Vector Fiscal</option>
           </Select>
+        </div>
+      </Card>
+
+      <Card>
+        <h3 className="font-heading font-semibold text-primary mb-1">Timbrado y Firma Digital</h3>
+        <p className="text-xs text-ink-muted mb-4">
+          Credenciales de facturación electrónica. Sin vigentes, el cliente no
+          puede facturar — el sistema avisa 7/3/1 día antes del vencimiento,
+          igual que el resto de los vencimientos.
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Input label="Número de Timbrado" name="timbradoNumero" defaultValue={inicial?.timbradoNumero} />
+          <Input
+            label="Vence Timbrado"
+            name="timbradoVencimiento"
+            type="date"
+            defaultValue={inicial?.timbradoVencimiento}
+          />
+          <Input
+            label="Vence Firma Digital"
+            name="firmaDigitalVencimiento"
+            type="date"
+            defaultValue={inicial?.firmaDigitalVencimiento}
+          />
         </div>
       </Card>
 

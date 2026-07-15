@@ -3,7 +3,8 @@ import { EstadoCliente, Prisma, TipoCliente } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { requireApiSession, filtroClientesPorRol } from "@/lib/api-auth";
 import { encriptar } from "@/lib/crypto";
-import { validarRuc, parseObligaciones } from "@/lib/clientes";
+import { validarRuc, parseObligaciones } from "@/lib/clientes-ui";
+import { sincronizarVencimientoFijo } from "@/lib/clientes";
 
 export async function GET(req: NextRequest) {
   const { user, error } = await requireApiSession();
@@ -80,6 +81,8 @@ export async function POST(req: NextRequest) {
       : undefined;
 
   const obligaciones = parseObligaciones(body.obligaciones);
+  const timbradoVencimiento = body.timbradoVencimiento ? new Date(body.timbradoVencimiento) : null;
+  const firmaDigitalVencimiento = body.firmaDigitalVencimiento ? new Date(body.firmaDigitalVencimiento) : null;
 
   const cliente = await prisma.cliente.create({
     data: {
@@ -96,12 +99,22 @@ export async function POST(req: NextRequest) {
       responsableId: body.responsableId,
       accesos,
       actualizadoPor: user.id,
+      timbradoNumero: body.timbradoNumero?.trim() || null,
+      timbradoVencimiento,
+      firmaDigitalVencimiento,
       obligaciones: {
         create: obligaciones.map((o) => ({ tipo: o.tipo, diaVencimiento: o.diaVencimiento })),
       },
     },
     select: { id: true },
   });
+
+  if (timbradoVencimiento) {
+    await sincronizarVencimientoFijo(cliente.id, "TIMBRADO", timbradoVencimiento, body.responsableId);
+  }
+  if (firmaDigitalVencimiento) {
+    await sincronizarVencimientoFijo(cliente.id, "FIRMA_DIGITAL", firmaDigitalVencimiento, body.responsableId);
+  }
 
   return NextResponse.json({ data: cliente }, { status: 201 });
 }

@@ -23,6 +23,7 @@ import { EstadoMensualTabla } from "@/components/estado-mensual/EstadoMensualTab
 import { DeclaracionesTab } from "@/components/declaraciones/DeclaracionesTab";
 import { formatFecha } from "@/lib/format";
 import { TIPO_VENCIMIENTO_META, etiquetaVencimiento, generarVencimientosClienteDelMes } from "@/lib/vencimientos";
+import { colorUrgencia } from "@/lib/vencimientos-ui";
 import { ESTADO_VENCIMIENTO, ESTADO_TAREA } from "@/lib/badges";
 import { sincronizarVencidosEstadoMensual, mapaFechasVencimiento } from "@/lib/estado-mensual";
 
@@ -199,6 +200,36 @@ export default async function ClienteDetallePage({
               ))}
             </div>
           )}
+        </Card>
+
+        <Card>
+          <h3 className="font-heading font-semibold text-primary mb-4">Habilitación fiscal</h3>
+          <dl className="space-y-3 text-sm">
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">N° de Timbrado</dt>
+              <dd className="text-ink-base font-medium">{cliente.timbradoNumero || "—"}</dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Vence Timbrado</dt>
+              <dd
+                className="font-medium"
+                style={{ color: cliente.timbradoVencimiento ? colorUrgencia(cliente.timbradoVencimiento) : undefined }}
+              >
+                {cliente.timbradoVencimiento ? formatFecha(cliente.timbradoVencimiento) : "—"}
+              </dd>
+            </div>
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Vence Firma Digital</dt>
+              <dd
+                className="font-medium"
+                style={{
+                  color: cliente.firmaDigitalVencimiento ? colorUrgencia(cliente.firmaDigitalVencimiento) : undefined,
+                }}
+              >
+                {cliente.firmaDigitalVencimiento ? formatFecha(cliente.firmaDigitalVencimiento) : "—"}
+              </dd>
+            </div>
+          </dl>
         </Card>
 
         {esAdmin && <AccesosPanel accesos={accesos} />}
