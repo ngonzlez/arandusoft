@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroExpedientesPorRol } from "@/lib/api-auth";
 import { urlFirmadaArchivo } from "@/lib/storage";
 
 type Params = { params: Promise<{ id: string; docId: string }> };
@@ -13,7 +13,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const { id, docId } = await params;
 
   const documento = await prisma.documento.findFirst({
-    where: { id: docId, expedienteId: id, expediente: { cliente: { ...filtroClientesPorRol(user.rol) } } },
+    where: { id: docId, expedienteId: id, expediente: { ...filtroExpedientesPorRol(user.rol) } },
     select: { publicId: true, url: true },
   });
 

@@ -519,16 +519,28 @@ model EnvioArchivo {
 model Expediente {
   id            String           @id @default(cuid())
   titulo        String
-  clienteId     String
-  cliente       Cliente          @relation(fields: [clienteId], references: [id])
+  // Muchos expedientes no tienen cliente registrado en el sistema — se
+  // identifican por nombre/año/número de causa, no por cliente.
+  clienteId     String?
+  cliente       Cliente?         @relation(fields: [clienteId], references: [id])
   tipo          TipoExpediente
   estado        EstadoExpediente @default(NUEVO)
   responsableId String
   responsable   User             @relation("ExpedienteResponsable", fields: [responsableId], references: [id])
   fechaInicio   DateTime
   fechaLimite   DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
+
+  numero       String? // número de causa — texto libre, los formatos varían
+  anio         Int? // año del expediente, para filtrar/ordenar
+  ciudadId     String?
+  ciudad       Ciudad?     @relation(fields: [ciudadId], references: [id])
+  juzgadoId    String?
+  juzgado      Juzgado?    @relation(fields: [juzgadoId], references: [id])
+  secretariaId String?
+  secretaria   Secretaria? @relation(fields: [secretariaId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   documentos   Documento[]
   notas        Nota[]
@@ -539,6 +551,55 @@ model Expediente {
   @@index([clienteId])
   @@index([responsableId])
   @@index([estado])
+  @@index([anio, numero])
+}
+
+// ───────────────────────── CATÁLOGOS JUDICIALES (referencia) ─────────────────────────
+
+model Departamento {
+  id       String   @id @default(cuid())
+  nombre   String   @unique
+  ciudades Ciudad[]
+}
+
+model Ciudad {
+  id             String       @id @default(cuid())
+  nombre         String
+  departamentoId String
+  departamento   Departamento @relation(fields: [departamentoId], references: [id])
+  expedientes    Expediente[]
+
+  @@unique([departamentoId, nombre])
+}
+
+model Juzgado {
+  id              String   @id @default(cuid())
+  nombre          String
+  circunscripcion String? // "Capital", "Central", localidad del juzgado de paz
+  fuero           String? // Civil, Penal, Laboral... editable, no auto-clasificado
+  juezActual      String? // referencial, puede desactualizarse
+  ubicacion       String? // piso/edificio o dirección
+  telefono        String?
+  activo          Boolean @default(true)
+
+  secretarias Secretaria[]
+  expedientes Expediente[]
+
+  @@unique([nombre, circunscripcion])
+}
+
+model Secretaria {
+  id        String  @id @default(cuid())
+  nombre    String
+  juzgadoId String
+  juzgado   Juzgado @relation(fields: [juzgadoId], references: [id])
+  actuario  String? // nombre del actuario/secretario, referencial
+  telefono  String?
+  activo    Boolean @default(true)
+
+  expedientes Expediente[]
+
+  @@unique([juzgadoId, nombre])
 }
 
 model Documento {

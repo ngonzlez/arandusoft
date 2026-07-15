@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EstadoExpediente, Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroClientesPorRol, filtroExpedientesPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 type Params = { params: Promise<{ id: string }> };
@@ -14,10 +14,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   const expediente = await prisma.expediente.findFirst({
-    where: { id, cliente: { ...filtroClientesPorRol(user.rol) } },
+    where: { id, ...filtroExpedientesPorRol(user.rol) },
     include: {
       cliente: { select: { id: true, nombre: true, ruc: true } },
       responsable: { select: { id: true, nombre: true } },
+      ciudad: { select: { id: true, nombre: true, departamento: { select: { id: true, nombre: true } } } },
+      juzgado: { select: { id: true, nombre: true } },
+      secretaria: { select: { id: true, nombre: true } },
       documentos: {
         orderBy: { createdAt: "desc" },
         include: { subidor: { select: { nombre: true } } },
@@ -48,7 +51,7 @@ export async function PATCH(req: NextRequest, { params }: Params) {
   const { id } = await params;
 
   const existente = await prisma.expediente.findFirst({
-    where: { id, cliente: { ...filtroClientesPorRol(user.rol) } },
+    where: { id, ...filtroExpedientesPorRol(user.rol) },
   });
   if (!existente) {
     return NextResponse.json({ error: "No encontrado" }, { status: 404 });
@@ -63,10 +66,26 @@ export async function PATCH(req: NextRequest, { params }: Params) {
     return NextResponse.json({ error: "Estado inválido", code: "VALIDATION_ERROR" }, { status: 400 });
   }
 
+  if (body.clienteId) {
+    const cliente = await prisma.cliente.findFirst({
+      where: { id: body.clienteId, ...filtroClientesPorRol(user.rol) },
+      select: { id: true },
+    });
+    if (!cliente) {
+      return NextResponse.json({ error: "Cliente no encontrado" }, { status: 404 });
+    }
+  }
+
   const data: Prisma.ExpedienteUncheckedUpdateInput = {
     ...(body.titulo !== undefined ? { titulo: body.titulo.trim() } : {}),
     ...(body.estado !== undefined ? { estado: body.estado } : {}),
     ...(body.responsableId !== undefined ? { responsableId: body.responsableId } : {}),
+    ...(body.clienteId !== undefined ? { clienteId: body.clienteId || null } : {}),
+    ...(body.numero !== undefined ? { numero: body.numero?.trim() || null } : {}),
+    ...(body.anio !== undefined ? { anio: body.anio ? Number(body.anio) : null } : {}),
+    ...(body.ciudadId !== undefined ? { ciudadId: body.ciudadId || null } : {}),
+    ...(body.juzgadoId !== undefined ? { juzgadoId: body.juzgadoId || null } : {}),
+    ...(body.secretariaId !== undefined ? { secretariaId: body.secretariaId || null } : {}),
     ...(body.fechaLimite !== undefined
       ? { fechaLimite: body.fechaLimite ? new Date(body.fechaLimite) : null }
       : {}),

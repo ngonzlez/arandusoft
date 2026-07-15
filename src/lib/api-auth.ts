@@ -87,3 +87,11 @@ export function filtroPresupuestosPorRol(rol: Rol): Prisma.PresupuestoWhereInput
   if (Object.keys(filtroCliente).length === 0) return {};
   return { OR: [{ clienteId: null }, { cliente: filtroCliente }] };
 }
+
+// Mismo patrón para Expediente (clienteId ahora opcional — muchos expedientes
+// no tienen cliente registrado, se identifican por número/año de causa).
+export function filtroExpedientesPorRol(rol: Rol): Prisma.ExpedienteWhereInput {
+  const filtroCliente = filtroClientesPorRol(rol);
+  if (Object.keys(filtroCliente).length === 0) return {};
+  return { OR: [{ clienteId: null }, { cliente: filtroCliente }] };
+}

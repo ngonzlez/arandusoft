@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { EstadoTarea, Prioridad } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, filtroClientesPorRol, filtroTareasPorRol } from "@/lib/api-auth";
+import { requireApiSession, filtroClientesPorRol, filtroTareasPorRol, filtroExpedientesPorRol } from "@/lib/api-auth";
 import { crearNotificacion } from "@/lib/notificaciones";
 
 export async function GET(req: NextRequest) {
@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
   // consistente el filtro de visibilidad por rol (que se basa en clienteId).
   if (expedienteId) {
     const expediente = await prisma.expediente.findFirst({
-      where: { id: expedienteId, cliente: { ...filtroClientesPorRol(user.rol) } },
+      where: { id: expedienteId, ...filtroExpedientesPorRol(user.rol) },
       select: { clienteId: true },
     });
     if (!expediente) {

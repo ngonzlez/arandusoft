@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { filtroClientesPorRol } from "@/lib/api-auth";
+import { filtroClientesPorRol, filtroExpedientesPorRol } from "@/lib/api-auth";
 import { tieneFeature } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ExpedientesLista } from "@/components/expedientes/ExpedientesLista";
@@ -17,7 +17,7 @@ export default async function ExpedientesPage() {
 
   const [expedientes, usuarios, clientes] = await Promise.all([
     prisma.expediente.findMany({
-      where: { cliente: { ...filtroClientesPorRol(user.rol) } },
+      where: { ...filtroExpedientesPorRol(user.rol) },
       orderBy: { createdAt: "desc" },
       include: {
         cliente: { select: { id: true, nombre: true } },

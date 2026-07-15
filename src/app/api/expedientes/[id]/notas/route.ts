@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { requireApiSession, requireFeature, filtroClientesPorRol } from "@/lib/api-auth";
+import { requireApiSession, requireFeature, filtroExpedientesPorRol } from "@/lib/api-auth";
 
 type Params = { params: Promise<{ id: string }> };
 
-async function expedienteVisible(id: string, rol: Parameters<typeof filtroClientesPorRol>[0]) {
+async function expedienteVisible(id: string, rol: Parameters<typeof filtroExpedientesPorRol>[0]) {
   return prisma.expediente.findFirst({
-    where: { id, cliente: { ...filtroClientesPorRol(rol) } },
+    where: { id, ...filtroExpedientesPorRol(rol) },
     select: { id: true },
   });
 }

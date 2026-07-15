@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { filtroClientesPorRol } from "@/lib/api-auth";
+import { filtroExpedientesPorRol } from "@/lib/api-auth";
 import { tieneFeature } from "@/lib/licencia";
 import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS } from "@/lib/expedientes";
 import { ESTADO_TAREA } from "@/lib/badges";
@@ -32,7 +32,7 @@ export default async function ExpedienteDetallePage({
   if (!juridicoActivo) redirect("/dashboard");
 
   const expediente = await prisma.expediente.findFirst({
-    where: { id, cliente: { ...filtroClientesPorRol(user.rol) } },
+    where: { id, ...filtroExpedientesPorRol(user.rol) },
     include: {
       cliente: { select: { id: true, nombre: true, ruc: true } },
       responsable: { select: { id: true, nombre: true } },
@@ -66,9 +66,13 @@ export default async function ExpedienteDetallePage({
           <div className="flex justify-between gap-4">
             <dt className="text-ink-muted">Cliente</dt>
             <dd className="text-ink-base font-medium">
-              <Link href={`/clientes/${expediente.cliente.id}`} className="hover:underline">
-                {expediente.cliente.nombre}
-              </Link>
+              {expediente.cliente ? (
+                <Link href={`/clientes/${expediente.cliente.id}`} className="hover:underline">
+                  {expediente.cliente.nombre}
+                </Link>
+              ) : (
+                <span className="text-ink-faint">Sin cliente asociado</span>
+              )}
             </dd>
           </div>
           <div className="flex justify-between gap-4">
@@ -138,7 +142,9 @@ export default async function ExpedienteDetallePage({
           <h1 className="font-heading text-lg font-bold text-primary leading-tight">
             {expediente.titulo}
           </h1>
-          <p className="text-xs text-ink-muted mt-1 font-mono">{expediente.cliente.ruc}</p>
+          {expediente.cliente?.ruc && (
+            <p className="text-xs text-ink-muted mt-1 font-mono">{expediente.cliente.ruc}</p>
+          )}
         </div>
         <div className="flex items-center gap-2">
           <EstadoExpedienteControl expedienteId={expediente.id} estadoActual={expediente.estado} />
