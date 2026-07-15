@@ -45,6 +45,8 @@ export function CatalogoJuzgados({ juzgados }: { juzgados: Juzgado[] }) {
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [nuevaSecNombre, setNuevaSecNombre] = useState("");
+  const [editandoSecId, setEditandoSecId] = useState<string | null>(null);
+  const [eliminandoSecId, setEliminandoSecId] = useState<string | null>(null);
 
   // Tras refrescar (agregar/desactivar secretaría), el modal abierto debe
   // reflejar los datos frescos del prop, no la foto vieja del clic inicial.
@@ -138,8 +140,20 @@ export function CatalogoJuzgados({ juzgados }: { juzgados: Juzgado[] }) {
     });
     if (!res.ok) {
       toast("error", "No se pudo actualizar la secretaría");
+      return false;
+    }
+    router.refresh();
+    return true;
+  }
+
+  async function eliminarSecretaria(juzgadoId: string, secId: string) {
+    const res = await fetch(`/api/juzgados/${juzgadoId}/secretarias/${secId}`, { method: "DELETE" });
+    if (!res.ok) {
+      toast("error", "No se pudo eliminar la secretaría");
       return;
     }
+    setEliminandoSecId(null);
+    toast("exito", "Secretaría eliminada");
     router.refresh();
   }
 
@@ -269,25 +283,101 @@ export function CatalogoJuzgados({ juzgados }: { juzgados: Juzgado[] }) {
                 Secretarías {editar.secretarias.length > 0 && `(${editar.secretarias.length})`}
               </p>
               <div className="space-y-2 mb-3">
-                {editar.secretarias.map((s) => (
-                  <div
-                    key={s.id}
-                    className={`flex items-center gap-2 rounded-control border border-line px-3 py-2 ${!s.activo ? "opacity-50" : ""}`}
-                  >
-                    <span className="flex-1 text-sm">
-                      <span className="font-medium">{s.nombre}</span>
-                      {s.actuario && <span className="text-ink-muted"> · {s.actuario}</span>}
-                    </span>
-                    <label className="flex items-center gap-1.5 text-xs text-ink-muted">
-                      <input
-                        type="checkbox"
-                        defaultChecked={s.activo}
-                        onChange={(e) => actualizarSecretaria(editar.id, s.id, { activo: e.target.checked })}
-                      />
-                      Activa
-                    </label>
-                  </div>
-                ))}
+                {editar.secretarias.map((s) => {
+                  if (eliminandoSecId === s.id) {
+                    return (
+                      <div
+                        key={s.id}
+                        className="flex items-center gap-2 rounded-control border border-urgent/40 bg-[#FEE2E2]/40 px-3 py-2"
+                      >
+                        <span className="flex-1 text-sm text-urgent">
+                          ¿Eliminar <strong>{s.nombre}</strong> definitivamente?
+                        </span>
+                        <Button size="sm" variant="ghost" onClick={() => setEliminandoSecId(null)}>
+                          Cancelar
+                        </Button>
+                        <Button size="sm" variant="danger" onClick={() => eliminarSecretaria(editar.id, s.id)}>
+                          Eliminar
+                        </Button>
+                      </div>
+                    );
+                  }
+
+                  if (editandoSecId === s.id) {
+                    return (
+                      <form
+                        key={s.id}
+                        className="rounded-control border border-primary/40 px-3 py-2 space-y-2"
+                        onSubmit={async (e) => {
+                          e.preventDefault();
+                          const form = new FormData(e.currentTarget);
+                          const ok = await actualizarSecretaria(editar.id, s.id, {
+                            nombre: form.get("nombre"),
+                            actuario: form.get("actuario"),
+                            telefono: form.get("telefono"),
+                          });
+                          if (ok) setEditandoSecId(null);
+                        }}
+                      >
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                          <input
+                            name="nombre"
+                            defaultValue={s.nombre}
+                            placeholder="Nombre"
+                            className="h-8 rounded-control border border-line px-2 text-sm focus:outline-none focus:border-primary"
+                          />
+                          <input
+                            name="actuario"
+                            defaultValue={s.actuario ?? ""}
+                            placeholder="Actuario/a"
+                            className="h-8 rounded-control border border-line px-2 text-sm focus:outline-none focus:border-primary"
+                          />
+                          <input
+                            name="telefono"
+                            defaultValue={s.telefono ?? ""}
+                            placeholder="Teléfono"
+                            className="h-8 rounded-control border border-line px-2 text-sm focus:outline-none focus:border-primary"
+                          />
+                        </div>
+                        <div className="flex justify-end gap-2">
+                          <Button type="button" size="sm" variant="ghost" onClick={() => setEditandoSecId(null)}>
+                            Cancelar
+                          </Button>
+                          <Button type="submit" size="sm">
+                            Guardar
+                          </Button>
+                        </div>
+                      </form>
+                    );
+                  }
+
+                  return (
+                    <div
+                      key={s.id}
+                      className={`flex items-center gap-2 rounded-control border border-line px-3 py-2 ${!s.activo ? "opacity-50" : ""}`}
+                    >
+                      <span className="flex-1 text-sm">
+                        <span className="font-medium">{s.nombre}</span>
+                        {s.actuario && <span className="text-ink-muted"> · {s.actuario}</span>}
+                        {s.telefono && <span className="text-ink-faint"> · {s.telefono}</span>}
+                      </span>
+                      <label className="flex items-center gap-1.5 text-xs text-ink-muted">
+                        <input
+                          type="checkbox"
+                          defaultChecked={s.activo}
+                          onChange={(e) => actualizarSecretaria(editar.id, s.id, { activo: e.target.checked })}
+                        />
+                        Activa
+                      </label>
+                      <Button size="sm" variant="ghost" onClick={() => setEditandoSecId(s.id)}>
+                        Editar
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => setEliminandoSecId(s.id)}>
+                        Eliminar
+                      </Button>
+                    </div>
+                  );
+                })}
               </div>
               <div className="flex gap-2">
                 <input
