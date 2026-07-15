@@ -453,3 +453,26 @@ Sesión de ajustes tras revisión del cliente en local. Contexto importante para
 - **NO se hizo `git push`** — el usuario pidió probar localmente primero antes de subir. Los 6 commits de esta feature están solo en local (`main`), no en el remoto.
 - Revisar vía el CRUD los ~174 juzgados "standalone" importados del Excel (sin secretaría separable) por si el parseo agrupó mal algún caso límite — es un parseo mecánico de la fuente, no una verificación judicial.
 - Departamentos/Ciudades seedeados NO son la lista completa de ~260 municipios de Paraguay — punto de partida ampliable desde el CRUD.
+
+---
+
+## Feature — Timbrado y Firma Digital por cliente (2026-07-16)
+
+**Contexto:** el cliente factura electrónicamente y necesita trackear 2 credenciales por cliente suyo: Timbrado (número + vencimiento, autorización SET) y Firma Digital/certificado (solo vencimiento, una sola por cliente) — ambas vencen cada 1-2 años, sin vigentes el cliente no puede facturar. Se integraron al sistema de Vencimientos ya existente (mismo calendario, mismas alertas 7d/3d/día) en vez de crear uno paralelo.
+
+**Qué se construyó:**
+- `TipoVencimiento` gana `TIMBRADO` y `FIRMA_DIGITAL`; `Cliente` gana `timbradoNumero`, `timbradoVencimiento`, `firmaDigitalVencimiento` (todo opcional, migración aditiva).
+- `sincronizarVencimientoFijo()` en `lib/clientes.ts`: crea/reemplaza el `Vencimiento` correspondiente cuando cambia la fecha desde el form del cliente. **No usa upsert por la clave compuesta** `(clienteId,tipo,fecha)` — cambiar la fecha con upsert crearía una fila nueva en vez de reemplazar la vigente, dejando la vieja como PENDIENTE huérfano. Hace `findFirst` por `(clienteId,tipo)` y reemplaza esa fila, reseteando los flags `notificado*` (vencimiento nuevo, no hereda que ya se avisó del anterior). Vaciar la fecha borra el `Vencimiento` solo si sigue PENDIENTE — uno GESTIONADO/VENCIDO es historial, no se toca.
+- El cron diario (`api/cron/daily`) **no necesitó ningún cambio** — ya recogía cualquier `Vencimiento` PENDIENTE sin filtrar por tipo.
+- UI: card "Timbrado y Firma Digital" en `ClienteForm.tsx`; card "Habilitación fiscal" en la ficha del cliente (siempre visible, a diferencia de "Estado de cuenta" que solo muestra el próximo vencimiento general).
+
+**Fix de yapa (bug real preexistente, no de este cambio):** `lib/clientes.ts` instanciaba `PrismaClient` en el navegador — `ClienteForm.tsx` y otros 3 client components importaban de ahí un archivo que también tenía `import { prisma }`. Mismo patrón ya resuelto antes para `vencimientos.ts`: separado en `lib/clientes-ui.ts` (puro, sin prisma: labels, `parseObligaciones`, `validarRuc`, tipo `AccesosCliente`) + `lib/clientes.ts` ahora con `import "server-only"`. Confirmado con un scan de todos los chunks del build de producción: ya no aparece ninguna instanciación de `PrismaClient` en el JS que llega al navegador.
+
+**Migraciones:** `20260716120000_timbrado_firma_digital`.
+
+**Env vars:** ninguna nueva.
+
+**Verificado end-to-end:** PATCH crea los 2 `Vencimiento`; cambiar la fecha del timbrado reemplaza la fila (conteo verificado, no duplica); cron recoge la alerta 3d, marca `notificado3d: true` y crea la notificación con el mensaje correcto ("Vencimiento en 3 días: TIMBRADO — Villalba y Asociados..."); vaciar la fecha de firma digital borra el `Vencimiento` PENDIENTE; alta de cliente nuevo (POST) con timbrado también genera el `Vencimiento`; ficha muestra número + ambas fechas; build limpio.
+
+**Pendiente/notas:**
+- **NO se hizo `git push`** — sigue pendiente desde la feature anterior (Expedientes con catálogos judiciales), sumado a este commit. Todo en local (`main`), nada en el remoto.
