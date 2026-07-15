@@ -424,3 +424,32 @@ Sesión de ajustes tras revisión del cliente en local. Contexto importante para
 **Pendiente/notas:**
 - Al desplegar: correr las 3 migraciones (automático en el arranque del contenedor) y prender `presupuestos` en `/admin/licencia` del deploy que corresponda.
 - Posibles siguientes pasos (no pedidos): enviar presupuesto por email al cliente (reusa `EnvioArchivo`/Resend), convertir presupuesto aceptado en algo facturable, moneda USD.
+
+---
+
+## Feature — Expedientes con catálogos judiciales + mejoras de Tareas (2026-07-15)
+
+**Contexto:** feedback de uso real del cliente tras usar Expedientes: (a) la mayoría de sus casos no tienen un cliente registrado en el sistema — se identifican por nombre/año/número de causa; pidió además clasificar por juzgado/secretaría y departamento/ciudad con catálogos seleccionables, mantenibles desde Configuración; (b) las tareas listadas en la ficha del cliente eran de solo lectura; (c) con volumen real (~40 tareas/mes) la vista de Tareas se volvía una lista sin fin.
+
+**Fase 1 — Schema:** `Expediente.clienteId` pasa de requerido a opcional (migración aditiva, `ALTER COLUMN DROP NOT NULL`); campos nuevos `numero` (texto libre), `anio`, `ciudadId`, `juzgadoId`, `secretariaId` (todos opcionales). Modelos nuevos: `Departamento`, `Ciudad`, `Juzgado`, `Secretaria` (Juzgado y Secretaría independientes entre sí — en la práctica no todo juzgado tiene secretaría separable). Nuevo `filtroExpedientesPorRol()` en `lib/api-auth.ts` (mismo patrón early-return que Tareas/Presupuestos, evita el footgun de Prisma con `{}` vacío anidado en OR) — reemplaza el uso directo de `filtroClientesPorRol` en las 8 rutas/páginas que filtran expedientes (incluida `tareas/page.tsx`, que se había pasado por alto en el grep original).
+
+**Fase 2 — Seed de catálogos:** Departamentos = los 17 de Paraguay + Asunción, con las ciudades de Central verificadas contra el Excel real del estudio. Juzgados/Secretarías: el usuario proveyó `docs/Juzgados_y_Secretarias.xlsx` (235 juzgados, 112 secretarías reales de Capital, Juzgados de Paz y Dpto. Central) — convertido una sola vez (`scripts/convertir-juzgados-excel.ts`) a JSON estático versionado (`prisma/data/juzgados-referencia.json`), no parseado en cada seed ni en runtime de producción. Parseo estructural (regex sobre "Juzgado X. Secretaría N"), no verificación judicial — avisado explícitamente al usuario.
+
+**Fase 3 — CRUD de catálogos:** `/configuracion` pasa de un form único a 3 tabs (reusa `ClienteTabs`): Perfil del estudio (solo ADMIN), Juzgados y Secretarías, Departamentos y Ciudades. JURIDICO gana acceso a la página (antes solo ADMIN) para poder cargar un juzgado que falte sin depender del ADMIN — bloqueado igual si la feature jurídico está apagada. Rutas nuevas: `/api/departamentos`, `/api/ciudades`, `/api/juzgados`, `/api/juzgados/[id]/secretarias` (+`[id]`/`[secId]`). Departamentos/Ciudades solo alta+renombrar (catálogo geográfico estable, sin baja); Juzgados/Secretarías con soft-toggle `activo`.
+
+**Fase 4 — UI de Expediente:** modal "Nuevo expediente" con cliente opcional ("Sin cliente" por defecto) + Número/Año + Departamento→Ciudad y Juzgado→Secretaría en cascada. Listado gana columnas N°/Año y Juzgado. Ficha muestra los mismos datos nuevos; el subtítulo bajo el título ahora es "número/año" en vez de solo el RUC del cliente.
+
+**Fase 5 — Deep-link Tareas:** las tareas en la ficha del cliente ahora linkean a `/tareas?tarea=<id>`; `TareasBoard` abre el SlideOver de detalle directo al montar y limpia el query param (preservando `?mes=` si había uno).
+
+**Fase 6 — Filtro por mes en Tareas:** mismo patrón de `MesSelector` que Calendario/Estado Mensual, filtra por `createdAt` del mes, default al mes actual. Resuelve la lista sin fin sin agregar una sección "Archivo" separada — las completadas quedan acotadas por mes.
+
+**Migraciones:** `20260715120000_expediente_flexible_catalogos_judiciales`.
+
+**Env vars:** ninguna nueva.
+
+**Verificado end-to-end (curl):** JURIDICO no puede crear/ver expediente de cliente CONTABLE-only (404 ambos sentidos) pero sí ve/crea expedientes sin cliente; ADMIN ve todo; CRUD de catálogos con permisos correctos (CONTABLE 307/403, JURIDICO puede crear juzgado+secretaría, ADMIN puede editarlo); expediente creado con número/año/ciudad/juzgado/secretaría reales se ve correcto en listado y ficha; deep-link desde ficha de cliente abre la tarea; filtro mensual oculta tareas de otros meses; build limpio en cada fase.
+
+**Pendiente/notas:**
+- **NO se hizo `git push`** — el usuario pidió probar localmente primero antes de subir. Los 6 commits de esta feature están solo en local (`main`), no en el remoto.
+- Revisar vía el CRUD los ~174 juzgados "standalone" importados del Excel (sin secretaría separable) por si el parseo agrupó mal algún caso límite — es un parseo mecánico de la fuente, no una verificación judicial.
+- Departamentos/Ciudades seedeados NO son la lista completa de ~260 municipios de Paraguay — punto de partida ampliable desde el CRUD.
