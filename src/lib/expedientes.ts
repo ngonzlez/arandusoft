@@ -13,3 +13,10 @@ export const ESTADO_EXPEDIENTE_LABELS: Record<string, string> = {
   COMPLETADO: "Completado",
   ARCHIVADO: "Archivado",
 };
+
+// "1234/2026" — con lo que haya cargado; nunca ambos vacíos y "—" a la vez.
+export function formatNumeroExpediente(numero: string | null, anio: number | null): string {
+  if (!numero && !anio) return "—";
+  if (numero && anio) return `${numero}/${anio}`;
+  return numero ?? String(anio);
+}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { TipoExpediente, EstadoExpediente } from "@prisma/client";
-import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS } from "@/lib/expedientes";
+import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS, formatNumeroExpediente } from "@/lib/expedientes";
 import { ESTADO_EXPEDIENTE } from "@/lib/badges";
 import { formatFecha } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
@@ -21,24 +21,60 @@ interface Expediente {
   tipo: TipoExpediente;
   estado: EstadoExpediente;
   fechaLimite: string | null;
-  cliente: { id: string; nombre: string };
+  numero: string | null;
+  anio: number | null;
+  cliente: { id: string; nombre: string } | null;
+  juzgado: { id: string; nombre: string } | null;
   responsable: { id: string; nombre: string };
   _count: { documentos: number; tareas: number };
+}
+
+interface Ciudad {
+  id: string;
+  nombre: string;
+}
+interface Departamento {
+  id: string;
+  nombre: string;
+  ciudades: Ciudad[];
+}
+interface Secretaria {
+  id: string;
+  nombre: string;
+}
+interface Juzgado {
+  id: string;
+  nombre: string;
+  circunscripcion: string | null;
+  secretarias: Secretaria[];
 }
 
 interface Props {
   expedientes: Expediente[];
   usuarios: { id: string; nombre: string }[];
   clientes: { id: string; nombre: string }[];
+  departamentos: Departamento[];
+  juzgados: Juzgado[];
   miUserId: string;
 }
 
-export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: Props) {
+export function ExpedientesLista({ expedientes, usuarios, clientes, departamentos, juzgados, miUserId }: Props) {
   const router = useRouter();
   const toast = useToast();
   const [modalNuevo, setModalNuevo] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [departamentoId, setDepartamentoId] = useState("");
+  const [juzgadoId, setJuzgadoId] = useState("");
+
+  const ciudadesDelDepto = useMemo(
+    () => departamentos.find((d) => d.id === departamentoId)?.ciudades ?? [],
+    [departamentos, departamentoId]
+  );
+  const secretariasDelJuzgado = useMemo(
+    () => juzgados.find((j) => j.id === juzgadoId)?.secretarias ?? [],
+    [juzgados, juzgadoId]
+  );
 
   async function crear(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -51,11 +87,16 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: 
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         titulo: form.get("titulo"),
-        clienteId: form.get("clienteId"),
+        clienteId: form.get("clienteId") || null,
         tipo: form.get("tipo"),
         responsableId: form.get("responsableId"),
         fechaInicio: `${form.get("fechaInicio")}T12:00:00Z`,
         fechaLimite: form.get("fechaLimite") ? `${form.get("fechaLimite")}T12:00:00Z` : null,
+        numero: form.get("numero") || null,
+        anio: form.get("anio") || null,
+        ciudadId: form.get("ciudadId") || null,
+        juzgadoId: form.get("juzgadoId") || null,
+        secretariaId: form.get("secretariaId") || null,
       }),
     });
 
@@ -88,8 +129,9 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: 
         <Table>
           <THead>
             <TH>Título</TH>
+            <TH>N° / Año</TH>
             <TH>Cliente</TH>
-            <TH>Tipo</TH>
+            <TH>Juzgado</TH>
             <TH>Estado</TH>
             <TH>Responsable</TH>
             <TH>Límite</TH>
@@ -99,8 +141,9 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: 
             {expedientes.map((e) => (
               <TRow key={e.id} onClick={() => router.push(`/expedientes/${e.id}`)}>
                 <TD className="font-medium text-primary">{e.titulo}</TD>
-                <TD>{e.cliente.nombre}</TD>
-                <TD>{TIPO_EXPEDIENTE_LABELS[e.tipo]}</TD>
+                <TD className="font-mono text-xs">{formatNumeroExpediente(e.numero, e.anio)}</TD>
+                <TD>{e.cliente?.nombre ?? <span className="text-ink-faint">—</span>}</TD>
+                <TD>{e.juzgado?.nombre ?? <span className="text-ink-faint">—</span>}</TD>
                 <TD>
                   <Badge style={ESTADO_EXPEDIENTE[e.estado]}>{ESTADO_EXPEDIENTE_LABELS[e.estado]}</Badge>
                 </TD>
@@ -124,10 +167,10 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: 
         <form onSubmit={crear} className="space-y-4">
           <Input label="Título" name="titulo" required placeholder="Ej: Demanda laboral c/ Fulano" />
           <div className="grid grid-cols-2 gap-3">
-            <Select label="Cliente" name="clienteId" required defaultValue="">
-              <option value="" disabled>
-                Elegir cliente...
-              </option>
+            <Input label="Número de expediente (opcional)" name="numero" placeholder="Ej: 1234" />
+            <Input label="Año (opcional)" name="anio" type="number" placeholder="Ej: 2026" />
+            <Select label="Cliente (opcional)" name="clienteId" defaultValue="">
+              <option value="">Sin cliente</option>
               {clientes.map((c) => (
                 <option key={c.id} value={c.id}>
                   {c.nombre}
@@ -150,6 +193,55 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, miUserId }: 
             </Select>
             <Input label="Fecha de inicio" name="fechaInicio" type="date" required />
             <Input label="Fecha límite (opcional)" name="fechaLimite" type="date" />
+
+            <Select
+              label="Departamento (opcional)"
+              value={departamentoId}
+              onChange={(e) => setDepartamentoId(e.target.value)}
+            >
+              <option value="">Sin especificar</option>
+              {departamentos.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.nombre}
+                </option>
+              ))}
+            </Select>
+            <Select label="Ciudad (opcional)" name="ciudadId" defaultValue="" disabled={!departamentoId}>
+              <option value="">Sin especificar</option>
+              {ciudadesDelDepto.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.nombre}
+                </option>
+              ))}
+            </Select>
+
+            <Select
+              label="Juzgado (opcional)"
+              name="juzgadoId"
+              value={juzgadoId}
+              onChange={(e) => setJuzgadoId(e.target.value)}
+            >
+              <option value="">Sin especificar</option>
+              {juzgados.map((j) => (
+                <option key={j.id} value={j.id}>
+                  {j.nombre}
+                  {j.circunscripcion ? ` (${j.circunscripcion})` : ""}
+                </option>
+              ))}
+            </Select>
+            <Select
+              label="Secretaría (opcional)"
+              name="secretariaId"
+              defaultValue=""
+              disabled={!juzgadoId || secretariasDelJuzgado.length === 0}
+            >
+              <option value="">Sin especificar</option>
+              {secretariasDelJuzgado.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.nombre}
+                </option>
+              ))}
+            </Select>
           </div>
 
           {error && (

@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroExpedientesPorRol } from "@/lib/api-auth";
 import { tieneFeature } from "@/lib/licencia";
-import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS } from "@/lib/expedientes";
+import { TIPO_EXPEDIENTE_LABELS, ESTADO_EXPEDIENTE_LABELS, formatNumeroExpediente } from "@/lib/expedientes";
 import { ESTADO_TAREA } from "@/lib/badges";
 import { formatFecha, formatFechaHora } from "@/lib/format";
 import { Avatar } from "@/components/ui/Avatar";
@@ -35,6 +35,9 @@ export default async function ExpedienteDetallePage({
     where: { id, ...filtroExpedientesPorRol(user.rol) },
     include: {
       cliente: { select: { id: true, nombre: true, ruc: true } },
+      ciudad: { select: { id: true, nombre: true, departamento: { select: { nombre: true } } } },
+      juzgado: { select: { id: true, nombre: true, circunscripcion: true } },
+      secretaria: { select: { id: true, nombre: true } },
       responsable: { select: { id: true, nombre: true } },
       documentos: {
         orderBy: { createdAt: "desc" },
@@ -76,8 +79,39 @@ export default async function ExpedienteDetallePage({
             </dd>
           </div>
           <div className="flex justify-between gap-4">
+            <dt className="text-ink-muted">N° / Año</dt>
+            <dd className="text-ink-base font-medium font-mono">
+              {formatNumeroExpediente(expediente.numero, expediente.anio)}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-4">
             <dt className="text-ink-muted">Tipo</dt>
             <dd className="text-ink-base font-medium">{TIPO_EXPEDIENTE_LABELS[expediente.tipo]}</dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-muted">Juzgado</dt>
+            <dd className="text-ink-base font-medium text-right">
+              {expediente.juzgado ? (
+                <>
+                  {expediente.juzgado.nombre}
+                  {expediente.secretaria && (
+                    <span className="block text-xs text-ink-muted font-normal">{expediente.secretaria.nombre}</span>
+                  )}
+                </>
+              ) : (
+                <span className="text-ink-faint">Sin especificar</span>
+              )}
+            </dd>
+          </div>
+          <div className="flex justify-between gap-4">
+            <dt className="text-ink-muted">Departamento / Ciudad</dt>
+            <dd className="text-ink-base font-medium">
+              {expediente.ciudad ? (
+                `${expediente.ciudad.nombre} (${expediente.ciudad.departamento.nombre})`
+              ) : (
+                <span className="text-ink-faint">Sin especificar</span>
+              )}
+            </dd>
           </div>
           <div className="flex justify-between gap-4">
             <dt className="text-ink-muted">Fecha de inicio</dt>
@@ -142,9 +176,10 @@ export default async function ExpedienteDetallePage({
           <h1 className="font-heading text-lg font-bold text-primary leading-tight">
             {expediente.titulo}
           </h1>
-          {expediente.cliente?.ruc && (
-            <p className="text-xs text-ink-muted mt-1 font-mono">{expediente.cliente.ruc}</p>
-          )}
+          <p className="text-xs text-ink-muted mt-1 font-mono">
+            {formatNumeroExpediente(expediente.numero, expediente.anio)}
+            {expediente.cliente?.ruc && ` · ${expediente.cliente.ruc}`}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <EstadoExpedienteControl expedienteId={expediente.id} estadoActual={expediente.estado} />

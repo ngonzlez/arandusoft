@@ -15,12 +15,13 @@ export default async function ExpedientesPage() {
   const juridicoActivo = await tieneFeature("juridico");
   if (!juridicoActivo) redirect("/dashboard");
 
-  const [expedientes, usuarios, clientes] = await Promise.all([
+  const [expedientes, usuarios, clientes, departamentos, juzgados] = await Promise.all([
     prisma.expediente.findMany({
       where: { ...filtroExpedientesPorRol(user.rol) },
       orderBy: { createdAt: "desc" },
       include: {
         cliente: { select: { id: true, nombre: true } },
+        juzgado: { select: { id: true, nombre: true } },
         responsable: { select: { id: true, nombre: true } },
         _count: { select: { documentos: true, tareas: true } },
       },
@@ -35,6 +36,15 @@ export default async function ExpedientesPage() {
       orderBy: { nombre: "asc" },
       select: { id: true, nombre: true },
     }),
+    prisma.departamento.findMany({
+      orderBy: { nombre: "asc" },
+      include: { ciudades: { orderBy: { nombre: "asc" }, select: { id: true, nombre: true } } },
+    }),
+    prisma.juzgado.findMany({
+      where: { activo: true },
+      orderBy: [{ circunscripcion: "asc" }, { nombre: "asc" }],
+      include: { secretarias: { where: { activo: true }, orderBy: { nombre: "asc" } } },
+    }),
   ]);
 
   return (
@@ -44,6 +54,8 @@ export default async function ExpedientesPage() {
         expedientes={JSON.parse(JSON.stringify(expedientes))}
         usuarios={usuarios}
         clientes={clientes}
+        departamentos={JSON.parse(JSON.stringify(departamentos))}
+        juzgados={JSON.parse(JSON.stringify(juzgados))}
         miUserId={user.id}
       />
     </div>
