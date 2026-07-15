@@ -1,23 +1,51 @@
 import { redirect } from "next/navigation";
+import { EstadoExpediente, Prisma } from "@prisma/client";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol, filtroExpedientesPorRol } from "@/lib/api-auth";
 import { tieneFeature } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { ExpedientesLista } from "@/components/expedientes/ExpedientesLista";
+import { ExpedientesFiltros } from "./ExpedientesFiltros";
 
 export const metadata = { title: "Expedientes — ArandúSoft" };
 
-export default async function ExpedientesPage() {
+interface Props {
+  searchParams: Promise<{ q?: string; anio?: string; estado?: string }>;
+}
+
+export default async function ExpedientesPage({ searchParams }: Props) {
   const session = await auth();
   const user = session!.user;
+  const sp = await searchParams;
 
   const juridicoActivo = await tieneFeature("juridico");
   if (!juridicoActivo) redirect("/dashboard");
 
-  const [expedientes, usuarios, clientes, departamentos, juzgados] = await Promise.all([
+  const anio = sp.anio ? Number(sp.anio) : undefined;
+  const estado = Object.values(EstadoExpediente).includes(sp.estado as EstadoExpediente)
+    ? (sp.estado as EstadoExpediente)
+    : undefined;
+
+  const filtroRol = filtroExpedientesPorRol(user.rol);
+
+  const where: Prisma.ExpedienteWhereInput = {
+    ...filtroRol,
+    ...(anio ? { anio } : {}),
+    ...(estado ? { estado } : {}),
+    ...(sp.q
+      ? {
+          OR: [
+            { titulo: { contains: sp.q, mode: "insensitive" } },
+            { numero: { contains: sp.q, mode: "insensitive" } },
+          ],
+        }
+      : {}),
+  };
+
+  const [expedientes, usuarios, clientes, departamentos, juzgados, aniosDistintos] = await Promise.all([
     prisma.expediente.findMany({
-      where: { ...filtroExpedientesPorRol(user.rol) },
+      where,
       orderBy: { createdAt: "desc" },
       include: {
         cliente: { select: { id: true, nombre: true } },
@@ -45,11 +73,20 @@ export default async function ExpedientesPage() {
       orderBy: [{ circunscripcion: "asc" }, { nombre: "asc" }],
       include: { secretarias: { where: { activo: true }, orderBy: { nombre: "asc" } } },
     }),
+    prisma.expediente.findMany({
+      where: { ...filtroRol, anio: { not: null } },
+      distinct: ["anio"],
+      orderBy: { anio: "desc" },
+      select: { anio: true },
+    }),
   ]);
 
   return (
     <div>
       <PageHeader titulo="Expedientes" subtitulo={`${expedientes.length} en total`} />
+      <div className="mb-4">
+        <ExpedientesFiltros anios={aniosDistintos.map((a) => a.anio!).filter(Boolean)} />
+      </div>
       <ExpedientesLista
         expedientes={JSON.parse(JSON.stringify(expedientes))}
         usuarios={usuarios}
