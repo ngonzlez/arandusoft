@@ -336,7 +336,12 @@ export default async function ClienteDetallePage({
                   <ul className="divide-y divide-line/60">
                     {cliente.tareas.map((t) => (
                       <li key={t.id} className="flex items-center gap-3 py-2.5 text-sm">
-                        <span className="flex-1 font-medium text-primary">{t.titulo}</span>
+                        <Link
+                          href={`/tareas?tarea=${t.id}`}
+                          className="flex-1 font-medium text-primary hover:underline"
+                        >
+                          {t.titulo}
+                        </Link>
                         <Badge style={ESTADO_TAREA[t.estado]}>{t.estado.replace("_", " ")}</Badge>
                         {t.fechaLimite && (
                           <span className="text-xs text-ink-muted w-20">

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { EstadoTarea, Prioridad } from "@prisma/client";
 import { formatFecha } from "@/lib/format";
 import { PRIORIDAD, ESTADO_TAREA } from "@/lib/badges";
@@ -42,6 +42,7 @@ interface Props {
   clientes: { id: string; nombre: string }[];
   expedientes: { id: string; titulo: string }[];
   miUserId: string;
+  tareaIdInicial?: string;
 }
 
 const COLUMNAS: { estado: EstadoTarea; label: string }[] = [
@@ -56,13 +57,28 @@ const PRIORIDAD_LABEL: Record<Prioridad, string> = {
   BAJA: "Baja",
 };
 
-export function TareasBoard({ tareas, usuarios, clientes, expedientes, miUserId }: Props) {
+export function TareasBoard({ tareas, usuarios, clientes, expedientes, miUserId, tareaIdInicial }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const toast = useToast();
   const [vista, setVista] = useState<"kanban" | "lista">("kanban");
   const [soloMias, setSoloMias] = useState(false);
   const [modalNueva, setModalNueva] = useState(false);
   const [detalle, setDetalle] = useState<Tarea | null>(null);
+
+  // Deep-link desde la ficha del cliente (/tareas?tarea=<id>): abre el
+  // detalle directo sin que el usuario tenga que buscarla en la lista.
+  useEffect(() => {
+    if (!tareaIdInicial) return;
+    const t = tareas.find((x) => x.id === tareaIdInicial);
+    if (t) setDetalle(t);
+    const params = new URLSearchParams(searchParams);
+    params.delete("tarea");
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tareaIdInicial]);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [checklistNueva, setChecklistNueva] = useState<string[]>([""]);
