@@ -1,3 +1,4 @@
+import "server-only";
 import { NextResponse } from "next/server";
 import { Prisma, Rol, TipoCliente } from "@prisma/client";
 import { auth } from "@/lib/auth";

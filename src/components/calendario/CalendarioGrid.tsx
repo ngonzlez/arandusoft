@@ -4,7 +4,7 @@ import { useState } from "react";
 import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
-import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos-ui";
 import { NuevoVencimientoModal } from "@/components/calendario/NuevoVencimientoModal";
 
 interface VencimientoItem {

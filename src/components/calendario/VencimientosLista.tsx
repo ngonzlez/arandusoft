@@ -6,7 +6,7 @@ import Link from "next/link";
 import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatFecha } from "@/lib/format";
 import { ESTADO_VENCIMIENTO } from "@/lib/badges";
-import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos";
+import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos-ui";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";

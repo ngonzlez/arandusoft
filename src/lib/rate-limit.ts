@@ -1,3 +1,5 @@
+import "server-only";
+
 // Limitador de intentos en memoria — ventana fija por clave (email o IP).
 // Un solo proceso por cliente (arquitectura 1 deploy = 1 estudio), así que
 // no hace falta Redis: esta memoria vive mientras el proceso esté arriba.
