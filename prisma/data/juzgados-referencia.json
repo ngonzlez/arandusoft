@@ -1,0 +1,2738 @@
+[
+  {
+    "nombre": "Juzgado de Ejecución Penal. Nº 1",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Luz Rossana Bogarín",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "Abg. Nora Abg. Céspedes Ledesma",
+        "telefono": "3762"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "Abg. Belen Cuellar",
+        "telefono": "3761"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado de Ejecución Penal. Nº 2",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg.Carlos Luis Mendoza",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 3",
+        "actuario": "Abg. Laura Enciso",
+        "telefono": "3702"
+      },
+      {
+        "nombre": "Secretaría 4",
+        "actuario": "Abg. Lucas Ruiz Diaz",
+        "telefono": "3703"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado de Ejecución Penal. Nº 3",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Sandra Silveira Benítez",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 5",
+        "actuario": "Abg. Mariano Gómez",
+        "telefono": "3732"
+      },
+      {
+        "nombre": "Secretaría 6",
+        "actuario": "Abg. Alexis Servían",
+        "telefono": "3740"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado de Ejecución Penal. Nº 4",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Sandra Kirchhofer",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 7",
+        "actuario": "Abg. Karen Molinas",
+        "telefono": "3720"
+      },
+      {
+        "nombre": "Secretaría 8",
+        "actuario": "Abg. Daisy Sánchez",
+        "telefono": "3729"
+      }
+    ]
+  },
+  {
+    "nombre": "Ejecución Penal - Especializados en Delitos Económicos, Corrupción y Crimen Organizado — 1er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Sandra Kirchhofer",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": "3729",
+    "secretarias": []
+  },
+  {
+    "nombre": "Ejecución Penal - Especializados en Delitos Económicos, Corrupción y Crimen Organizado — 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Ma. Lidia Wyder Mendieta",
+    "ubicacion": "Segundo Piso Torre Norte",
+    "telefono": "3263 3277",
+    "secretarias": []
+  },
+  {
+    "nombre": "Ejecución Penal - Especializados en Delitos Económicos, Corrupción y Crimen Organizado — 3er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Carlos Mendoza Peña",
+    "ubicacion": "Segundo Piso Torre Norte",
+    "telefono": "3286 3278",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 1 Juzgado Penal de Sentencia Nº 1",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Portillo, Yolanda",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3634 3640",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 1 Juzgado Penal de Sentencia Nº 2",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Capurro, Héctor",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3535 3525",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 1 Juzgado Penal de Sentencia Nº3",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Zárate, Juan Carlos",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3513 3530",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 1 Juzgado Penal de Sentencia Nº 4",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "García De Zúñiga, María Fernanda",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3635 3620",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 2 Juzgado Penal de Sentencia Nº 5",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Hermosilla, Carlos",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3633 3623",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 2 Juzgado Penal de Sentencia Nº 6",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Escobar, Héctor Fabián",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3618 3626",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 2 Juzgado Penal de Sentencia Nº 7",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Mendoza Benítez, Juan Pablo",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3543",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 2 Juzgado Penal de Sentencia Nº 8",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Fretes Sandoval, Juan Vicente",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3619 3625",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 3 Juzgado Penal de Sentencia Nº 9",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Alfieri Duria, Víctor Hugo",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3536 3522",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 3 Juzgado Penal de Sentencia Nº 10",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Ruíz González, Olga Elizabeth",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3515 3532",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 3 Juzgado Penal de Sentencia Nº 11",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Salinas Rojas, Celia",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "2526 3531",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 3 Juzgado Penal de Sentencia Nº 12",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Mario Garcia Marino",
+    "ubicacion": "7mo Piso Torre Norte",
+    "telefono": "3504 3529 3517",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 4 Juzgado Penal de Sentencia Nº 13",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Báez Ferreira, Darío Javier",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3614 3628",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 4 Juzgado Penal de Sentencia Nº 14",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "VACANTE (Interino: Christian González)",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3537 3550",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº4 Juzgado Penal de Sentencia Nº15",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Hermosa De Correa, Gloria Amanda",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3519 3517",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº4 Juzgado Penal de Sentencia Nº 16",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "VACANTE",
+    "ubicacion": "-",
+    "telefono": "-",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 5 Juzgado Penal de Sentencia Nº 17",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Garcete Ortiz, Lourdes Rocío",
+    "ubicacion": "5to Piso Torre Norte",
+    "telefono": "3514 3533",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 5 Juzgado Penal de Sentencia Nº 18",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Ortiz Rodríguez, Juan Francisco",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3613 3629",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº5 Juzgado Penal de Sentencia Nº19",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Maldonado Nuñez, Rossana",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3627 3617",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº5 Juzgado Penal de Sentencia Nº 20",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Aguirre Rodas, Manuel",
+    "ubicacion": "6to Piso Torre Norte",
+    "telefono": "3642 3624",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 6 Juzgado Penal de Sentencia Nº 21",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Fleitas González, Cándida María",
+    "ubicacion": "8vo Piso Torre Sur",
+    "telefono": "3578 2813 3893",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 6 Juzgado Penal de Sentencia Nº22",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Ocampo Fernández, Laura Beatriz",
+    "ubicacion": "8vo Piso Torre Norte",
+    "telefono": "3580",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 6 Juzgado Penal de Sentencia Nº 23",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Weinsensee Iaffei, Fabián Antonio",
+    "ubicacion": "8vo Piso Torre Norte",
+    "telefono": "2229 2704",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL Nº 6 Juzgado Penal de Sentencia Nº 24",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Villalba Idoyaga, Sonia Beatriz",
+    "ubicacion": "8vo Piso Torre Norte",
+    "telefono": "2228",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 1",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Clara Ruiz Díaz",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "3512 3507 2542",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 2",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Alicia Pedrozo",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2179 2821",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 3",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Cynthia Lovera",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2513 2225",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 4",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Raúl Florentín Cueto",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2779 2841 2667",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 5",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Rosana Diana Carvallo",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2182 2181 2278",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital N° 6",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lici Sánchez",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2520 2316",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 7",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Miguel A. Palacios",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2763 2799",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 8",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. José Agustín Delmás",
+    "ubicacion": "Séptimo Piso Torre Norte",
+    "telefono": "3787 3774",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 9",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Rolando Duarte",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3401 3415",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 10",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Mirko Valinotti",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3418",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 11",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Jean Paul López",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3403 3421",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal de Garantías de la Capital Nº 12",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Francisco Acevedo Morel",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3403 3423",
+    "secretarias": []
+  },
+  {
+    "nombre": "Penal de Garantías - Especializados en Delitos Económicos y Corrupción — 1er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Humberto Otazú",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3445 3446",
+    "secretarias": []
+  },
+  {
+    "nombre": "Penal de Garantías - Especializados en Delitos Económicos y Corrupción — 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Rodrigo Estigarribia",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3505 3430",
+    "secretarias": []
+  },
+  {
+    "nombre": "Penal de Garantías - Especializados en Crimen Organizado — 1er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lici Teresita Sánchez",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2520 2316",
+    "secretarias": []
+  },
+  {
+    "nombre": "Penal de Garantías - Especializados en Crimen Organizado — 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Omar Legal",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "3408 3410",
+    "secretarias": []
+  },
+  {
+    "nombre": "Penal de Garantías - Especializados en Crimen Organizado — 3er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Rosarito Montania",
+    "ubicacion": "Tercer Piso Torre Norte",
+    "telefono": "2514",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal Adolescente 1er Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Liz Paola Mongelos",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3439 3440",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Penal Adolescente 2do Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Ubaldo Matías Garcete",
+    "ubicacion": "Cuarto Piso Torre Norte",
+    "telefono": "3436",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 1er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lizza Natalia Reyes",
+    "ubicacion": "Planta Baja",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "Abg. Juan Espínola",
+        "telefono": "2565"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "Abg. Yenny Núñez",
+        "telefono": "2566"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Arnaldo Martínez",
+    "ubicacion": "Planta Baja",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 3",
+        "actuario": "Abg. Luis Ovelar",
+        "telefono": "2581"
+      },
+      {
+        "nombre": "Secretaría 4",
+        "actuario": "Abg. Noelia Ortiz",
+        "telefono": "2572"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 3er Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Juan Francisco Blanco",
+    "ubicacion": "Planta Baja",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 5",
+        "actuario": "Abg. Ana María Ocampo",
+        "telefono": "2606"
+      },
+      {
+        "nombre": "Secretaría 6",
+        "actuario": "Abg. Perla Reyes",
+        "telefono": "2608"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 4to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. . Édgar Rivas Laguardia (int.)",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 7",
+        "actuario": "Abg.Fabrizzio Sarubbi",
+        "telefono": "2613"
+      },
+      {
+        "nombre": "Secretaría 8",
+        "actuario": "Abg. Giovana Monserrat Basualdo González",
+        "telefono": "2615"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 5to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Alfredo Barrios Jara",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 9",
+        "actuario": "Abg. Heriberto Lezcano",
+        "telefono": "2616"
+      },
+      {
+        "nombre": "Secretaría 10",
+        "actuario": "Abg.Sabrina Caro",
+        "telefono": "2818"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 6to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Ulises Peña",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 11",
+        "actuario": "Abg. Leticia Limprich",
+        "telefono": "2625"
+      },
+      {
+        "nombre": "Secretaría 12",
+        "actuario": "Abg. Alicia Méndez",
+        "telefono": "2623"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 7mo Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Edgar Rivas Laguardia",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 13",
+        "actuario": "Abg. Adolfo Giménez",
+        "telefono": "2629"
+      },
+      {
+        "nombre": "Secretaría 14",
+        "actuario": "Abg. Rocío Rodríguez",
+        "telefono": "2633"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 8vo Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Walter Mendoza",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 15",
+        "actuario": "Abg. Oscar Bareiro",
+        "telefono": "2632"
+      },
+      {
+        "nombre": "Secretaría 16",
+        "actuario": "Abg. Alexis Brambilla",
+        "telefono": "2634"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 9mo Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Mafalda Cameron",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 17",
+        "actuario": "Abg. Marcelo Rocholl",
+        "telefono": "2506"
+      },
+      {
+        "nombre": "Secretaría 18",
+        "actuario": "Abg. Gisela Gómez",
+        "telefono": "2508"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 10mo Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Emilce González",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 19",
+        "actuario": "Abg. Rebeca Espínola",
+        "telefono": "2532"
+      },
+      {
+        "nombre": "Secretaría 20",
+        "actuario": "Abg. Tobías Redekop",
+        "telefono": "2292"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 11ro Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. José Guillermo Trovato (int.)",
+    "ubicacion": "Tercer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 21",
+        "actuario": "Abg. Sofhia Zarza",
+        "telefono": "2531"
+      },
+      {
+        "nombre": "Secretaría 22",
+        "actuario": "Abg. Diego Torres",
+        "telefono": "2351"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 12er Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Guillermo Trovato",
+    "ubicacion": "Planta Baja",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 23",
+        "actuario": "Abg. Carmen Franco",
+        "telefono": "2538"
+      },
+      {
+        "nombre": "Secretaría 24",
+        "actuario": "Abg. Yamile Maggi Benitez",
+        "telefono": "2540"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 13er Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Luz Marlene Ruiz Diaz",
+    "ubicacion": "Planta Baja",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 25",
+        "actuario": "Abg. Roque Maldonado",
+        "telefono": "2859"
+      },
+      {
+        "nombre": "Secretaría 26",
+        "actuario": "Abg. Rubén Vera Esteche",
+        "telefono": "2406"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 14to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Guillermo Ariel Riveros",
+    "ubicacion": "Primer Piso",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 27",
+        "actuario": "Abg. Luis Fernando Bogado",
+        "telefono": "2192"
+      },
+      {
+        "nombre": "Secretaría 28",
+        "actuario": "Abg. María Laura Díaz",
+        "telefono": "2193"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 15to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg.Rossana Frutos",
+    "ubicacion": "Primer Piso",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 29",
+        "actuario": "Abg. Pedro Constantini",
+        "telefono": "2029"
+      },
+      {
+        "nombre": "Secretaría 30",
+        "actuario": "Abg.Analiza Florentín",
+        "telefono": "2030"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 16 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Marisa Raquel Vargas Jaquet",
+    "ubicacion": "Sub Suelo 1",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 31",
+        "actuario": "Abg. Leticia Bernal",
+        "telefono": "2381"
+      },
+      {
+        "nombre": "Secretaría 32",
+        "actuario": "Abg. Linda Brun",
+        "telefono": "2666"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 17 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Karen González",
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 33",
+        "actuario": "Abg. Patricia Cardozo (int.)",
+        "telefono": "2165"
+      },
+      {
+        "nombre": "Secretaría 34",
+        "actuario": "Abg. Patricia Cardozo",
+        "telefono": "2848"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 18 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Vivian López",
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 35",
+        "actuario": "Abg. Nimia López",
+        "telefono": "3465"
+      },
+      {
+        "nombre": "Secretaría 36",
+        "actuario": "Abg. Julio Cabral",
+        "telefono": "3466"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 19 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Claudia Domínguez",
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 37",
+        "actuario": "Abg. Laure Arzamendia",
+        "telefono": "3462"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 19to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Claudia Domínguez",
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 38",
+        "actuario": "Abg. Andrea Porzio",
+        "telefono": "3463"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 20to Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Juan Martin Palacios",
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 39",
+        "actuario": "Abg. Vidalia Pereira",
+        "telefono": "2814"
+      },
+      {
+        "nombre": "Secretaría 40",
+        "actuario": "Abg.Luis Vega Acosta",
+        "telefono": "2842"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 21 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. José Villalba Báez",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 41",
+        "actuario": "Abg. Natalia Medina",
+        "telefono": "2439"
+      },
+      {
+        "nombre": "Secretaría 42",
+        "actuario": "Abg.Sophia Marecos",
+        "telefono": "2437"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 22 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Martin Acosta Conde",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 43",
+        "actuario": "Abg.Marco Ocampos",
+        "telefono": "2191"
+      },
+      {
+        "nombre": "Secretaría 44",
+        "actuario": "Abg. Armando Figari",
+        "telefono": "2285"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 23 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Juan Andrés Martínez",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 45",
+        "actuario": "Abg. Dalma Pintos",
+        "telefono": "2431"
+      },
+      {
+        "nombre": "Secretaría 46",
+        "actuario": "Abg. Nadia Soledad Ortíz",
+        "telefono": "2244"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 24 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Alejandra Magali Zavala",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 47",
+        "actuario": "Abg. Edgar Jara Mendoza",
+        "telefono": "2233"
+      },
+      {
+        "nombre": "Secretaría 48",
+        "actuario": "Abg. Carlos Galeano",
+        "telefono": "2261"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 25 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Liz Carina Caballero",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 49",
+        "actuario": "Abg.Olga Vázquez",
+        "telefono": "2188"
+      },
+      {
+        "nombre": "Secretaría 50",
+        "actuario": "Abg.Fátima Vázquez",
+        "telefono": "2189"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Civil y Comercial 26 Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg.Heinrick Fabián Von Lucken Gamarra",
+    "ubicacion": "Primer Piso Torre Norte",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 51",
+        "actuario": "Abg.Lilian Adorno Saccomani",
+        "telefono": "2183"
+      },
+      {
+        "nombre": "Secretaría 52",
+        "actuario": "Abg.Judith Zarza",
+        "telefono": "2310"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral 1er.Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Greta Aquino Bittar",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "Abg. Laura Zarate",
+        "telefono": "2257"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral. 1er.Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Greta Aquino Bittar",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "Abg. Ma. Inés Velázquez",
+        "telefono": "2227"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral. 2do.Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Graciela Ortíz",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 3",
+        "actuario": "Abg. Ángel Sanabria",
+        "telefono": "2224"
+      },
+      {
+        "nombre": "Secretaría 4",
+        "actuario": "Abg. Cesar Lezcano",
+        "telefono": "2552"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral. 3er.Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Marcela Fernández Celauro",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 5",
+        "actuario": "Abg. Juliana Centeno",
+        "telefono": "2262"
+      },
+      {
+        "nombre": "Secretaría 6",
+        "actuario": "Abg. Edgar Servín",
+        "telefono": "2987"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral. 4to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Gloria Fretes Mahur",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 7",
+        "actuario": "Abg. María Lorenza Pedrozo Marecos (int.)",
+        "telefono": "2723"
+      },
+      {
+        "nombre": "Secretaría 8",
+        "actuario": "Abg.Gloria Martínez",
+        "telefono": "2220"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral. 5to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Rubén Darío López",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 9",
+        "actuario": "Abg. Alex Denis Popof",
+        "telefono": "2248"
+      },
+      {
+        "nombre": "Secretaría 10",
+        "actuario": "Abg. Evangelina Añasco",
+        "telefono": "2223"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral 6to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Jorge Barboza",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 11",
+        "actuario": "Abg. Gabriela Pintos Rios",
+        "telefono": "2867"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Laboral 6to.Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Jorge Barboza",
+    "ubicacion": "Quinto Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 12",
+        "actuario": "Abg. Maria Laura Espinoza",
+        "telefono": "2747"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia 1er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg.Marina Soerensen",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "Abg.Yazmin Cano",
+        "telefono": "2567"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "Abg.Nathalia Cárdenas Rodríguez",
+        "telefono": "2576"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lucila Bajac (int.)",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 3",
+        "actuario": "Abg. Daisy Cristaldo Ramos",
+        "telefono": "2631"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia. 2do. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lucila Bajac (int.)",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 4",
+        "actuario": "Abg.Brenda Luján García",
+        "telefono": "2469"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia. 3er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Ma. Graciela Fernández",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 5",
+        "actuario": "Abg. Claudia Álvarez",
+        "telefono": "2246"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia 3er. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Ma. Graciela Fernández",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 6",
+        "actuario": "Abg. Elizabeth Villalba",
+        "telefono": "2484"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia. 4to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Nidia Bettina Ovando",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 7",
+        "actuario": "Abg.Marta Alice Silva Hermosa",
+        "telefono": "2671"
+      },
+      {
+        "nombre": "Secretaría 8",
+        "actuario": "Abg. María Eduvigis B.",
+        "telefono": "2674"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia 5to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg. Lucila Ma. Bajac",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 9",
+        "actuario": "Abg.Liza Cárdenas Méndez",
+        "telefono": "2595"
+      },
+      {
+        "nombre": "Secretaría 10",
+        "actuario": "Abg. Sonia Ocampos Vázquez",
+        "telefono": "2597"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado Niñez y Adolescencia 6to. Turno",
+    "circunscripcion": "Capital",
+    "fuero": null,
+    "juezActual": "Abg.Martha Paola Vera Cabral",
+    "ubicacion": "Primer Piso Torre Sur",
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 11",
+        "actuario": "Abg. Martín Ayala",
+        "telefono": "2592"
+      },
+      {
+        "nombre": "Secretaría 12",
+        "actuario": "Abg.MariaAngelaGonzález Delorenzi",
+        "telefono": "2587"
+      }
+    ]
+  },
+  {
+    "nombre": "Juzgado de Paz — Catedral",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Javier Ferreira",
+    "ubicacion": "Alonso e/ Isabel La Católica - Edificio Luz Amalia",
+    "telefono": "2959",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Catedral. 2° Turno",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Marlene Elizabeth Barreto",
+    "ubicacion": "Samudio Corrales c/ Yegros",
+    "telefono": "021 370 380",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — La Encarnación",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Victor Medina",
+    "ubicacion": "Alonso e/ Isabel La Católica - Edificio Luz Amalia",
+    "telefono": "021 424 872",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — San Roque",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Rogerth Chaparro Cabañas",
+    "ubicacion": "Colon y Lisboa (7ma. proyectada)",
+    "telefono": "-",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Santísima Trinidad",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Gloria Josefina Machuca",
+    "ubicacion": "Marcelino Pérez 549 esq. Ing. Fernando Bertoni",
+    "telefono": "021 290 373",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Santísima Trinidad 2° Turno",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Alejandro Alcides Peña Yegros",
+    "ubicacion": "Sgto. 1ro. Juan R, Céspedes e/ Del Espíritu Santo y Cnel. Felipe Toledo",
+    "telefono": "021 283 620",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Santísima Trinidad 3° Turno",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Lourdes Piñeiro",
+    "ubicacion": "Máximo Arellano c/ Tte. Figueredo",
+    "telefono": "021 276 390",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Recoleta",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Víctor Rodríguez Acosta",
+    "ubicacion": "23 de Octubre c/ Guido Spano",
+    "telefono": "Sria1: Gloria Morínigo 0981551107 Sria2: Rosa Lezcano 0981 415 141",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Villa Morra",
+    "circunscripcion": "Capital",
+    "fuero": "Paz",
+    "juezActual": "Abg. Elvira Margarita Franco González",
+    "ubicacion": "Campos Cervera esq. Alas Paraguayas",
+    "telefono": "021 606 574 0992 928 725",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — San Lorenzo",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Hugo A. Agüero Ayala",
+    "ubicacion": "Saturio Rios esquina Cerro Corá",
+    "telefono": "0981 662 256",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Fernando de la Mora",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Natalia Del Carmen Molas",
+    "ubicacion": "10 De Julio .Fdo Zona Norte",
+    "telefono": "0981 819 728",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Luque",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Norma Beatriz Ortiz de Segovia",
+    "ubicacion": "Benigno Gonzalez c/ Iturbe",
+    "telefono": "0994 884 194",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Mariano Roque Alonso",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Fidelino Cáceres Zulma Liliana Acuña Duarte (por periodo 3 meses, a partir de marzo/2025)",
+    "ubicacion": "Pitiantuta c/Boquerón",
+    "telefono": "0981 165 731",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Villa Elisa",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Martha Beatriz Benitez Alderete",
+    "ubicacion": "Sanjuan c/Vía Férrea Nº2220 Asunción",
+    "telefono": "0981 812 271",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Ñemby",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Miguel Angel Pereira",
+    "ubicacion": "Avenida Caaguazu",
+    "telefono": "0992 427 216",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Capiatá",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Blas Alcides Figueredo Miranda",
+    "ubicacion": "Barrio Mbocajaty. Tte Riquelme y 1ro de Noviembre",
+    "telefono": "0971 128 286",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Lambaré",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "José Segundo Velázquez",
+    "ubicacion": "Rojas Silva c/ Mcal. Estigarribia",
+    "telefono": "906-655",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — J. Augusto Saldivar",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Lidia Mariana Fariña Sanabria",
+    "ubicacion": "Ruta Py 01 Km26 Toledo Cañada",
+    "telefono": "0981 483 917",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Itauguá",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Marcelo D. Cantero",
+    "ubicacion": "Caballero Alvarez casi Teniente Martínez Barrio Okara Poty",
+    "telefono": "0971 719 109",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Nueva Italia",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Maria Esther Salinas Enciso (Interina)",
+    "ubicacion": "Avda. Mcal Jose Felix Estigarribia Y Proceres de Mayo, Barrio Santa Rosa",
+    "telefono": "0971 867 204",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Villeta",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Beatriz Olga Morán Avalos",
+    "ubicacion": "Rodríguez de Grancia c/ Lomas Valentina. Barrio Inmaculada",
+    "telefono": "0985 973 924",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Limpio",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Margareth Maria Lys Genez Rivas",
+    "ubicacion": "Avda San José - Limpio",
+    "telefono": "021 780 959",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Aregua",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Ma. Mercedes Jimenez Cubilla",
+    "ubicacion": "Iturbe y 25 de Diciembre",
+    "telefono": "0961 995 644",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Ypané",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Maria Esther Salinas Enciso",
+    "ubicacion": "Calle Vicente Iturbe casi Gral Escobar. Barrio San Francisco",
+    "telefono": "0971 867 204",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Guarambaré",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Ana Maria Flores Vda. de Ramos",
+    "ubicacion": "Calle 8 De Septiembre c/ Ytororo Barrio Colon",
+    "telefono": "0982 123 374",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Ita Jurisdiccion Penal",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Venancio Ramon Diaz Centeno (Interino)",
+    "ubicacion": "Gral Diaz c/ Curupayty. Km 26",
+    "telefono": "0991 973 916",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Ita Jurisdiccion Civil",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Venancio Ramon Diaz Centeno",
+    "ubicacion": "Gral Diaz c/ Curupayty. Km 26",
+    "telefono": "0991 973 916",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — San Antonio",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Olga Maria Caballero de Romero",
+    "ubicacion": "Calle Madame Lynch casi Avda San Antonio",
+    "telefono": "021 991 682",
+    "secretarias": []
+  },
+  {
+    "nombre": "Juzgado de Paz — Ypacarai",
+    "circunscripcion": "Dpto. Central",
+    "fuero": "Paz",
+    "juezActual": "Natalia Isolina Caballero",
+    "ubicacion": "Pedro Juan Caballero c/ Constitucion Barrio Palma",
+    "telefono": "0971 746 883",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL PENAL DE SENTENCIA Nº4-2",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-840765",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL DE APELACION PENAL",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0975-395208",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL NIÑEZ Y ADOLESCENCIA",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-228295",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL DE APELACION CIVIL, COM Y LAB 1º SALA",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0961-596547",
+    "secretarias": []
+  },
+  {
+    "nombre": "TRIBUNAL DE APELACION CIVIL, COM Y LAB 2º SALA",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0992-921602",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 1º TURNO",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "SILVIA SOSA COLMAN",
+        "telefono": "0981-193919"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "HUGO RUBEN BIANCIOTTO ARZAMENDIA",
+        "telefono": "0981-800120"
+      },
+      {
+        "nombre": "Secretaría 3",
+        "actuario": "WILLIAN JAVIER TORRES DENIS",
+        "telefono": "0971-160306"
+      },
+      {
+        "nombre": "Secretaría 4",
+        "actuario": "RAUL JARA FOTH",
+        "telefono": "0983-488604"
+      },
+      {
+        "nombre": "Secretaría 5",
+        "actuario": "GERMAN SANTIAGO BERNAL PACHER",
+        "telefono": "0981-782380"
+      },
+      {
+        "nombre": "Secretaría 6",
+        "actuario": "NELIDA ROSA VENIALGO TORRES",
+        "telefono": "0981-858013"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 1TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "LAURA MAGALI CACERES",
+        "telefono": "0992 893594"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "MARIA JOSE MIRANDA",
+        "telefono": "0984-910798"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL 2 TURNO SECRETARIA 3",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0995-695305",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL 2 TURNO SECRETARIA 4",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-770086",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL 3 TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981490277",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL 4 TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0961-814267",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 1º TURNO",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "ANA CAROLINA GADEA PRADO",
+        "telefono": "0986-264765"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "CARLOS ENRIQUE MELZER ACOSTA",
+        "telefono": "0981-462623"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 2º TURNO",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-202931",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 1º TURNO",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "DAVID ROMUALDO SERVIAN MAIDANA",
+        "telefono": "0981-557983"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "CLAUDIA CAROLINA FIORE SANCHEZ",
+        "telefono": "0992-213996"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO CIVIL Y COMERCIAL 2º TURNO",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-805239",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL Y LABORAL 1ER T",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "ARMANDO JACINTO VILLALBA BOGADO",
+        "telefono": "0981-554012"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "GRACIELA DAVALOS LEZCANO",
+        "telefono": "0981-218981"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO CIVIL, COMERCIAL 2DO TURNO",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-524772",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO EN LO CIVIL, COMERCIAL Y LABORAL - 1° T",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "JOSE ALBERTO DELGADO DOMINGUEZ",
+        "telefono": "0984-257237"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "MAURA VILLASANTI CABRERA",
+        "telefono": "0981-974480"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO EN LO CIVIL, COMERCIAL Y LABORAL",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0991-298506",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL 2º TURNO",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-272664",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0984-877142",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL",
+    "circunscripcion": "LIMPIO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0992-306631",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL 1º TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-607030",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL 2º TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-434732",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL 1º TURNO",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-733181",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LABORAL 2º TURNO",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0985-650171",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº2-1",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-360716",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº2-2",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0992-730400",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº2-3",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0991-295974",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº2-4",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-590215",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº4-3",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-336231",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº4-4",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-650711",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº6-1",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-343371",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº4-1",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0985-880257",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE LIQUIDACION Y SENT Nº 1-3",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "LOURDES RAQUEL TORRES MOLAS",
+        "telefono": "0962-125959"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "ALAN LUIS LOMBARDO",
+        "telefono": "0982-264945"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 3-3",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-147968",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO LIQUIDACION Y SENTENCIA Nº1- 4",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-930436",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 3 -2",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0992-286504",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 3 -1",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-115479",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 3-4",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-922306",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 5",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-892744",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 5-1",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981- 987.202",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 5-2",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-325419",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 5-3",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-684885",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº 6-3",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-815182",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA 6-2",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-199810",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA 6-4",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-992528",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº1-1",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "KAREM MABEL F. MENDOZA VELAZQUEZ",
+        "telefono": "0981-373948"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "MARIA ESTELA LEON GARCIA",
+        "telefono": "0981-936019"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE SENTENCIA Nº1-2",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "KATIANA ELIZABETH BRITEZ DOMINGUEZ",
+        "telefono": "0992-297153"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "GIANNI DAVID FERRARI VEZZETTI",
+        "telefono": "0981-546046"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO DE LA NIÑEZ Y LA ADOLESCENCIA Nº 1",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "ROSSANA ELIZABETH ACOSTA BARRIOS",
+        "telefono": "0985-901794"
+      },
+      {
+        "nombre": "Secretaría 2",
+        "actuario": null,
+        "telefono": null
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE LA ADOLESCENCIA",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-546779",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE LA NIÑEZ Y LA ADOLESCENCIA Nº 2",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-642365",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE LA NIÑEZ Y LA ADOLESCENCIA",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "NILDA SUSANA BOGADO AYALA",
+        "telefono": "0981-288467"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE ADOLESCENCIA",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-390701",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL ADOLESCENTE",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0986-163299",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL ADOLESCENTE",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-868656",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE LA NIÑEZ Y LA ADOLESCENCIA",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-181526",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE LA ADOLESCENCIA",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0991-711978",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y ADOLESCENCIA 2º TURNO",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-442293",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y ADOLESCENCIA 1º TURNO",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-927585",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y LA ADOLESCENCIA 1º TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "SANDRA GONZALEZ DOS SANTO",
+        "telefono": "0974-600450"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y LA ADOLESCENCIA 2º TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "021-634693",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y LA ADOLESCENCIA 3º TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0991-868608",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE LA ADOLESCENCIA",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-991506",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y ADOLESCENCIA 1",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-158683",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO NIÑEZ Y ADOLESCENCIA 2",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-165412",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE LA ADOLESCENCIA",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-253312",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº 1 SECRETARIA 1",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-698617",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº 1 SECRETARIA 2",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0994-888298",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº 2",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-557869",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº1",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0985 861775",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS SECRETARIA 1-",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-959258",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS SECRETARIA 2",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-919901",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 1 SENTENCIA 1",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982 601161",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 1 SENTENCIA 2",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981 219239",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 2",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0994 206085",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 3",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0994 450814",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS SECRETARIA 1",
+    "circunscripcion": "LIMPIO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-682776",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS SECRETARIA 2",
+    "circunscripcion": "LIMPIO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-899997",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº 1",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 1",
+        "actuario": "SHIRLEY ALESSANDRA CACERES SOSA",
+        "telefono": "0974-584683"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS Nº1",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": null,
+    "secretarias": [
+      {
+        "nombre": "Secretaría 2",
+        "actuario": "TADEO FISH",
+        "telefono": "0974-584681"
+      }
+    ]
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 2TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0974-584676",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE GARANTIAS 3TURNO",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0985-928496",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL GARANTIAS 1",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0984-924334",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL GARANTIAS 2",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-476254",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL GARANTIAS 3",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-176953",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE EJECUCION Nº 1 SCE2",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-437877",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE EJECUCION Nº 3",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0976-139721",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO PENAL DE EJECUCION Nº2",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982-325216",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ DE AREGUA",
+    "circunscripcion": "AREGUA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0962-158348",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ CAPIATA",
+    "circunscripcion": "CAPIATA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-538881",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ FERNANDO DE LA MORA",
+    "circunscripcion": "FERNANDO DE LA MORA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-236403",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ GUARAMBARE",
+    "circunscripcion": "GUARAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0961-421997",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ DE ITA 2do TURNO",
+    "circunscripcion": "ITA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0974-272722",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ DE ITA 1er TURNO",
+    "circunscripcion": "ITA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0972-194187",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ ITAUGUA",
+    "circunscripcion": "ITAUGUA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-797968",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ J.A.SALDIVAR",
+    "circunscripcion": "J.AUGUSTO SALDIVAR",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-858951",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ LAMBARE SECRETARIA 1",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981 539431",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ LAMBARE SECRETARIA 2",
+    "circunscripcion": "LAMBARE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0982 629377",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ LIMPIO",
+    "circunscripcion": "LIMPIO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-900122",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ LUQUE",
+    "circunscripcion": "LUQUE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0983-148073",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ de MARIANO ROQUE ALONSO",
+    "circunscripcion": "M.R.ALONSO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0991-325990",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ NUEVA ITALIA",
+    "circunscripcion": "NUEVA ITALIA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0992-353708",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ ÑEMBY",
+    "circunscripcion": "ÑEMBY",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981 210898",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ SAN ANTONIO (interino)",
+    "circunscripcion": "SAN ANTONIO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-295515",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ DE SAN LORENZO SECRETARIA 1",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0971-711569",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ DE SAN LORENZO SECRETARIA 2",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-295515",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ VILLA ELISA",
+    "circunscripcion": "VILLA ELISA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-143020",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ VILLETA",
+    "circunscripcion": "VILLETA",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0994-255539",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ YPACARAI",
+    "circunscripcion": "YPACARAI",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-238618",
+    "secretarias": []
+  },
+  {
+    "nombre": "JUZGADO DE PAZ YPANE",
+    "circunscripcion": "YPANE",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-848270",
+    "secretarias": []
+  },
+  {
+    "nombre": "OFICINA DE COORDINACION Y DIST. DE CAUSAS",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0981-111443",
+    "secretarias": []
+  },
+  {
+    "nombre": "ATENCION PERMANENTE SAN LORENZO",
+    "circunscripcion": "SAN LORENZO",
+    "fuero": null,
+    "juezActual": null,
+    "ubicacion": null,
+    "telefono": "0985-896278",
+    "secretarias": []
+  }
+]
