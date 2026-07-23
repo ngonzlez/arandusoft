@@ -42,6 +42,7 @@ export default async function CalendarioPage({
     orderBy: { fechaVencimiento: "asc" },
     include: {
       cliente: { select: { id: true, nombre: true } },
+      expediente: { select: { id: true, numero: true, anio: true, caratula: true, titulo: true } },
       responsable: { select: { nombre: true } },
     },
   });

@@ -28,20 +28,6 @@ export default async function EstadoMensualPage({
   const mes = MES_RE.test(sp.mes ?? "") ? sp.mes! : mesActual;
   const [año, mesNum] = mes.split("-").map(Number);
 
-  const clientesBase = await prisma.cliente.findMany({
-    where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
-    orderBy: { nombre: "asc" },
-    select: {
-      id: true,
-      ruc: true,
-      obligaciones: { where: { activa: true }, select: { tipo: true, diaVencimiento: true } },
-    },
-  });
-
-  // Marca VENCIDO lo que corresponda antes de mostrar la grilla — así el
-  // sistema avisa solo, sin depender de que alguien tilde algo.
-  await sincronizarVencidosEstadoMensual(clientesBase, mes);
-
   const clientes = await prisma.cliente.findMany({
     where: { estado: "ACTIVO", ...filtroClientesPorRol(user.rol) },
     orderBy: { nombre: "asc" },
@@ -61,6 +47,12 @@ export default async function EstadoMensualPage({
       },
     },
   });
+
+  // Marca VENCIDO lo que corresponda antes de mostrar la grilla — así el
+  // sistema avisa solo, sin depender de que alguien tilde algo. Reusa la
+  // query de arriba (superset de lo que necesita: id/ruc/obligaciones) en
+  // vez de un segundo findMany solo para esto.
+  await sincronizarVencidosEstadoMensual(clientes, mes);
 
   const conObligaciones = clientes
     .filter((c) => c.obligaciones.length > 0)

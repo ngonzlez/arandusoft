@@ -35,7 +35,10 @@ export const authConfig: NextAuthConfig = {
       const user = auth?.user;
 
       const esPublica =
-        pathname === "/login" || pathname === "/suspendido" || pathname === "/";
+        pathname === "/login" ||
+        pathname === "/suspendido" ||
+        pathname === "/" ||
+        pathname.startsWith("/r/"); // reportes públicos de expedientes (token)
       if (esPublica) return true;
 
       if (!user) return false; // NextAuth redirige a /login

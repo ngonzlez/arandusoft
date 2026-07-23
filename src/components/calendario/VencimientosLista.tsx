@@ -7,6 +7,7 @@ import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatFecha } from "@/lib/format";
 import { ESTADO_VENCIMIENTO } from "@/lib/badges";
 import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos-ui";
+import { formatNumeroExpediente } from "@/lib/expedientes";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
@@ -22,6 +23,7 @@ interface VencimientoItem {
   estado: EstadoVencimiento;
   fechaVencimiento: Date;
   cliente: { id: string; nombre: string } | null;
+  expediente: { id: string; numero: string | null; anio: number | null; caratula: string | null; titulo: string } | null;
   responsable: { nombre: string } | null;
 }
 
@@ -90,7 +92,7 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-line bg-line-soft">
-                {["", "Fecha", "Tipo", "Cliente", "Estado", "Responsable", ""].map((h, i) => (
+                {["", "Fecha", "Tipo", "Cliente / Expediente", "Estado", "Responsable", ""].map((h, i) => (
                   <th
                     key={i}
                     className="py-3 px-3 text-left font-medium text-ink-muted text-xs uppercase tracking-wide"
@@ -122,6 +124,14 @@ export function VencimientosLista({ vencimientos, clientes }: Props) {
                       {v.cliente ? (
                         <Link href={`/clientes/${v.cliente.id}`} className="text-primary hover:underline">
                           {v.cliente.nombre}
+                        </Link>
+                      ) : v.expediente ? (
+                        <Link
+                          href={`/expedientes/${v.expediente.id}`}
+                          className="text-primary hover:underline"
+                          title={v.expediente.caratula ?? v.expediente.titulo}
+                        >
+                          Exp. {formatNumeroExpediente(v.expediente.numero, v.expediente.anio)}
                         </Link>
                       ) : (
                         <span className="text-ink-faint">General</span>

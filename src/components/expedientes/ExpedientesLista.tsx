@@ -14,6 +14,7 @@ import { Modal } from "@/components/ui/Modal";
 import { Table, THead, TH, TRow, TD } from "@/components/ui/Table";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { useToast } from "@/components/ui/Toast";
+import { ImportarCsjButton } from "./ImportarCsjButton";
 
 interface Expediente {
   id: string;
@@ -25,6 +26,7 @@ interface Expediente {
   anio: number | null;
   cliente: { id: string; nombre: string } | null;
   juzgado: { id: string; nombre: string } | null;
+  despachoCsj: string | null;
   responsable: { id: string; nombre: string };
   _count: { documentos: number; tareas: number };
 }
@@ -115,7 +117,8 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, departamento
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
+      <div className="flex justify-end gap-2 mb-4">
+        <ImportarCsjButton clientes={clientes} />
         <Button onClick={() => setModalNuevo(true)}>Nuevo expediente</Button>
       </div>
 
@@ -143,7 +146,9 @@ export function ExpedientesLista({ expedientes, usuarios, clientes, departamento
                 <TD className="font-medium text-primary">{e.titulo}</TD>
                 <TD className="font-mono text-xs">{formatNumeroExpediente(e.numero, e.anio)}</TD>
                 <TD>{e.cliente?.nombre ?? <span className="text-ink-faint">—</span>}</TD>
-                <TD>{e.juzgado?.nombre ?? <span className="text-ink-faint">—</span>}</TD>
+                <TD>
+                  {e.juzgado?.nombre ?? e.despachoCsj ?? <span className="text-ink-faint">—</span>}
+                </TD>
                 <TD>
                   <Badge style={ESTADO_EXPEDIENTE[e.estado]}>{ESTADO_EXPEDIENTE_LABELS[e.estado]}</Badge>
                 </TD>

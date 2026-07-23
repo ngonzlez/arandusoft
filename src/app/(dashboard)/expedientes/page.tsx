@@ -11,7 +11,7 @@ import { ExpedientesFiltros } from "./ExpedientesFiltros";
 export const metadata = { title: "Expedientes — ArandúSoft" };
 
 interface Props {
-  searchParams: Promise<{ q?: string; anio?: string; estado?: string }>;
+  searchParams: Promise<{ q?: string; anio?: string; estado?: string; desde?: string; hasta?: string }>;
 }
 
 export default async function ExpedientesPage({ searchParams }: Props) {
@@ -29,15 +29,35 @@ export default async function ExpedientesPage({ searchParams }: Props) {
 
   const filtroRol = filtroExpedientesPorRol(user.rol);
 
+  // Rango de fechas → filtra expedientes con movimiento (actuación) en el
+  // período, igual que la búsqueda de "movimientos" de CSJ.
+  const desde = sp.desde ? new Date(`${sp.desde}T00:00:00`) : undefined;
+  const hasta = sp.hasta ? new Date(`${sp.hasta}T23:59:59`) : undefined;
+  const filtroFecha =
+    desde || hasta
+      ? {
+          actuaciones: {
+            some: {
+              fecha: {
+                ...(desde ? { gte: desde } : {}),
+                ...(hasta ? { lte: hasta } : {}),
+              },
+            },
+          },
+        }
+      : {};
+
   const where: Prisma.ExpedienteWhereInput = {
     ...filtroRol,
     ...(anio ? { anio } : {}),
     ...(estado ? { estado } : {}),
+    ...filtroFecha,
     ...(sp.q
       ? {
           OR: [
             { titulo: { contains: sp.q, mode: "insensitive" } },
             { numero: { contains: sp.q, mode: "insensitive" } },
+            { caratula: { contains: sp.q, mode: "insensitive" } },
           ],
         }
       : {}),

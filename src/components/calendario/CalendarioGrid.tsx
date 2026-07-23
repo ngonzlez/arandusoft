@@ -5,6 +5,7 @@ import { EstadoVencimiento, TipoVencimiento } from "@prisma/client";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
 import { TIPO_VENCIMIENTO_META, etiquetaVencimiento } from "@/lib/vencimientos-ui";
+import { formatNumeroExpediente } from "@/lib/expedientes";
 import { NuevoVencimientoModal } from "@/components/calendario/NuevoVencimientoModal";
 
 interface VencimientoItem {
@@ -14,6 +15,19 @@ interface VencimientoItem {
   estado: EstadoVencimiento;
   fechaVencimiento: Date;
   cliente: { nombre: string } | null;
+  expediente: { numero: string | null; anio: number | null; caratula: string | null; titulo: string } | null;
+}
+
+// Cliente o, si es un plazo de expediente sin cliente asociado, el expediente
+// (carátula/N°-Año) — evita el "General" vacío en plazos procesales.
+function referencia(v: VencimientoItem): string {
+  if (v.cliente) return v.cliente.nombre;
+  if (v.expediente) {
+    const num = formatNumeroExpediente(v.expediente.numero, v.expediente.anio);
+    const nombre = v.expediente.caratula ?? v.expediente.titulo;
+    return num !== "—" ? `Exp. ${num}` : nombre;
+  }
+  return "General";
 }
 
 interface Props {
@@ -98,9 +112,9 @@ export function CalendarioGrid({ año, mes, vencimientos, clientes }: Props) {
                         key={v.id}
                         className="truncate rounded px-1.5 py-0.5 text-[10px] font-medium leading-tight"
                         style={{ backgroundColor: estilo.bg, color: estilo.text }}
-                        title={`${etiquetaVencimiento(v.tipo, v.descripcion)} — ${v.cliente?.nombre ?? "General"} (${v.estado})`}
+                        title={`${etiquetaVencimiento(v.tipo, v.descripcion)} — ${referencia(v)} (${v.estado})`}
                       >
-                        {etiquetaVencimiento(v.tipo, v.descripcion)} · {v.cliente?.nombre ?? "General"}
+                        {etiquetaVencimiento(v.tipo, v.descripcion)} · {referencia(v)}
                       </div>
                     );
                   })}

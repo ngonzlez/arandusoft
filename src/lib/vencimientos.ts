@@ -77,26 +77,32 @@ export async function generarVencimientosClienteDelMes(
   });
   if (!cliente) return 0;
 
-  let creados = 0;
+  // Filas objetivo en memoria (sin DB) antes de escribir nada.
+  const filas: { tipo: TipoObligacion; fecha: Date }[] = [];
   for (const o of cliente.obligaciones) {
     const fecha = calcularFechaVencimientoObligacion(cliente.ruc, o.tipo, o.diaVencimiento, periodoAño, periodoMes);
-    if (!fecha) continue;
-
-    await prisma.vencimiento.upsert({
-      where: {
-        clienteId_tipo_fechaVencimiento: { clienteId: cliente.id, tipo: o.tipo, fechaVencimiento: fecha },
-      },
-      create: {
-        clienteId: cliente.id,
-        tipo: o.tipo,
-        fechaVencimiento: fecha,
-        responsableId: cliente.responsableId,
-      },
-      update: {},
-    });
-    creados++;
+    if (fecha) filas.push({ tipo: o.tipo, fecha });
   }
-  return creados;
+  if (filas.length === 0) return 0;
+
+  // Promise.all en vez de loop secuencial de upserts.
+  await Promise.all(
+    filas.map((f) =>
+      prisma.vencimiento.upsert({
+        where: {
+          clienteId_tipo_fechaVencimiento: { clienteId: cliente.id, tipo: f.tipo, fechaVencimiento: f.fecha },
+        },
+        create: {
+          clienteId: cliente.id,
+          tipo: f.tipo,
+          fechaVencimiento: f.fecha,
+          responsableId: cliente.responsableId,
+        },
+        update: {},
+      })
+    )
+  );
+  return filas.length;
 }
 
 // Genera (idempotente) los vencimientos del Calendario cuya fecha cae en el
@@ -119,32 +125,40 @@ export async function generarVencimientosDelMes(año: number, mes: number): Prom
     },
   });
 
-  let creados = 0;
+  // Filas objetivo en memoria (sin DB) antes de escribir nada.
+  const filas: { clienteId: string; responsableId: string; tipo: TipoObligacion; fecha: Date }[] = [];
   for (const c of clientes) {
     for (const o of c.obligaciones) {
       const fecha = calcularFechaVencimientoObligacion(c.ruc, o.tipo, o.diaVencimiento, periodoAño, periodoMes);
-      if (!fecha) continue;
+      if (fecha) filas.push({ clienteId: c.id, responsableId: c.responsableId, tipo: o.tipo, fecha });
+    }
+  }
+  if (filas.length === 0) return 0;
 
-      await prisma.vencimiento.upsert({
+  // Promise.all en vez de loop secuencial. Si la base de clientes crece
+  // mucho (miles de filas), esto debería chunkearse — no hace falta con el
+  // tamaño actual de este estudio.
+  await Promise.all(
+    filas.map((f) =>
+      prisma.vencimiento.upsert({
         where: {
           clienteId_tipo_fechaVencimiento: {
-            clienteId: c.id,
-            tipo: o.tipo,
-            fechaVencimiento: fecha,
+            clienteId: f.clienteId,
+            tipo: f.tipo,
+            fechaVencimiento: f.fecha,
           },
         },
         create: {
-          clienteId: c.id,
-          tipo: o.tipo,
-          fechaVencimiento: fecha,
-          responsableId: c.responsableId,
+          clienteId: f.clienteId,
+          tipo: f.tipo,
+          fechaVencimiento: f.fecha,
+          responsableId: f.responsableId,
         },
         update: {}, // ya existe: no tocar estado ni flags de notificación
-      });
-      creados++;
-    }
-  }
-  return creados;
+      })
+    )
+  );
+  return filas.length;
 }
 
 // Filtro de vencimientos visibles por rol: los de clientes visibles + los sin cliente.

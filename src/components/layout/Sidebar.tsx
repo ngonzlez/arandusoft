@@ -13,6 +13,7 @@ interface SidebarProps {
   usuario: { nombre: string; rol: string };
   nombreEstudio: string;
   notificacionesNoLeidas?: number;
+  cedulasCsj?: number;
   onNavigate?: () => void; // cierra drawer en mobile
 }
 
@@ -23,7 +24,7 @@ const ROL_LABEL: Record<string, string> = {
   SUPERADMIN: "Superadmin",
 };
 
-export function Sidebar({ items, usuario, nombreEstudio, notificacionesNoLeidas = 0, onNavigate }: SidebarProps) {
+export function Sidebar({ items, usuario, nombreEstudio, notificacionesNoLeidas = 0, cedulasCsj = 0, onNavigate }: SidebarProps) {
   const pathname = usePathname();
 
   return (
@@ -48,7 +49,7 @@ export function Sidebar({ items, usuario, nombreEstudio, notificacionesNoLeidas 
 
       <nav className="flex-1 px-3 overflow-y-auto">
         {items.map((item) => {
-          const activo = pathname.startsWith(item.href);
+          const activo = pathname === item.href || pathname.startsWith(item.href + "/");
           return (
             <Link
               key={item.href}
@@ -63,9 +64,14 @@ export function Sidebar({ items, usuario, nombreEstudio, notificacionesNoLeidas 
             >
               <span className="flex items-center">{ICONS[item.icon]}</span>
               <span className="flex-1">{item.label}</span>
-              {item.icon === "bell" && notificacionesNoLeidas > 0 && (
+              {item.href === "/notificaciones" && notificacionesNoLeidas > 0 && (
                 <span className="rounded-full bg-urgent px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
                   {notificacionesNoLeidas}
+                </span>
+              )}
+              {item.href === "/notificaciones-csj" && cedulasCsj > 0 && (
+                <span className="rounded-full bg-urgent px-1.5 py-0.5 text-[10px] font-semibold leading-none text-white">
+                  {cedulasCsj}
                 </span>
               )}
             </Link>

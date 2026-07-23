@@ -11,11 +11,15 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Table, THead, TH, TRow, TD } from "@/components/ui/Table";
 import { ClienteTabs } from "@/components/clientes/ClienteTabs";
 import { NotasPanel } from "@/components/shared/NotasPanel";
 import { DocumentosExpediente } from "@/components/expedientes/DocumentosExpediente";
+import { ActuacionesTabla } from "@/components/expedientes/ActuacionesTabla";
 import { EstadoExpedienteControl } from "@/components/expedientes/EstadoExpedienteControl";
 import { FechaLimiteControl } from "@/components/expedientes/FechaLimiteControl";
+import { PlazoControl } from "@/components/expedientes/PlazoControl";
+import { CompartirReporte } from "@/components/expedientes/CompartirReporte";
 
 export const metadata = { title: "Expediente — ArandúSoft" };
 
@@ -39,6 +43,11 @@ export default async function ExpedienteDetallePage({
       juzgado: { select: { id: true, nombre: true, circunscripcion: true } },
       secretaria: { select: { id: true, nombre: true } },
       responsable: { select: { id: true, nombre: true } },
+      materia: { select: { nombre: true } },
+      circunscripcion: { select: { nombre: true } },
+      actuaciones: { orderBy: { fecha: "desc" } },
+      intervinientes: { orderBy: { createdAt: "asc" } },
+      movimientos: { orderBy: { fechaIngreso: "desc" } },
       documentos: {
         orderBy: { createdAt: "desc" },
         include: { subidor: { select: { nombre: true } } },
@@ -60,6 +69,13 @@ export default async function ExpedienteDetallePage({
     },
   });
   if (!expediente) notFound();
+
+  // Marca las actuaciones como revisadas (sale de "actuación nueva" en la cartera).
+  if (expediente.origenCsj) {
+    await prisma.expediente
+      .update({ where: { id: expediente.id }, data: { actuacionesRevisadasAt: new Date() } })
+      .catch(() => {});
+  }
 
   const resumen = (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -88,6 +104,30 @@ export default async function ExpedienteDetallePage({
             <dt className="text-ink-muted">Tipo</dt>
             <dd className="text-ink-base font-medium">{TIPO_EXPEDIENTE_LABELS[expediente.tipo]}</dd>
           </div>
+          {expediente.materia && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Materia</dt>
+              <dd className="text-ink-base font-medium">{expediente.materia.nombre}</dd>
+            </div>
+          )}
+          {expediente.circunscripcion && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Circunscripción</dt>
+              <dd className="text-ink-base font-medium">{expediente.circunscripcion.nombre}</dd>
+            </div>
+          )}
+          {expediente.proceso && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Proceso</dt>
+              <dd className="text-ink-base font-medium">{expediente.proceso}</dd>
+            </div>
+          )}
+          {expediente.fase && (
+            <div className="flex justify-between gap-4">
+              <dt className="text-ink-muted">Fase</dt>
+              <dd className="text-ink-base font-medium text-right">{expediente.fase}</dd>
+            </div>
+          )}
           <div className="flex justify-between gap-4">
             <dt className="text-ink-muted">Juzgado</dt>
             <dd className="text-ink-base font-medium text-right">
@@ -98,6 +138,8 @@ export default async function ExpedienteDetallePage({
                     <span className="block text-xs text-ink-muted font-normal">{expediente.secretaria.nombre}</span>
                   )}
                 </>
+              ) : expediente.despachoCsj ? (
+                expediente.despachoCsj
               ) : (
                 <span className="text-ink-faint">Sin especificar</span>
               )}
@@ -169,6 +211,89 @@ export default async function ExpedienteDetallePage({
     </div>
   );
 
+  const esCsj = expediente.origenCsj || expediente.actuaciones.length > 0;
+
+  const actuacionesTab = (
+    <Card>
+      <ActuacionesTabla
+        casoId={expediente.csjCasoId}
+        instancia={expediente.csjInstancia}
+        actuaciones={expediente.actuaciones.map((a) => ({
+          id: a.id,
+          csjId: a.csjId,
+          grupoProceso: a.grupoProceso,
+          procesoJudicial: a.procesoJudicial,
+          descripcion: a.descripcion,
+          tipo: a.tipo,
+          estado: a.estado,
+          despacho: a.despacho,
+          fecha: a.fecha ? a.fecha.toISOString() : null,
+          documentos: Array.isArray(a.documentos)
+            ? (a.documentos as { idDocumento: number; descripcion: string }[])
+            : [],
+        }))}
+      />
+    </Card>
+  );
+
+  const movimientosTab = (
+    <Card>
+      {expediente.movimientos.length === 0 ? (
+        <p className="text-sm text-ink-faint">Sin movimientos importados.</p>
+      ) : (
+        <Table>
+          <THead>
+            <TH>Despacho</TH>
+            <TH>Estado</TH>
+            <TH>Ingreso</TH>
+            <TH>Egreso</TH>
+          </THead>
+          <tbody>
+            {expediente.movimientos.map((m) => (
+              <TRow key={m.id}>
+                <TD className="font-medium">{m.despacho}</TD>
+                <TD className="text-ink-muted">{m.estado ?? "—"}</TD>
+                <TD className="whitespace-nowrap text-ink-muted">
+                  {m.fechaIngreso ? formatFecha(m.fechaIngreso) : "—"}
+                </TD>
+                <TD className="whitespace-nowrap text-ink-muted">
+                  {m.fechaFin ? formatFecha(m.fechaFin) : "—"}
+                </TD>
+              </TRow>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </Card>
+  );
+
+  const partesTab = (
+    <Card>
+      {expediente.intervinientes.length === 0 ? (
+        <p className="text-sm text-ink-faint">Sin partes registradas en CSJ para este expediente.</p>
+      ) : (
+        <Table>
+          <THead>
+            <TH>Tipo de parte</TH>
+            <TH>Nombre / Razón social</TH>
+            <TH>Documento</TH>
+          </THead>
+          <tbody>
+            {expediente.intervinientes.map((i) => (
+              <TRow key={i.id}>
+                <TD className="text-ink-muted">{i.tipoParte ?? "—"}</TD>
+                <TD className="font-medium">{i.nombre}</TD>
+                <TD className="text-ink-muted">
+                  {[i.tipoDocumento, i.nroDocumento].filter(Boolean).join(" ") || "—"}
+                </TD>
+              </TRow>
+            ))}
+          </tbody>
+        </Table>
+      )}
+    </Card>
+  );
+
   return (
     <div>
       <div className="flex items-start justify-between gap-4 mb-5 flex-wrap">
@@ -181,7 +306,9 @@ export default async function ExpedienteDetallePage({
             {expediente.cliente?.ruc && ` · ${expediente.cliente.ruc}`}
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          <PlazoControl expedienteId={expediente.id} />
+          <CompartirReporte expedienteId={expediente.id} />
           <EstadoExpedienteControl expedienteId={expediente.id} estadoActual={expediente.estado} />
           <Link href="/expedientes">
             <Button variant="outline">Volver</Button>
@@ -246,6 +373,25 @@ export default async function ExpedienteDetallePage({
                 </Card>
               ),
           },
+          ...(esCsj
+            ? [
+                {
+                  key: "actuaciones",
+                  label: `Actuaciones (${expediente.actuaciones.length})`,
+                  content: actuacionesTab,
+                },
+                {
+                  key: "partes",
+                  label: `Partes (${expediente.intervinientes.length})`,
+                  content: partesTab,
+                },
+                {
+                  key: "movimientos",
+                  label: `Movimientos (${expediente.movimientos.length})`,
+                  content: movimientosTab,
+                },
+              ]
+            : []),
         ]}
       />
     </div>

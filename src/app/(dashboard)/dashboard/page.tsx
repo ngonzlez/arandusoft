@@ -4,10 +4,12 @@ import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
 import { formatFecha, formatFechaLarga } from "@/lib/format";
 import { filtroVencimientosPorRol, TIPO_VENCIMIENTO_META, colorUrgencia, etiquetaVencimiento } from "@/lib/vencimientos";
+import { tieneFeature } from "@/lib/licencia";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { Card, StatTile } from "@/components/ui/Card";
 import { Avatar } from "@/components/ui/Avatar";
 import { ICONS } from "@/components/layout/Icons";
+import { CarteraJuridica } from "@/components/dashboard/CarteraJuridica";
 
 export const metadata = { title: "Dashboard — ArandúSoft" };
 
@@ -45,6 +47,7 @@ export default async function DashboardPage() {
   const criticos = proximos.filter((v) => colorUrgencia(v.fechaVencimiento) === "#DC2626").length;
 
   const nombre = user.name?.split(" ")[0] ?? "";
+  const juridico = await tieneFeature("juridico");
 
   return (
     <div>
@@ -146,6 +149,8 @@ export default async function DashboardPage() {
           )}
         </Card>
       </div>
+
+      {juridico && <CarteraJuridica rol={user.rol} />}
     </div>
   );
 }

@@ -72,6 +72,7 @@ enum TipoVencimiento {
   ASAMBLEA
   RENOVACION_CONTRATO
   PLAZO_PROCESAL
+  AUDIENCIA
   TIMBRADO
   FIRMA_DIGITAL
   OTRO
@@ -159,6 +160,7 @@ model User {
   archivosRecibidos    EnvioArchivo[]        @relation("ArchivosRecibidos")
   resetTokens          PasswordResetToken[]
   presupuestosCreados  Presupuesto[]         @relation("PresupuestoCreadoPor")
+  credencialCsj        CredencialCsj?
 
   @@index([rol])
 }
@@ -176,22 +178,22 @@ model PasswordResetToken {
 }
 
 model Licencia {
-  id                String         @id @default(cuid())
-  estado            EstadoLicencia
-  venceEl           DateTime
-  mensajeSuspension String?
+  id                       String         @id @default(cuid())
+  estado                   EstadoLicencia
+  venceEl                  DateTime
+  mensajeSuspension        String?
   // Config del estudio (Opción A: 1 deploy = 1 cliente). El superadmin la
   // edita desde su panel — reemplaza nombre/dominio hardcodeados y el flag
   // de módulo jurídico por variable de entorno estática.
-  nombreEstudio            String  @default("Mi Estudio")
+  nombreEstudio            String         @default("Mi Estudio")
   dominio                  String?
-  moduloJuridicoHabilitado Boolean @default(false) // DEPRECADO: no se lee más — usar features[]
+  moduloJuridicoHabilitado Boolean        @default(false) // DEPRECADO: no se lee más — usar features[]
   // Features habilitadas para este estudio (keys de FEATURES_DISPONIBLES en
   // lib/features.ts). El superadmin las prende/apaga desde /admin/licencia.
-  features                 String[] @default([])
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
-  pagos             PagoLicencia[]
+  features                 String[]       @default([])
+  createdAt                DateTime       @default(now())
+  updatedAt                DateTime       @updatedAt
+  pagos                    PagoLicencia[]
 }
 
 enum EstadoPresupuesto {
@@ -293,18 +295,18 @@ model PagoLicencia {
 // ───────────────────────── CLIENTES ─────────────────────────
 
 model Cliente {
-  id            String        @id @default(cuid())
-  nombre        String
-  ruc           String        @unique
-  cedula        String?
-  telefono      String?
-  email         String?
-  direccion     String?
-  tipo          TipoCliente
-  estado        EstadoCliente @default(ACTIVO)
-  estadoFiscal  EstadoFiscal  @default(AL_DIA)
-  responsableId String
-  responsable   User          @relation("ClienteResponsable", fields: [responsableId], references: [id])
+  id             String        @id @default(cuid())
+  nombre         String
+  ruc            String        @unique
+  cedula         String?
+  telefono       String?
+  email          String?
+  direccion      String?
+  tipo           TipoCliente
+  estado         EstadoCliente @default(ACTIVO)
+  estadoFiscal   EstadoFiscal  @default(AL_DIA)
+  responsableId  String
+  responsable    User          @relation("ClienteResponsable", fields: [responsableId], references: [id])
   accesos        String? // blob cifrado AES-256-GCM, solo ADMIN desencripta server-side
   observaciones  String? // notas libres de la ficha (ej: "cliente puntual", "falta info de X")
   actualizadoPor String? // userId de la última modificación (auditoría PRD)
@@ -316,8 +318,8 @@ model Cliente {
   timbradoVencimiento     DateTime?
   firmaDigitalVencimiento DateTime?
 
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   obligaciones     ClienteObligacion[]
   estadosMensuales EstadoMensual[]
@@ -378,7 +380,7 @@ model Declaracion {
   archivoUrl            String
   archivoPublicId       String?
   archivoNombreOriginal String?
-  archivoFormato        String   @default("pdf") // "pdf" | "xlsx" (excel de Marangatu/DNIT)
+  archivoFormato        String         @default("pdf") // "pdf" | "xlsx" (excel de Marangatu/DNIT)
   tamanioBytes          Int?
   archivado             Boolean        @default(false)
   cargadoPor            String
@@ -402,6 +404,10 @@ model Vencimiento {
   tipo             TipoVencimiento
   descripcion      String? // detalle libre; obligatorio en la UI cuando tipo = OTRO
   fechaVencimiento DateTime
+  // Plazos procesales (tipo = PLAZO_PROCESAL): datos del cálculo.
+  subtipoPlazo     String? // "Vencimiento" (días hábiles) / "Caducidad de Instancia" / "Prescripción"
+  diasHabiles      Int? // cantidad de días hábiles usada en el cálculo
+  fechaBase        DateTime? // fecha desde la que se contó (ej. fechaNotificacion)
   estado           EstadoVencimiento @default(PENDIENTE)
   responsableId    String?
   responsable      User?             @relation("VencimientoResponsable", fields: [responsableId], references: [id])
@@ -549,15 +555,45 @@ model Expediente {
   secretariaId String?
   secretaria   Secretaria? @relation(fields: [secretariaId], references: [id])
 
+  // ── Datos oficiales importados de CSJ (apps.csj.gov.py/gestion-partes) ──
+  // Se mantienen distintos de los campos manuales de arriba. Un expediente
+  // cargado a mano tiene estos en null; uno importado los completa.
+  caratula              String? // carátula oficial del caso (distinta del `titulo` libre)
+  csjCasoId             String? // id del caso en CSJ (ej: "2983833")
+  csjInstancia          String? // notación de instancia en CSJ (ej: "2:0")
+  despachoCsj           String? // juzgado/despacho actual del caso en CSJ (texto; el detalle no lo trae, viene de la lista/actuaciones)
+  proceso               String? // tipo de proceso (ORDINARIO, etc.) — de /otros-datos
+  fase                  String? // fase procesal — de /otros-datos
+  monto                 String? // monto/cuantía (texto, ej "0,00") — de /otros-datos
+  origenCsj             Boolean          @default(false) // true si vino de una importación CSJ
+  csjSyncAt             DateTime? // última vez que se sincronizó con CSJ
+  actuacionesRevisadasAt DateTime? // hasta cuándo el usuario revisó las actuaciones (cartera "nuevas")
+  materiaId             String?
+  materia               Materia?         @relation(fields: [materiaId], references: [id])
+  circunscripcionId     String?
+  circunscripcion       Circunscripcion? @relation(fields: [circunscripcionId], references: [id])
+  // Expedientes acumulados: los hijos apuntan al padre (self-relation).
+  expedientePadreId     String?
+  expedientePadre       Expediente?      @relation("ExpedientesAcumulados", fields: [expedientePadreId], references: [id])
+  expedientesAcumulados Expediente[]     @relation("ExpedientesAcumulados")
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  documentos   Documento[]
-  notas        Nota[]
-  historial    HistorialExpediente[]
-  tareas       Tarea[]
-  vencimientos Vencimiento[]
+  documentos     Documento[]
+  notas          Nota[]
+  historial      HistorialExpediente[]
+  tareas         Tarea[]
+  vencimientos   Vencimiento[]
+  actuaciones      Actuacion[]
+  intervinientes   Interviniente[]
+  movimientos      MovimientoCaso[]
+  notificacionesCsj NotificacionCsj[]
+  reportes         ReporteExpediente[]
 
+  // Importación idempotente: no duplicar un caso CSJ ya traído. (En Postgres
+  // los null son distintos, así que los expedientes manuales no chocan.)
+  @@unique([csjCasoId, csjInstancia])
   @@index([clienteId])
   @@index([responsableId])
   @@index([estado])
@@ -583,7 +619,7 @@ model Ciudad {
 }
 
 model Juzgado {
-  id              String   @id @default(cuid())
+  id              String  @id @default(cuid())
   nombre          String
   circunscripcion String? // "Capital", "Central", localidad del juzgado de paz
   fuero           String? // Civil, Penal, Laboral... editable, no auto-clasificado
@@ -638,6 +674,140 @@ model HistorialExpediente {
   user           User              @relation(fields: [userId], references: [id])
   comentario     String?
   createdAt      DateTime          @default(now())
+
+  @@index([expedienteId])
+}
+
+// ───────────────────────── INTEGRACIÓN CSJ (Fase 1) ─────────────────────────
+// Datos traídos del portal del Poder Judicial. Todos los valores externos se
+// guardan como texto (no enum) para que CSJ pueda agregar valores sin romper
+// migraciones. Los IDs de CSJ son String? porque aún no se confirmó su tipo.
+
+model Materia {
+  id     String  @id @default(cuid())
+  csjId  String? @unique // id de la materia en CSJ
+  nombre String  @unique
+
+  expedientes Expediente[]
+}
+
+model Circunscripcion {
+  id     String  @id @default(cuid())
+  csjId  String? @unique // id de la circunscripción en CSJ
+  nombre String  @unique
+
+  expedientes Expediente[]
+}
+
+// Cada movimiento/actuación del caso (la tabla cronológica de CSJ).
+model Actuacion {
+  id                String     @id @default(cuid())
+  expedienteId      String
+  expediente        Expediente @relation(fields: [expedienteId], references: [id])
+  csjId             String? // id de la actuación en CSJ (para dedupe idempotente)
+  grupoProceso      String? // Principal / Excepciones / Incidentes / RHP / Recurso ("tipo grupo proceso")
+  procesoJudicial   String? // ej: "INHABILITACION JUDICIAL"
+  descripcion       String
+  tipo              String? // Providencia / Cédula de Notificación / Presentación Electrónica...
+  estado            String? // ej: "Finalizado"
+  despacho          String? // juzgado/secretaría que la emitió (texto; mapear a catálogo = mejora futura)
+  fecha             DateTime?
+  tieneNotificacion Boolean    @default(false)
+  pdfDisponible     Boolean    @default(false) // CSJ ofrece PDF de esta actuación
+  documentos        Json? // [{ idDocumento, descripcion }] de CSJ, para armar los links
+  createdAt         DateTime   @default(now())
+
+  @@unique([expedienteId, csjId])
+  @@index([expedienteId])
+}
+
+// Partes / intervinientes del caso, por instancia.
+model Interviniente {
+  id            String     @id @default(cuid())
+  expedienteId  String
+  expediente    Expediente @relation(fields: [expedienteId], references: [id])
+  instancia     String? // PRIMERA / SEGUNDA / CORTE
+  tipoParte     String? // Demandante / Demandado / ...
+  nombre        String
+  tipoDocumento String? // Cédula Identidad Nacional / RUC...
+  nroDocumento  String?
+  createdAt     DateTime   @default(now())
+
+  @@index([expedienteId])
+}
+
+// Movimientos del caso: historial de pases entre despachos (de /movimientos).
+model MovimientoCaso {
+  id           String     @id @default(cuid())
+  expedienteId String
+  expediente   Expediente @relation(fields: [expedienteId], references: [id])
+  despacho     String // descripcionDespachoJudicial
+  estado       String? // Activo / Transferido / Finalizado
+  instancia    String? // codInstancia
+  fechaIngreso DateTime?
+  fechaFin     DateTime?
+  createdAt    DateTime   @default(now())
+
+  @@index([expedienteId])
+}
+
+// Credenciales CSJ del abogado, cifradas (AES-256-GCM, lib/crypto.ts — mismo
+// patrón que Cliente.accesos). Una cuenta por usuario. El cron de Fase 2
+// sincroniza cada cuenta activa. La contraseña NUNCA se devuelve por API.
+model CredencialCsj {
+  id          String    @id @default(cuid())
+  userId      String    @unique
+  user        User      @relation(fields: [userId], references: [id])
+  usuarioEnc  String // usuario/matrícula CSJ, cifrado
+  passwordEnc String // contraseña CSJ, cifrada
+  matricula   String? // matrícula en claro (no sensible) para mostrar en UI
+  ultimoSync  DateTime?
+  activo      Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// Notificaciones electrónicas (cédulas) de CSJ — dispara plazos. El cron las
+// trae de /Notificaciones/PorRecibir y alerta las nuevas (dedupe por codNotificacionOrigen).
+model NotificacionCsj {
+  id                  String      @id @default(cuid())
+  codNotificacionOrigen String    @unique // id de la notificación en CSJ
+  expedienteId        String?
+  expediente          Expediente? @relation(fields: [expedienteId], references: [id])
+  csjCasoId           String?
+  csjInstancia        String?
+  caratula            String?
+  despacho            String?
+  proceso             String?
+  descripcion         String? // descripcionTipoActuacion (ej "Cédula de Notificación")
+  fechaNotificacion   DateTime? // cuándo corre el plazo
+  revisadoEnCsj       Boolean     @default(false)
+  alertadoAt          DateTime? // cuándo se notificó al usuario (dedupe)
+  createdAt           DateTime    @default(now())
+
+  @@index([expedienteId])
+  @@index([fechaNotificacion])
+}
+
+// Feriados Paraguay + feria judicial, para el cálculo de días hábiles.
+model Feriado {
+  id     String   @id @default(cuid())
+  fecha  DateTime @unique
+  nombre String
+  movil  Boolean  @default(false) // Semana Santa etc. (recalculado por año)
+}
+
+// Reporte compartible del estado de un expediente con el cliente final.
+model ReporteExpediente {
+  id                String     @id @default(cuid())
+  token             String     @unique // aleatorio, para el link público /r/[token]
+  expedienteId      String
+  expediente        Expediente @relation(fields: [expedienteId], references: [id])
+  creadoPor         String // userId (sin relación para no tocar User)
+  incluyeActuaciones Boolean   @default(true)
+  expiraEl          DateTime? // opcional
+  activo            Boolean    @default(true) // revocable
+  createdAt         DateTime   @default(now())
 
   @@index([expedienteId])
 }

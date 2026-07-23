@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { auth } from "@/lib/auth";
 import { getEstadoLicencia, getConfigEstudio } from "@/lib/licencia";
+import { getNotificacionesNoLeidasCached } from "@/lib/notificaciones-cache";
 import { prisma } from "@/lib/prisma";
 import { navParaRol } from "@/components/layout/nav";
 import { AppShell } from "@/components/layout/AppShell";
@@ -22,9 +23,14 @@ export default async function DashboardLayout({
   const { activa } = await getEstadoLicencia();
   if (!activa) redirect("/suspendido");
 
-  const [noLeidas, config] = await Promise.all([
-    prisma.notificacion.count({ where: { userId: id, leida: false } }),
+  // Cédulas CSJ sin revisar (badge del nav): consultamos siempre en paralelo con
+  // las demás (no podemos condicionar por `config.features` sin esperar a
+  // `getConfigEstudio` primero, y eso volvería a serializar los queries). Un
+  // count() sobre esta tabla chica es despreciable.
+  const [noLeidas, config, cedulasCsj] = await Promise.all([
+    getNotificacionesNoLeidasCached(id),
     getConfigEstudio(),
+    prisma.notificacionCsj.count({ where: { revisadoEnCsj: false } }),
   ]);
 
   return (
@@ -34,6 +40,7 @@ export default async function DashboardLayout({
         usuario={{ nombre: name ?? "Usuario", rol }}
         nombreEstudio={config.nombreEstudio}
         notificacionesNoLeidas={noLeidas}
+        cedulasCsj={cedulasCsj}
       >
         {children}
       </AppShell>

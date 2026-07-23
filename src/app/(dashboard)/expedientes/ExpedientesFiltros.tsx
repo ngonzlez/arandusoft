@@ -31,6 +31,8 @@ export function ExpedientesFiltros({ anios }: { anios: number[] }) {
 
   const anioActivo = searchParams.get("anio") ?? "";
   const estadoActivo = searchParams.get("estado") ?? "";
+  const desde = searchParams.get("desde") ?? "";
+  const hasta = searchParams.get("hasta") ?? "";
 
   return (
     <div className="flex flex-wrap items-center gap-3">
@@ -60,6 +62,39 @@ export function ExpedientesFiltros({ anios }: { anios: number[] }) {
           ))}
         </select>
       )}
+
+      <div className="flex items-center gap-1.5" title="Movimiento (actuación) entre fechas">
+        <span className="text-xs text-ink-muted">Movimiento:</span>
+        <input
+          type="date"
+          value={desde}
+          max={hasta || undefined}
+          onChange={(e) => setParam("desde", e.target.value)}
+          className="h-10 rounded-control border border-line bg-white px-2 text-sm text-ink-base focus:outline-none focus:border-primary"
+        />
+        <span className="text-xs text-ink-faint">a</span>
+        <input
+          type="date"
+          value={hasta}
+          min={desde || undefined}
+          onChange={(e) => setParam("hasta", e.target.value)}
+          className="h-10 rounded-control border border-line bg-white px-2 text-sm text-ink-base focus:outline-none focus:border-primary"
+        />
+        {(desde || hasta) && (
+          <button
+            onClick={() => {
+              const params = new URLSearchParams(searchParams.toString());
+              params.delete("desde");
+              params.delete("hasta");
+              router.replace(`${pathname}?${params.toString()}`);
+            }}
+            className="text-xs text-ink-faint hover:text-urgent px-1"
+            title="Limpiar fechas"
+          >
+            ✕
+          </button>
+        )}
+      </div>
 
       <div className="flex gap-1 flex-wrap">
         <button

@@ -52,13 +52,17 @@ export default async function ClienteDetallePage({
     },
   });
   if (clientePreObligaciones) {
-    await sincronizarVencidosEstadoMensual([clientePreObligaciones], mesActual);
     // Genera este mes y el siguiente para que "Próximo vencimiento" esté
     // siempre al día, sin depender de haber visitado el Calendario antes.
-    await generarVencimientosClienteDelMes(id, añoActual, mesNumActual);
+    // Las 3 llamadas escriben en tablas disjuntas (EstadoMensual/
+    // Cliente.estadoFiscal vs Vencimiento) — seguras en paralelo.
     const sigMes = mesNumActual === 12 ? 1 : mesNumActual + 1;
     const sigAño = mesNumActual === 12 ? añoActual + 1 : añoActual;
-    await generarVencimientosClienteDelMes(id, sigAño, sigMes);
+    await Promise.all([
+      sincronizarVencidosEstadoMensual([clientePreObligaciones], mesActual),
+      generarVencimientosClienteDelMes(id, añoActual, mesNumActual),
+      generarVencimientosClienteDelMes(id, sigAño, sigMes),
+    ]);
   }
 
   const cliente = await prisma.cliente.findFirst({

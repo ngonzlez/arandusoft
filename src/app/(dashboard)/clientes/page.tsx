@@ -48,6 +48,7 @@ export default async function ClientesPage({ searchParams }: Props) {
   const clientes = await prisma.cliente.findMany({
     where,
     orderBy: { nombre: "asc" },
+    take: 200,
     select: {
       id: true,
       nombre: true,

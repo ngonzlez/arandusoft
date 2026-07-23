@@ -11,10 +11,11 @@ interface AppShellProps {
   usuario: { nombre: string; rol: string };
   nombreEstudio: string;
   notificacionesNoLeidas?: number;
+  cedulasCsj?: number;
   children: React.ReactNode;
 }
 
-export function AppShell({ items, usuario, nombreEstudio, notificacionesNoLeidas, children }: AppShellProps) {
+export function AppShell({ items, usuario, nombreEstudio, notificacionesNoLeidas, cedulasCsj, children }: AppShellProps) {
   const [drawerAbierto, setDrawerAbierto] = useState(false);
 
   return (
@@ -26,6 +27,7 @@ export function AppShell({ items, usuario, nombreEstudio, notificacionesNoLeidas
           usuario={usuario}
           nombreEstudio={nombreEstudio}
           notificacionesNoLeidas={notificacionesNoLeidas}
+          cedulasCsj={cedulasCsj}
         />
       </div>
 

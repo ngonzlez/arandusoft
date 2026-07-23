@@ -3,6 +3,8 @@ import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { filtroClientesPorRol } from "@/lib/api-auth";
 import { filtroVencimientosPorRol } from "@/lib/vencimientos";
+import { tieneFeature } from "@/lib/licencia";
+import { ReportesJuridicos } from "@/components/reportes/ReportesJuridicos";
 import { TZ_PARAGUAY, formatPeriodo, formatFecha } from "@/lib/format";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { MesSelector } from "@/components/estado-mensual/MesSelector";
@@ -89,6 +91,7 @@ export default async function ReportesPage({
   ]);
 
   const maxTareas = Math.max(1, ...tareasPorUsuario.map((u) => u._count.tareas));
+  const juridico = await tieneFeature("juridico");
 
   return (
     <div>
@@ -159,6 +162,8 @@ export default async function ReportesPage({
           )}
         </Card>
       </div>
+
+      {juridico && <ReportesJuridicos rol={user.rol} />}
 
       <p className="text-xs text-ink-faint mt-6">
         Reportes con gráficos ampliados (evolución mensual, dona de vencimientos)

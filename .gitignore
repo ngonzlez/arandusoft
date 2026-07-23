@@ -48,3 +48,7 @@ prisma/seed.cjs
 
 # Checklist personal con secretos reales (CRON_SECRET) — no commitear
 PENDIENTES.md
+
+# Notas CSJ con credenciales reales + capturas con datos de terceros — no commitear
+docs/csj.md
+docs/carpetas/

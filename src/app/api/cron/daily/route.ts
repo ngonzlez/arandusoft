@@ -7,6 +7,7 @@ import { formatFecha } from "@/lib/format";
 import { recalcularEstadoFiscal } from "@/lib/clientes";
 import { sincronizarVencidosEstadoMensual } from "@/lib/estado-mensual";
 import { generarVencimientosDelMes, etiquetaVencimiento } from "@/lib/vencimientos";
+import { sincronizarCsj } from "@/lib/csj/sync";
 import { formatInTimeZone } from "date-fns-tz";
 import { TZ_PARAGUAY } from "@/lib/format";
 
@@ -47,6 +48,7 @@ export async function GET(req: NextRequest) {
     tareasVencidas: 0,
     estadoFiscalRecalculado: 0,
     licenciaAvisada: false,
+    csj: { cuentas: 0, notificacionesNuevas: 0, actuacionesNuevas: 0, errores: [] as string[] },
   };
 
   // ── 1. Vencimientos pasados sin gestionar → VENCIDO ──
@@ -193,6 +195,13 @@ export async function GET(req: NextRequest) {
     await recalcularEstadoFiscal(c.id);
   }
   resumen.estadoFiscalRecalculado = clientesActivos.length;
+
+  // ── 6. Radar CSJ: notificaciones electrónicas + actuaciones nuevas ──
+  try {
+    resumen.csj = await sincronizarCsj(enviarEmailSeguro, plantillaEmail);
+  } catch (e) {
+    resumen.csj.errores.push(e instanceof Error ? e.message : "error general");
+  }
 
   return NextResponse.json({ data: resumen });
 }
