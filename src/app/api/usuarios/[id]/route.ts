@@ -52,8 +52,17 @@ export async function PATCH(
     );
   }
 
+  const email = body.email !== undefined ? body.email.trim().toLowerCase() : undefined;
+  if (email !== undefined && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json(
+      { error: "Correo inválido", code: "VALIDATION_ERROR" },
+      { status: 400 }
+    );
+  }
+
   const data: Prisma.UserUpdateInput = {
     ...(body.nombre !== undefined ? { nombre: body.nombre.trim() } : {}),
+    ...(email !== undefined ? { email } : {}),
     ...(body.rol !== undefined ? { rol: body.rol } : {}),
     ...(body.activo !== undefined ? { activo: !!body.activo } : {}),
     ...(body.password !== undefined
@@ -61,11 +70,20 @@ export async function PATCH(
       : {}),
   };
 
-  const actualizado = await prisma.user.update({
-    where: { id },
-    data,
-    select: { id: true, nombre: true, email: true, rol: true, activo: true },
-  });
-
-  return NextResponse.json({ data: actualizado });
+  try {
+    const actualizado = await prisma.user.update({
+      where: { id },
+      data,
+      select: { id: true, nombre: true, email: true, rol: true, activo: true },
+    });
+    return NextResponse.json({ data: actualizado });
+  } catch (e) {
+    if (e instanceof Prisma.PrismaClientKnownRequestError && e.code === "P2002") {
+      return NextResponse.json(
+        { error: "Ya existe un usuario con ese correo", code: "VALIDATION_ERROR" },
+        { status: 409 }
+      );
+    }
+    throw e;
+  }
 }

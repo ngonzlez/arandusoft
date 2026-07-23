@@ -206,6 +206,25 @@ export function EquipoGrid({ usuarios, miUserId }: { usuarios: Usuario[]; miUser
               onSubmit={async (e) => {
                 e.preventDefault();
                 const form = new FormData(e.currentTarget);
+                const email = (form.get("email") as string).trim();
+                if (email && email !== editar.email && (await actualizar(editar.id, { email }))) {
+                  setEditar({ ...editar, email });
+                }
+              }}
+              className="flex items-end gap-2"
+            >
+              <div className="flex-1">
+                <Input label="Correo corporativo" name="email" type="email" defaultValue={editar.email} required />
+              </div>
+              <Button type="submit" variant="outline" disabled={guardando}>
+                Cambiar
+              </Button>
+            </form>
+
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                const form = new FormData(e.currentTarget);
                 const password = form.get("password") as string;
                 if (password && (await actualizar(editar.id, { password }))) {
                   (e.target as HTMLFormElement).reset();
