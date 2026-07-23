@@ -48,6 +48,7 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (e) {
+    console.error("[csj/vincular]", e);
     if (e instanceof CsjError) {
       const status = e.status === 401 ? 401 : 502;
       return NextResponse.json(
@@ -56,7 +57,10 @@ export async function POST(req: NextRequest) {
       );
     }
     return NextResponse.json(
-      { error: "No se pudo conectar con CSJ", code: "CSJ_ERROR" },
+      {
+        error: `Error interno: ${e instanceof Error ? e.message : "desconocido"}`,
+        code: "CSJ_ERROR",
+      },
       { status: 502 }
     );
   }
